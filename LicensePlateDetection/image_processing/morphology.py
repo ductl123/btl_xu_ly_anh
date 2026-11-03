@@ -152,3 +152,107 @@ def binary_opening(image_bin: np.ndarray, se: np.ndarray) -> np.ndarray:
     opened = binary_dilation(eroded, se)
     return opened
 
+
+# ==============================================================================
+# CÁC PHÉP TOÁN HÌNH THÁI HỌC NÂNG CAO (MỤC 3.5)
+# Xử lý: Biển số bị dính bẩn, Che khuất một phần, Nét ký tự bị đứt
+# ==============================================================================
+
+def grayscale_dilation(image_gray: np.ndarray, se: np.ndarray) -> np.ndarray:
+    """
+    Phép Giãn trên ảnh mức xám (Grayscale Dilation):
+    (f ⊕ b)(x, y) = max_{(s, t) in b} { f(x - s, y - t) }
+    Cài đặt thuần NumPy bằng cách trượt lát cắt và tìm giá trị cực đại.
+    """
+    h, w = image_gray.shape
+    kh, kw = se.shape
+    pad_h, pad_w = kh // 2, kw // 2
+
+    active_offsets = []
+    for r in range(kh):
+        for c in range(kw):
+            if se[r, c]:
+                active_offsets.append((r - pad_h, c - pad_w))
+
+    padded = np.pad(image_gray, ((pad_h, pad_h), (pad_w, pad_w)), mode='edge')
+    output = np.zeros_like(image_gray, dtype=np.uint8)
+
+    first = True
+    for dr, dc in active_offsets:
+        shifted = padded[pad_h + dr : pad_h + dr + h, pad_w + dc : pad_w + dc + w]
+        if first:
+            output = shifted.copy()
+            first = False
+        else:
+            output = np.maximum(output, shifted)
+
+    return output
+
+
+def grayscale_erosion(image_gray: np.ndarray, se: np.ndarray) -> np.ndarray:
+    """
+    Phép Xói trên ảnh mức xám (Grayscale Erosion):
+    (f ⊖ b)(x, y) = min_{(s, t) in b} { f(x + s, y + t) }
+    """
+    h, w = image_gray.shape
+    kh, kw = se.shape
+    pad_h, pad_w = kh // 2, kw // 2
+
+    active_offsets = []
+    for r in range(kh):
+        for c in range(kw):
+            if se[r, c]:
+                active_offsets.append((r - pad_h, c - pad_w))
+
+    padded = np.pad(image_gray, ((pad_h, pad_h), (pad_w, pad_w)), mode='edge')
+    output = np.zeros_like(image_gray, dtype=np.uint8)
+
+    first = True
+    for dr, dc in active_offsets:
+        shifted = padded[pad_h + dr : pad_h + dr + h, pad_w + dc : pad_w + dc + w]
+        if first:
+            output = shifted.copy()
+            first = False
+        else:
+            output = np.minimum(output, shifted)
+
+    return output
+
+
+def black_hat_transform(image_gray: np.ndarray, se: np.ndarray) -> np.ndarray:
+    """
+    [Mục 3.5: Các phép toán hình thái học]
+    Biến đổi Black-Hat (Bottom-Hat Transform): BTH(f) = (f • b) - f
+    Tác dụng: Bóc tách các chi tiết tối màu (ký tự chữ, số) trên nền sáng
+    đặc biệt hiệu quả khi biển số bị dính bẩn bùn đất, dầu mỡ hoặc bị che khuất một phần.
+    """
+    dilated = grayscale_dilation(image_gray, se)
+    closed = grayscale_erosion(dilated, se)
+    diff = closed.astype(np.int16) - image_gray.astype(np.int16)
+    return np.clip(diff, 0, 255).astype(np.uint8)
+
+
+def white_top_hat_transform(image_gray: np.ndarray, se: np.ndarray) -> np.ndarray:
+    """
+    [Mục 3.5: Các phép toán hình thái học]
+    Biến đổi Top-Hat (White Top-Hat Transform): WTH(f) = f - (f ∘ b)
+    Tác dụng: Làm nổi bật các chi tiết sáng nhỏ hơn phần tử cấu trúc, khử nền tối loang lổ.
+    """
+    eroded = grayscale_erosion(image_gray, se)
+    opened = grayscale_dilation(eroded, se)
+    diff = image_gray.astype(np.int16) - opened.astype(np.int16)
+    return np.clip(diff, 0, 255).astype(np.uint8)
+
+
+def bridge_broken_characters(binary_img: np.ndarray, gap_size: int = 3) -> np.ndarray:
+    """
+    Hàn gắn nét ký tự bị đứt do trầy xước, dính bụi bẩn hoặc che khuất cục bộ
+    bằng phép Closing định hướng dọc và chéo nhỏ.
+    """
+    se_v = create_structuring_element(gap_size, 1, 'rect')
+    se_cross = create_structuring_element(3, 3, 'cross')
+    bridged = binary_closing(binary_img, se_v)
+    bridged = binary_closing(bridged, se_cross)
+    return bridged
+
+

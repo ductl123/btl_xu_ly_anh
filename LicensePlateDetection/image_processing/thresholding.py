@@ -75,3 +75,71 @@ def fixed_threshold(image_gray: np.ndarray, threshold: int = 120) -> np.ndarray:
     binary_img = np.where(image_gray >= threshold, np.uint8(255), np.uint8(0))
     return binary_img
 
+
+def adaptive_local_threshold(
+    image_gray: np.ndarray,
+    block_size: int = 25,
+    k: float = 0.2,
+    r: float = 128.0,
+    method: str = "sauvola"
+) -> np.ndarray:
+    """
+    [Mục 3.4: Phân đoạn ảnh (Image Segmentation)]
+    Phân ngưỡng cục bộ thích nghi (Adaptive Local Thresholding - Sauvola / Mean):
+    Đặc trị cho các trường hợp:
+    - Loá sáng (Overexposure/Glare): Điểm chói phản quang chỉ ảnh hưởng cục bộ, không làm mù toàn ảnh.
+    - Thiếu sáng / Chụp tối (Uneven illumination/Shadow): Vùng tối vẫn có ngưỡng cục bộ riêng để bóc tách nét chữ.
+    
+    Nguyên lý thuật toán Sauvola:
+    T(x, y) = m(x, y) * [ 1 + k * ( s(x, y) / R - 1 ) ]
+    Trong đó:
+    - m(x, y): Giá trị kỳ vọng trung bình trong cửa sổ lân cận block_size x block_size.
+    - s(x, y): Độ lệch chuẩn cục bộ.
+    - R: Khoảng động độ lệch chuẩn cực đại (thường là 128).
+    - k: Hệ số kiểm soát (thường từ 0.1 đến 0.3).
+    
+    Cài đặt thuần NumPy sử dụng bảng diện tích tích phân (Integral Image) để tính toán siêu tốc O(1) mỗi pixel.
+    """
+    if block_size % 2 == 0:
+        block_size += 1
+
+    img = image_gray.astype(np.float64)
+    h, w = img.shape
+    pad = block_size // 2
+
+    # Bảng ảnh tích phân (Integral Image) cho giá trị và bình phương giá trị
+    padded = np.pad(img, ((pad, pad), (pad, pad)), mode='edge')
+    
+    # Tính tổng cục bộ bằng Integral Image
+    integral = np.pad(np.cumsum(np.cumsum(padded, axis=0), axis=1), ((1, 0), (1, 0)), mode='constant')
+    integral_sq = np.pad(np.cumsum(np.cumsum(padded ** 2, axis=0), axis=1), ((1, 0), (1, 0)), mode='constant')
+
+    # Tọa độ 4 góc của cửa sổ
+    y1 = np.arange(h)
+    y2 = y1 + block_size
+    x1 = np.arange(w)
+    x2 = x1 + block_size
+
+    # Grid 2D
+    Y1, X1 = np.meshgrid(y1, x1, indexing='ij')
+    Y2, X2 = np.meshgrid(y2, x2, indexing='ij')
+
+    area = float(block_size * block_size)
+
+    # Tổng giá trị trong cửa sổ O(1)
+    win_sum = (integral[Y2, X2] - integral[Y1, X2] - integral[Y2, X1] + integral[Y1, X1])
+    win_sq_sum = (integral_sq[Y2, X2] - integral_sq[Y1, X2] - integral_sq[Y2, X1] + integral_sq[Y1, X1])
+
+    mean = win_sum / area
+    variance = np.maximum(0.0, (win_sq_sum / area) - (mean ** 2))
+    std = np.sqrt(variance)
+
+    if method == "sauvola":
+        threshold = mean * (1.0 + k * ((std / r) - 1.0))
+    else:  # Adaptive Mean
+        threshold = mean - 7.0
+
+    binary = np.where(img >= threshold, np.uint8(255), np.uint8(0))
+    return binary
+
+

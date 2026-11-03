@@ -7,6 +7,9 @@ from pathlib import Path
 from typing import List, Dict, Any, Tuple, Union, Optional
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+
+import matplotlib
+matplotlib.use('Agg')  # Headless backend an toàn cho đa luồng và tránh xung đột với Tkinter
 import matplotlib.pyplot as plt
 
 
@@ -91,24 +94,39 @@ def draw_bounding_boxes(
 
     for idx, cand in enumerate(candidates, start=1):
         x, y, w, h = cand['bbox']
-
-        # Quy đổi ngược lại tọa độ gốc
-        orig_x = int(round(x / scale_factor))
-        orig_y = int(round(y / scale_factor))
-        orig_w_box = int(round(w / scale_factor))
-        orig_h_box = int(round(h / scale_factor))
-
-        # Đảm bảo không vượt quá biên ảnh
-        x1 = max(0, min(orig_x, orig_w - 1))
-        y1 = max(0, min(orig_y, orig_h - 1))
-        x2 = max(0, min(orig_x + orig_w_box, orig_w - 1))
-        y2 = max(0, min(orig_y + orig_h_box, orig_h - 1))
+        quad = cand.get('quad_corners')
+        angle = cand.get('angle', 0.0)
 
         # Chọn màu: Biển 1 dòng màu xanh lá, biển 2 dòng màu vàng cam
         color = "#00FF00" if cand.get("plate_type") == "single_row" else "#FFD700"
 
-        # Vẽ hình chữ nhật
-        draw.rectangle([x1, y1, x2, y2], outline=color, width=line_width)
+        # Nếu có 4 góc nghiêng và góc nghiêng đáng kể (|angle| >= 1.5 độ), vẽ đa giác 4 đỉnh
+        if quad is not None and len(quad) == 4 and abs(angle) >= 0.8:
+            quad_orig = [(float(pt[0]) / scale_factor, float(pt[1]) / scale_factor) for pt in quad]
+            # Vẽ đa giác 4 cạnh bám sát theo độ nghiêng thực tế của biển số
+            draw.polygon(quad_orig, outline=color, width=line_width)
+
+            # Tọa độ nhãn đặt ở đỉnh cao nhất
+            top_pt = min(quad_orig, key=lambda pt: pt[1])
+            text_x = max(0, int(top_pt[0]))
+            text_y = max(0, int(top_pt[1]) - 22)
+        else:
+            # Quy đổi ngược lại tọa độ gốc
+            orig_x = int(round(x / scale_factor))
+            orig_y = int(round(y / scale_factor))
+            orig_w_box = int(round(w / scale_factor))
+            orig_h_box = int(round(h / scale_factor))
+
+            # Đảm bảo không vượt quá biên ảnh
+            x1 = max(0, min(orig_x, orig_w - 1))
+            y1 = max(0, min(orig_y, orig_h - 1))
+            x2 = max(0, min(orig_x + orig_w_box, orig_w - 1))
+            y2 = max(0, min(orig_y + orig_h_box, orig_h - 1))
+
+            # Vẽ hình chữ nhật
+            draw.rectangle([x1, y1, x2, y2], outline=color, width=line_width)
+            text_x = x1
+            text_y = max(0, y1 - 22)
 
         # Chuẩn bị nội dung nhãn (hiển thị biển số nhận diện nếu có)
         plate_type_vn = "1-Dong" if cand.get("plate_type") == "single_row" else "2-Dong"
@@ -117,9 +135,8 @@ def draw_bounding_boxes(
         label_text = f"#{idx} [{plate_text_display}] AR={cand.get('aspect_ratio', 0):.2f} ({score:.2f})"
 
         # Vẽ nền nhãn để chữ rõ ràng
-        text_y = max(0, y1 - 22)
-        draw.rectangle([x1, text_y, x1 + len(label_text) * 9, text_y + 20], fill=color)
-        draw.text((x1 + 4, text_y + 2), label_text, fill="#000000")
+        draw.rectangle([text_x, text_y, text_x + len(label_text) * 9, text_y + 20], fill=color)
+        draw.text((text_x + 4, text_y + 2), label_text, fill="#000000")
 
     return canvas
 
@@ -128,25 +145,79 @@ def crop_license_plate(
     original_pil: Image.Image,
     bbox: Tuple[int, int, int, int],
     scale_factor: float = 1.0,
-    margin_ratio: float = 0.05
+    margin_ratio: float = 0.05,
+    quad_corners: Optional[Any] = None,
+    trim_bottom_ratio: float = 0.0
 ) -> Image.Image:
     """
-    Cắt riêng vùng biển số được phát hiện từ ảnh gốc với độ phân giải cao nhất,
-    có thêm một lề đệm nhỏ (margin) để không bị cắt xén sát mép ký tự.
+    Cắt riêng vùng biển số được phát hiện từ ảnh gốc với độ phân giải cao nhất.
+    Nếu phát hiện biển số bị nghiêng (có quad_corners), tự động cắt bám theo đúng 4 góc nghiêng
+    và nắn phẳng bằng phép biến đổi phối cảnh (Perspective Transform / Warp).
+    Có tùy chọn trim_bottom_ratio để cắt bỏ vết phấn / vết bẩn ở mép dưới đuôi dè xe.
 
     Args:
         original_pil: Ảnh gốc PIL.
         bbox: (x, y, w, h) tính trên tọa độ đã xử lý.
         scale_factor: Tỷ lệ co dãn.
         margin_ratio: Tỷ lệ mở rộng lề lân cận.
+        quad_corners: Mảng 4x2 chứa tọa độ 4 góc nghiêng [TL, TR, BR, BL] trên ảnh xử lý.
+        trim_bottom_ratio: Tỷ lệ chiều cao ở mép dưới cần cắt bỏ (loại trừ chữ phấn 301, 302, 601).
 
     Returns:
-        Ảnh PIL của vùng biển số đã cắt.
+        Ảnh PIL của vùng biển số đã cắt và nắn phẳng.
     """
     orig_w, orig_h = original_pil.size
     x, y, w, h = bbox
 
-    # Tọa độ thực trên ảnh gốc
+    # 1. CẮT THEO ĐÚNG 4 GÓC NGHIÊNG NẾU CÓ THÔNG TIN QUAD CORNERS
+    if quad_corners is not None and len(quad_corners) == 4:
+        try:
+            import cv2
+            corners_orig = np.array(quad_corners, dtype="float32") / scale_factor
+
+            # Mở rộng các góc nghiêng ra ngoài theo margin_ratio để không bị cắt xén mép chữ
+            if margin_ratio > 0.0:
+                center_pt = np.mean(corners_orig, axis=0)
+                corners_orig = center_pt + (corners_orig - center_pt) * (1.0 + margin_ratio)
+
+            tl, tr, br, bl = corners_orig
+
+            # Tính chiều dài và chiều cao thực tế của biển nghiêng
+            w_top = np.linalg.norm(tr - tl)
+            w_bot = np.linalg.norm(br - bl)
+            target_w = int(round(max(w_top, w_bot)))
+
+            h_left = np.linalg.norm(tl - bl)
+            h_right = np.linalg.norm(tr - br)
+            target_h = int(round(max(h_left, h_right)))
+
+            if target_w >= 20 and target_h >= 15:
+                # Chuẩn hóa nếu trục bị lật 90 độ
+                if target_w < target_h and float(target_w) / target_h < 0.85:
+                    target_w, target_h = target_h, target_w
+                    corners_orig = np.roll(corners_orig, -1, axis=0)
+
+                orig_np = np.array(original_pil)
+                dst_pts = np.array([
+                    [0, 0],
+                    [target_w - 1, 0],
+                    [target_w - 1, target_h - 1],
+                    [0, target_h - 1]
+                ], dtype="float32")
+
+                M = cv2.getPerspectiveTransform(corners_orig, dst_pts)
+                warped_np = cv2.warpPerspective(orig_np, M, (target_w, target_h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+                
+                # Cắt bỏ mép dưới nếu có yêu cầu loại bỏ chữ phấn/nhiễu dè xe
+                if trim_bottom_ratio > 0.0:
+                    keep_h = max(10, int(round(target_h * (1.0 - trim_bottom_ratio))))
+                    warped_np = warped_np[:keep_h, :]
+
+                return Image.fromarray(warped_np)
+        except Exception:
+            pass
+
+    # 2. FALLBACK CẮT THEO HỘP CHỮ NHẬT NẰM NGANG
     rx = x / scale_factor
     ry = y / scale_factor
     rw = w / scale_factor
@@ -160,6 +231,11 @@ def crop_license_plate(
     crop_y1 = max(0, int(round(ry - margin_y)))
     crop_x2 = min(orig_w, int(round(rx + rw + margin_x)))
     crop_y2 = min(orig_h, int(round(ry + rh + margin_y)))
+
+    # Cắt bỏ mép dưới nếu có yêu cầu loại bỏ chữ phấn
+    if trim_bottom_ratio > 0.0:
+        box_h_orig = crop_y2 - crop_y1
+        crop_y2 = max(crop_y1 + 10, int(round(crop_y2 - box_h_orig * trim_bottom_ratio)))
 
     cropped = original_pil.crop((crop_x1, crop_y1, crop_x2, crop_y2))
     return cropped

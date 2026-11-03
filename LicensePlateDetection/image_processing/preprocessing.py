@@ -56,6 +56,22 @@ def enhance_contrast_dynamic(image_np: np.ndarray, p_low: float = 2.0, p_high: f
     return stretched.astype(np.uint8)
 
 
+def apply_clahe_contrast(image_gray: np.ndarray, clip_limit: float = 2.5, tile_grid_size: Tuple[int, int] = (8, 8)) -> np.ndarray:
+    """
+    Áp dụng thuật toán CLAHE (Contrast Limited Adaptive Histogram Equalization)
+    nâng cao độ tương phản thích nghi cục bộ:
+    - Làm rõ nét các ký tự chìm trong vùng tối, bóng râm hoặc bị cháy sáng/lóa sáng.
+    - Giới hạn độ dốc histogram (clip_limit) để không khuếch đại nhiễu hạt nền.
+    """
+    try:
+        import cv2
+        clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size)
+        return clahe.apply(image_gray)
+    except Exception:
+        # Fallback kéo giãn động nếu OpenCV không khả dụng
+        return enhance_contrast_dynamic(image_gray, p_low=2.0, p_high=98.0)
+
+
 
 def resize_image(image_pil: Image.Image, target_max_dim: int = 900) -> Tuple[Image.Image, float]:
     """
@@ -198,4 +214,107 @@ def median_blur(image_gray: np.ndarray, kernel_size: int = 3) -> np.ndarray:
     # Tính trung vị theo trục 0
     median_val = np.median(stacked, axis=0)
     return np.clip(np.round(median_val), 0, 255).astype(np.uint8)
+
+
+# ==============================================================================
+# CÁC KỸ THUẬT NÂNG CAO CHẤT LƯỢNG VÀ KHÔI PHỤC ẢNH (MỤC 3.1 & 3.2)
+# Dùng để xử lý: Mờ do chuyển động, Loá sáng, Thiếu sáng/Tối, Resolution thấp
+# ==============================================================================
+
+def unsharp_mask(image_gray: np.ndarray, amount: float = 1.5, kernel_size: int = 5, sigma: float = 1.0) -> np.ndarray:
+    """
+    [Mục 3.2: Lọc ảnh và khôi phục ảnh]
+    Kỹ thuật Unsharp Masking để khôi phục ảnh mờ do chuyển động (Motion Blur / Camera Shake):
+    Tạo mặt nạ biên sắc nét bằng cách trừ ảnh gốc cho ảnh mờ Gaussian, sau đó cộng ngược lại:
+    I_sharp = I + amount * (I - I_blurred)
+    
+    Args:
+        image_gray: Ảnh mức xám 2D uint8.
+        amount: Hệ số tăng cường độ nét (thường 1.0 - 2.5).
+        kernel_size: Kích thước nhân Gaussian.
+        sigma: Độ lệch chuẩn Gaussian.
+        
+    Returns:
+        Ảnh xám sau khi khử mờ và làm nét biên (H, W) uint8.
+    """
+    blurred = gaussian_blur(image_gray, kernel_size=kernel_size, sigma=sigma).astype(np.float32)
+    original = image_gray.astype(np.float32)
+    # Mặt nạ chi tiết tần số cao (High-frequency details)
+    detail = original - blurred
+    sharpened = original + amount * detail
+    return np.clip(np.round(sharpened), 0, 255).astype(np.uint8)
+
+
+def gamma_correction(image_gray: np.ndarray, gamma: float = 1.0) -> np.ndarray:
+    """
+    [Mục 3.1: Nâng cao chất lượng ảnh]
+    Biến đổi lũy thừa (Power-law / Gamma Transformation): s = 255 * (r / 255)^gamma
+    - Khi ảnh thiếu sáng / chụp tối: chọn gamma < 1.0 (ví dụ 0.60 - 0.75) để kích sáng chi tiết tối.
+    - Khi ảnh loá sáng / chụp chói: chọn gamma > 1.0 (ví dụ 1.30 - 1.60) để nén các vùng quá sáng.
+    
+    Args:
+        image_gray: Ảnh xám 2D uint8.
+        gamma: Tham số mũ gamma.
+        
+    Returns:
+        Ảnh xám sau khi chỉnh gamma uint8.
+    """
+    if abs(gamma - 1.0) < 1e-3:
+        return image_gray.copy()
+    norm = image_gray.astype(np.float32) / 255.0
+    corrected = np.power(norm, gamma) * 255.0
+    return np.clip(np.round(corrected), 0, 255).astype(np.uint8)
+
+
+def histogram_equalization(image_gray: np.ndarray) -> np.ndarray:
+    """
+    [Mục 3.1: Nâng cao chất lượng ảnh]
+    Cân bằng lược đồ xám toàn cục (Global Histogram Equalization) tự cài đặt thuần NumPy:
+    Tối đa hóa độ tương phản toàn diện cho các ảnh bị tối hoặc mờ nhạt:
+    s_k = round( (CDF(k) - CDF_min) / (N - CDF_min) * 255 )
+    
+    Args:
+        image_gray: Ảnh xám 2D uint8.
+        
+    Returns:
+        Ảnh xám sau khi cân bằng histogram uint8.
+    """
+    hist = np.bincount(image_gray.ravel(), minlength=256)
+    cdf = hist.cumsum()
+    cdf_mask = np.ma.masked_equal(cdf, 0)
+    cdf_mask = (cdf_mask - cdf_mask.min()) * 255 / (cdf_mask.max() - cdf_mask.min())
+    lookup_table = np.ma.filled(cdf_mask, 0).astype(np.uint8)
+    return lookup_table[image_gray]
+
+
+def upscale_low_resolution(image_np: np.ndarray, min_height: int = 120) -> Tuple[np.ndarray, float]:
+    """
+    [Mục 3.1 & 3.2: Xử lý kích thước quá nhỏ / Resolution thấp]
+    Nếu ảnh hoặc vùng biển số có chiều cao quá nhỏ (< min_height),
+    sử dụng nội suy Bicubic cao cấp để phóng đại, sau đó áp dụng Unsharp Masking
+    để tái tạo lại các cạnh nét của ký tự.
+    
+    Returns:
+        Tuple (ảnh sau khi upscale và làm nét, scale_factor).
+    """
+    h, w = image_np.shape[:2]
+    if h >= min_height:
+        return image_np, 1.0
+
+    scale = float(min_height) / float(h)
+    new_w = max(1, int(round(w * scale)))
+    new_h = min_height
+
+    im = Image.fromarray(image_np)
+    resized = im.resize((new_w, new_h), resample=Image.Resampling.BICUBIC)
+    arr = np.array(resized)
+
+    # Làm nét nhẹ các đường biên ký tự vừa được nội suy
+    if arr.ndim == 2:
+        enhanced = unsharp_mask(arr, amount=1.2, kernel_size=3, sigma=0.8)
+    else:
+        enhanced = arr
+
+    return enhanced, scale
+
 

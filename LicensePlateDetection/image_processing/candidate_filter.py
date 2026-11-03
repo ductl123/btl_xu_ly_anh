@@ -15,10 +15,11 @@ from typing import List, Dict, Any, Tuple, Optional
 import numpy as np
 
 
-def compute_iou(box1: Tuple[int, int, int, int], box2: Tuple[int, int, int, int]) -> float:
+def compute_iou_and_ios(box1: Tuple[int, int, int, int], box2: Tuple[int, int, int, int]) -> Tuple[float, float]:
     """
-    Tính chỉ số giao trên hợp (Intersection over Union - IoU) giữa 2 Bounding Box.
+    Tính chỉ số giao trên hợp (IoU) và giao trên hộp nhỏ hơn (IoS - Intersection over Smaller).
     Mỗi box có định dạng: (x, y, w, h).
+    IoS giúp phát hiện trường hợp hộp bao khổng lồ (ví dụ cả đuôi xe) chứa trọn biển số con.
     """
     x1, y1, w1, h1 = box1
     x2, y2, w2, h2 = box2
@@ -37,14 +38,129 @@ def compute_iou(box1: Tuple[int, int, int, int], box2: Tuple[int, int, int, int]
     union_area = area1 + area2 - inter_area
 
     if union_area <= 0:
-        return 0.0
-    return float(inter_area) / float(union_area)
+        return 0.0, 0.0
+    iou = float(inter_area) / float(union_area)
+    ios = float(inter_area) / float(min(area1, area2)) if min(area1, area2) > 0 else 0.0
+    return iou, ios
 
 
-def apply_nms(candidates: List[Dict[str, Any]], iou_threshold: float = 0.35) -> List[Dict[str, Any]]:
+def merge_vertical_split_boxes(components: List[Dict[str, Any]], max_dy_ratio: float = 0.65, min_x_overlap: float = 0.45) -> List[Dict[str, Any]]:
     """
-    Non-Maximum Suppression (NMS):
-    Loại bỏ các hộp bao bị chồng chéo lên nhau, giữ lại hộp có điểm tin cậy (score) cao nhất.
+    Thuật toán Gộp Bounding Box (Bounding Box Merging):
+    Tự động hàn gắn 2 contour thuộc dòng trên và dòng dưới của biển số 2 dòng
+    khi chụp góc nghiêng/chéo làm đứt gãy kết nối giữa 2 dòng.
+    
+    Điều kiện gộp:
+    - Trùng phùng theo phương ngang (Horizontal Overlap >= 45%).
+    - Khoảng cách trục dọc giữa 2 hộp nhỏ hơn ngưỡng (dy <= 0.65 * chiều cao hộp).
+    - Tỷ lệ khung hình sau khi gộp nằm trong khoảng biển 2 dòng hợp lệ (1.05 - 1.85).
+    """
+    if len(components) < 2:
+        return components
+
+    merged_list = []
+    used_indices = set()
+
+    for i in range(len(components)):
+        if i in used_indices:
+            continue
+        comp_a = components[i]
+        xa, ya, wa, ha = comp_a['bbox']
+        merged_with_other = False
+
+        # Không gộp nếu thành phần đã là một biển 2 dòng hoàn chỉnh (giữ nguyên không merge)
+        if comp_a.get('aspect_ratio', 1.0) <= 1.70 and comp_a.get('bbox_area', 0) > 1000:
+            merged_list.append(comp_a)
+            continue
+
+        for j in range(len(components)):
+            if i == j or j in used_indices:
+                continue
+            comp_b = components[j]
+            # Không gộp nếu thành phần B đã là một biển 2 dòng hoàn chỉnh
+            if comp_b.get('aspect_ratio', 1.0) <= 1.70 and comp_b.get('bbox_area', 0) > 1000:
+                continue
+            xb, yb, wb, hb = comp_b['bbox']
+
+            # Xác định hộp trên (top) và hộp dưới (bottom)
+            top_comp, bot_comp = (comp_a, comp_b) if ya < yb else (comp_b, comp_a)
+            xt, yt, wt, ht = top_comp['bbox']
+            xbt, ybt, wbt, hbt = bot_comp['bbox']
+
+            # Tính độ giao theo chiều ngang
+            x_left = max(xt, xbt)
+            x_right = min(xt + wt, xbt + wbt)
+            overlap_w = max(0, x_right - x_left)
+            overlap_ratio = overlap_w / float(min(wt, wbt)) if min(wt, wbt) > 0 else 0.0
+
+            # Khoảng cách dọc từ đáy hộp trên đến đỉnh hộp dưới
+            dy = ybt - (yt + ht)
+
+            # Kiểm tra tương quan kích thước chiều rộng (không lệch quá 50%)
+            w_diff = abs(wt - wbt) / float(max(wt, wbt)) if max(wt, wbt) > 0 else 1.0
+
+            if overlap_ratio >= min_x_overlap and w_diff <= 0.50 and (-ht * 0.35 <= dy <= ht * max_dy_ratio):
+                # Tạo hộp bao mới gộp cả 2
+                new_x = min(xt, xbt)
+                new_y = yt
+                new_w = max(xt + wt, xbt + wbt) - new_x
+                new_h = (ybt + hbt) - new_y
+                new_ar = float(new_w) / float(new_h) if new_h > 0 else 1.0
+
+                if 0.90 <= new_ar <= 1.95:
+                    comb_area = comp_a['area'] + comp_b['area']
+                    comb_bbox_area = new_w * new_h
+                    comb_density = float(comb_area) / float(comb_bbox_area) if comb_bbox_area > 0 else 0.5
+
+                    # Kế thừa góc nghiêng từ thành phần có diện tích lớn hơn
+                    merged_angle = comp_a.get('angle', 0.0) if comp_a.get('area', 0) >= comp_b.get('area', 0) else comp_b.get('angle', 0.0)
+                    merged_quad = comp_a.get('quad_corners') if comp_a.get('area', 0) >= comp_b.get('area', 0) else comp_b.get('quad_corners')
+
+                    # Nếu có góc nghiêng đáng kể, tạo quad_corners cho hộp bao đã gộp
+                    if abs(merged_angle) >= 1.5:
+                        try:
+                            import cv2
+                            rect = ((new_x + new_w / 2.0, new_y + new_h / 2.0), (new_w, new_h), merged_angle)
+                            box = cv2.boxPoints(rect)
+                            s = box.sum(axis=1)
+                            diff = np.diff(box, axis=1)
+                            rect_ord = np.zeros((4, 2), dtype="float32")
+                            rect_ord[0] = box[np.argmin(s)]
+                            rect_ord[2] = box[np.argmax(s)]
+                            rect_ord[1] = box[np.argmin(diff)]
+                            rect_ord[3] = box[np.argmax(diff)]
+                            merged_quad = rect_ord
+                        except Exception:
+                            pass
+
+                    merged_comp = {
+                        'id': comp_a['id'],
+                        'bbox': (new_x, new_y, new_w, new_h),
+                        'quad_corners': merged_quad,
+                        'angle': merged_angle,
+                        'area': comb_area,
+                        'bbox_area': comb_bbox_area,
+                        'density': comb_density,
+                        'aspect_ratio': new_ar,
+                        'is_merged': True
+                    }
+                    merged_list.append(merged_comp)
+                    used_indices.add(i)
+                    used_indices.add(j)
+                    merged_with_other = True
+                    break
+
+        if not merged_with_other:
+            merged_list.append(comp_a)
+
+    return merged_list
+
+
+def apply_nms(candidates: List[Dict[str, Any]], iou_threshold: float = 0.35, ios_threshold: float = 0.65) -> List[Dict[str, Any]]:
+    """
+    Non-Maximum Suppression (NMS) cải tiến:
+    Loại bỏ các hộp bao bị chồng chéo (IoU > iou_threshold) hoặc bị bao trùm (IoS > ios_threshold),
+    giữ lại hộp có điểm tin cậy (score) cao nhất.
     """
     if not candidates:
         return []
@@ -56,8 +172,8 @@ def apply_nms(candidates: List[Dict[str, Any]], iou_threshold: float = 0.35) -> 
     for cand in sorted_candidates:
         should_keep = True
         for kept_cand in kept:
-            iou = compute_iou(cand['bbox'], kept_cand['bbox'])
-            if iou > iou_threshold:
+            iou, ios = compute_iou_and_ios(cand['bbox'], kept_cand['bbox'])
+            if iou > iou_threshold or ios > ios_threshold:
                 should_keep = False
                 break
         if should_keep:
@@ -106,7 +222,10 @@ def filter_license_plate_candidates(
 
     valid_candidates: List[Dict[str, Any]] = []
 
-    for comp in components:
+    # Tự động gộp các bounding box bị xé lẻ do góc chụp nghiêng
+    merged_components = merge_vertical_split_boxes(components)
+
+    for comp in merged_components:
         x, y, w, h = comp['bbox']
         aspect_ratio = comp['aspect_ratio']
         density = comp['density']
@@ -177,6 +296,8 @@ def filter_license_plate_candidates(
         candidate_record = {
             'id': comp['id'],
             'bbox': (x, y, w, h),
+            'quad_corners': comp.get('quad_corners'),
+            'angle': comp.get('angle', 0.0),
             'area': comp['area'],
             'bbox_area': area,
             'aspect_ratio': aspect_ratio,
@@ -193,4 +314,102 @@ def filter_license_plate_candidates(
     filtered_candidates = apply_nms(valid_candidates, iou_threshold=iou_thresh)
 
     return filtered_candidates
+
+
+def refine_quad_corners(
+    orig_np: np.ndarray,
+    bbox: Tuple[int, int, int, int],
+    scale_factor: float = 1.0,
+    plate_type: str = "double_row"
+) -> Tuple[Optional[np.ndarray], float]:
+    """
+    Tìm chính xác 4 góc nghiêng (Quad Corners) của biển số xe trên ảnh gốc độ phân giải cao:
+    - Bóc tách mảng biển số màu sáng trên nền thân xe/dè xe tối màu.
+    - Tìm đường viền chữ nhật nghiêng (cv2.minAreaRect) bao khít 4 cạnh biển số.
+    - Sắp xếp 4 đỉnh chuẩn theo thứ tự: [Top-Left, Top-Right, Bottom-Right, Bottom-Left].
+    - Tính góc xoay nghiêng thực tế của biển số.
+
+    Args:
+        orig_np: Mảng RGB/Grayscale của ảnh gốc.
+        bbox: (x, y, w, h) trên ảnh xử lý (scaled).
+        scale_factor: Tỷ lệ co dãn giữa ảnh xử lý và ảnh gốc.
+        plate_type: 'double_row' hoặc 'single_row'.
+
+    Returns:
+        Tuple (quad_corners_on_scaled [4x2 float32], angle_degrees float).
+    """
+    try:
+        import cv2
+        H, W = orig_np.shape[:2]
+        x, y, w, h = bbox
+
+        ox = int(round(x / scale_factor))
+        oy = int(round(y / scale_factor))
+        ow = int(round(w / scale_factor))
+        oh = int(round(h / scale_factor))
+
+        margin_w = int(ow * 0.15)
+        margin_h = int(oh * 0.15)
+        rx1 = max(0, ox - margin_w)
+        ry1 = max(0, oy - margin_h)
+        rx2 = min(W, ox + ow + margin_w)
+        ry2 = min(H, oy + oh + margin_h)
+
+        roi = orig_np[ry1:ry2, rx1:rx2]
+        if roi.size == 0:
+            return None, 0.0
+
+        if len(roi.shape) == 3:
+            gray = cv2.cvtColor(roi, cv2.COLOR_RGB2GRAY)
+        else:
+            gray = roi.copy()
+
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+        _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        contours, _ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        best_quad = None
+        best_angle = 0.0
+        best_score = -1.0
+        roi_area = (rx2 - rx1) * (ry2 - ry1)
+
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            if area < roi_area * 0.12 or area > roi_area * 0.98:
+                continue
+            rect = cv2.minAreaRect(cnt)
+            (cx, cy), (rw, rh), ang = rect
+            if rw <= 0 or rh <= 0:
+                continue
+            ar = rw / rh if rw > rh else rh / rw
+            if plate_type == 'double_row' and not (1.0 <= ar <= 1.95):
+                continue
+            if plate_type == 'single_row' and not (2.4 <= ar <= 6.0):
+                continue
+
+            box = cv2.boxPoints(rect)
+            if area > best_score:
+                best_score = area
+                best_quad_orig = box + np.array([rx1, ry1], dtype='float32')
+
+                # Sắp xếp 4 đỉnh: TL, TR, BR, BL
+                s = best_quad_orig.sum(axis=1)
+                diff = np.diff(best_quad_orig, axis=1)
+                ordered_orig = np.zeros((4, 2), dtype='float32')
+                ordered_orig[0] = best_quad_orig[np.argmin(s)]       # Top-Left
+                ordered_orig[2] = best_quad_orig[np.argmax(s)]       # Bottom-Right
+                ordered_orig[1] = best_quad_orig[np.argmin(diff)]    # Top-Right
+                ordered_orig[3] = best_quad_orig[np.argmax(diff)]    # Bottom-Left
+
+                best_quad = ordered_orig * scale_factor
+
+                if rw < rh:
+                    best_angle = ang - 90.0 if ang > 0 else ang + 90.0
+                else:
+                    best_angle = ang
+
+        return best_quad, best_angle
+    except Exception:
+        return None, 0.0
+
 

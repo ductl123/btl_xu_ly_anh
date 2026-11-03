@@ -10,6 +10,9 @@ Phục vụ mục 8 theo yêu cầu đề tài:
 from pathlib import Path
 from typing import Union, Optional
 import numpy as np
+
+import matplotlib
+matplotlib.use('Agg')  # Headless backend an toàn cho đa luồng
 import matplotlib.pyplot as plt
 
 from image_processing.preprocessing import (

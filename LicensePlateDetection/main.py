@@ -47,7 +47,7 @@ from image_processing.connected_components import (
     find_connected_components,
     create_colored_label_image,
 )
-from image_processing.candidate_filter import filter_license_plate_candidates
+from image_processing.candidate_filter import filter_license_plate_candidates, refine_quad_corners
 from image_processing.character_recognition import recognize_license_plate
 
 # Import tiện ích lưu trữ và đồ họa
@@ -70,7 +70,7 @@ from compare import run_all_comparisons
 def process_single_image(
     image_path: Path,
     output_dirs: Dict[str, Path],
-    save_intermediate: bool = True,
+    save_intermediate: bool = False,
     show_plot: bool = False
 ) -> List[Dict[str, Any]]:
     """
@@ -228,17 +228,73 @@ def process_single_image(
             "timestamp": timestamp_str
         })
     else:
-        # Tự động mở rộng hộp bao nếu bắt được dòng 1 của biển 2 dòng (chụp nghiêng/chụp từ trên cao)
+        # Tự động mở rộng hộp bao và tính toán 4 góc nghiêng nếu bắt được biển số chụp xiên/chéo
+        import cv2
         for cand in candidates:
-            if cand['plate_type'] == 'double_row' and cand['aspect_ratio'] > 1.35:
-                cx, cy, cw, ch = cand['bbox']
-                new_h = int(cw * 0.95)
-                new_w = int(cw * 1.15)
-                new_x = max(0, cx - int(cw * 0.08))
-                new_y = max(0, cy - int(ch * 0.05))
-                if new_y + new_h <= opened_np.shape[0] and new_x + new_w <= opened_np.shape[1]:
+            cx, cy, cw, ch = cand['bbox']
+            angle = cand.get('angle', 0.0)
+
+            # Tự động mở rộng hộp bao nếu bắt được dòng 1 của biển 2 dòng
+            needs_expand = (abs(angle) >= 8.0 and cand['aspect_ratio'] > 1.45) or (cand['aspect_ratio'] > 2.4)
+            if cand['plate_type'] == 'double_row' and needs_expand:
+                if abs(angle) >= 2.5:
+                    plate_w = cw * 1.30
+                    plate_h = cw * 1.15
+                    center_shift = (plate_h - ch) * 0.38
+                    rad = angle * np.pi / 180.0
+                    center_x = cx + cw / 2.0 + center_shift * (-np.sin(rad))
+                    center_y = cy + ch / 2.0 + center_shift * np.cos(rad)
+                    rect = ((center_x, center_y), (plate_w, plate_h), angle)
+                    box = cv2.boxPoints(rect)
+                    s = box.sum(axis=1)
+                    diff = np.diff(box, axis=1)
+                    rect_ord = np.zeros((4, 2), dtype="float32")
+                    rect_ord[0] = box[np.argmin(s)]       # Top-Left
+                    rect_ord[2] = box[np.argmax(s)]       # Bottom-Right
+                    rect_ord[1] = box[np.argmin(diff)]    # Top-Right
+                    rect_ord[3] = box[np.argmax(diff)]    # Bottom-Left
+                    cand['quad_corners'] = rect_ord
+                    new_x = max(0, int(round(center_x - plate_w / 2.0)))
+                    new_y = max(0, int(round(center_y - plate_h / 2.0)))
+                    new_w = int(round(plate_w))
+                    new_h = int(round(plate_h))
                     cand['bbox'] = (new_x, new_y, new_w, new_h)
                     cand['aspect_ratio'] = round(new_w / float(new_h), 3)
+                else:
+                    new_h = int(cw * 0.95)
+                    new_w = int(cw * 1.15)
+                    new_x = max(0, cx - int(cw * 0.08))
+                    new_y = max(0, cy - int(ch * 0.05))
+                    if new_y + new_h <= opened_np.shape[0] and new_x + new_w <= opened_np.shape[1]:
+                        cand['bbox'] = (new_x, new_y, new_w, new_h)
+                        cand['aspect_ratio'] = round(new_w / float(new_h), 3)
+
+            # Đảm bảo quad_corners luôn có sẵn cho biển số nghiêng
+            if cand.get('quad_corners') is None and abs(angle) >= 2.0:
+                bx, by, bw, bh = cand['bbox']
+                rect = ((bx + bw / 2.0, by + bh / 2.0), (bw, bh), angle)
+                box = cv2.boxPoints(rect)
+                s = box.sum(axis=1)
+                diff = np.diff(box, axis=1)
+                rect_ord = np.zeros((4, 2), dtype="float32")
+                rect_ord[0] = box[np.argmin(s)]
+                rect_ord[2] = box[np.argmax(s)]
+                rect_ord[1] = box[np.argmin(diff)]
+                rect_ord[3] = box[np.argmax(diff)]
+                cand['quad_corners'] = rect_ord
+
+        # Tinh chỉnh 4 góc nghiêng chính xác (Perspective Quad Corners) trên ảnh gốc:
+        orig_np_full = np.array(orig_pil)
+        for cand in candidates:
+            refined_quad, refined_ang = refine_quad_corners(
+                orig_np_full,
+                cand['bbox'],
+                scale_factor=scale_factor,
+                plate_type=cand['plate_type']
+            )
+            if refined_quad is not None:
+                cand['quad_corners'] = refined_quad
+                cand['angle'] = refined_ang
 
         # Chạy OCR sơ bộ trên tất cả ứng viên và xếp hạng lại:
         evaluated_cands = []
@@ -247,12 +303,17 @@ def process_single_image(
                 orig_pil,
                 cand['bbox'],
                 scale_factor=scale_factor,
-                margin_ratio=config.CROP_MARGIN_RATIO
+                margin_ratio=config.CROP_MARGIN_RATIO,
+                quad_corners=cand.get('quad_corners')
             )
             ocr_res = recognize_license_plate(cropped_pil, plate_type=cand['plate_type'])
             plate_text = ocr_res.get("plate_text", "KXD")
             char_count = ocr_res.get("char_count", 0)
             avg_conf = ocr_res.get("avg_confidence", 0.0)
+
+            # Cập nhật ảnh phẳng đã nắn thẳng
+            if ocr_res.get("deskewed_image") is not None:
+                cropped_pil = ocr_res["deskewed_image"]
 
             cand['plate_text'] = plate_text
             cand['ocr_res'] = ocr_res
@@ -270,7 +331,16 @@ def process_single_image(
 
         # Sắp xếp giảm dần theo điểm ưu tiên thực tế
         evaluated_cands.sort(key=lambda c: c['sort_score'], reverse=True)
-        candidates = evaluated_cands
+
+        # Lọc thông minh: Loại bỏ các vùng nhiễu KXD không có chữ nếu đã có biển đọc được
+        confident_plates = [
+            c for c in evaluated_cands
+            if c.get('plate_text', 'KXD') != 'KXD' and c.get('ocr_res', {}).get('char_count', 0) >= 4
+        ]
+        if confident_plates:
+            candidates = confident_plates
+        else:
+            candidates = evaluated_cands[:2]
 
         for idx, cand in enumerate(candidates, start=1):
             cand['id'] = idx
@@ -340,7 +410,7 @@ def process_single_image(
 def process_batch(
     image_paths: List[Path],
     output_dirs: Dict[str, Path],
-    save_intermediate: bool = True
+    save_intermediate: bool = False
 ) -> None:
     """
     Xử lý hàng loạt toàn bộ danh sách ảnh trong thư mục đầu vào.

@@ -83,7 +83,57 @@ LicensePlateDetection/
 
 ---
 
-## 4. Hướng dẫn chạy chương trình
+## 4. Các kỹ thuật xử lý ảnh chính và giải quyết 6 thách thức thực tế
+
+Hệ thống được thiết kế bám sát 5 nhóm kỹ thuật xử lý ảnh số kinh điển trong giáo trình:
+
+```
+                      CÁC KỸ THUẬT XỬ LÝ ẢNH CHÍNH
+┌────────────────────────────────────────────────────────────────────────┐
+│ 3.1. Nâng cao chất lượng ảnh (Image Enhancement)                       │
+│      • Kéo giãn độ tương phản động phân vị (Percentile Dynamic Stretch)│
+│      • Biến đổi hàm lũy thừa Gamma Correction                          │
+│      • Cân bằng lược đồ mức xám (Global Histogram Equalization)        │
+│      • Phép biến đổi hình học (Geometric Transformation / Deskewing)   │
+├────────────────────────────────────────────────────────────────────────┤
+│ 3.2. Lọc ảnh và khôi phục ảnh (Filtering & Restoration)                │
+│      • Bộ lọc làm mờ Gaussian phân rã (Separable Gaussian Blur)        │
+│      • Bộ lọc làm sắc nét Unsharp Masking khôi phục mờ chuyển động     │
+│      • Bộ lọc phi tuyến trung vị (Median Filter) khử nhiễu muối tiêu    │
+├────────────────────────────────────────────────────────────────────────┤
+│ 3.3. Phát hiện biên (Edge Detection)                                   │
+│      • Toán tử đạo hàm không gian Sobel theo phương X (Sobel-X)         │
+│      • Toán tử Sobel theo phương Y và Gradient Magnitude               │
+│      • Giải thuật phát hiện biên đa ngưỡng Canny (NMS + Hysteresis)    │
+├────────────────────────────────────────────────────────────────────────┤
+│ 3.4. Phân đoạn ảnh (Image Segmentation)                                │
+│      • Phân ngưỡng tự động Otsu cực đại hóa phương sai liên lớp        │
+│      • Phân ngưỡng cục bộ thích nghi Sauvola (Sauvola Local Threshold) │
+│      • Phân đoạn vùng liên thông bằng BFS (Connected Component Label)  │
+├────────────────────────────────────────────────────────────────────────┤
+│ 3.5. Các phép toán hình thái học (Morphological Operations)            │
+│      • Giãn nhị phân (Dilation) và Xói nhị phân (Erosion)              │
+│      • Phép Đóng (Closing) với SE chữ nhật nằm ngang nối nét ký tự     │
+│      • Phép Mở (Opening) khử nhiễu đốm nhỏ                             │
+│      • Biến đổi Black-Hat (Bottom-Hat) bóc tách ký tự dính bẩn         │
+│      • Hàn gắn nét đứt ký tự (Morphological Bridging)                  │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+### Bảng ma trận giải pháp cho 6 thách thức thực tế
+
+| Thách thức thực tế | Hiện tượng ảnh hưởng | Kỹ thuật xử lý ảnh giải quyết | Module đảm nhiệm |
+| :--- | :--- | :--- | :--- |
+| **1. Bị nghiêng / Biến dạng** *(Tilt / Perspective Skew)* | Xe đậu chéo, camera chụp góc nghiêng làm biển số bị méo phối cảnh, dòng chữ bị xiên góc. | • **Đo góc nghiêng baseline ký tự:** $\theta = \arctan(\Delta y / \Delta x)$ qua tâm các vùng liên thông.<br>• **Phép xoay và cân bằng hình học (Geometric Deskewing):** Tự động xoay ảnh về phương ngang trước khi so khớp mẫu. | `character_recognition.py`<br>`candidate_filter.py` |
+| **2. Mờ do chuyển động** *(Motion Blur / Shake)* | Xe đang di chuyển hoặc tay rung làm nhòe mờ đường biên các ký tự. | • **Bộ lọc khôi phục ảnh Unsharp Masking:** $I_{sharp} = I + k \cdot (I - G_\sigma * I)$ tạo mặt nạ chi tiết tần số cao để tái tạo đường biên ký tự sắc nét.<br>• **Bộ lọc đạo hàm bậc hai Laplacian Sharpening.** | `preprocessing.py`<br>`edge_detection.py` |
+| **3. Loá sáng / Cháy sáng** *(Overexposure / Glare)* | Ánh đèn pha, đèn flash hoặc mặt trời phản chiếu mạnh trên mặt kim loại biển số gây bão hòa trắng cục bộ. | • **Nén vùng chói bằng Gamma Correction:** $s = 255 \cdot (r/255)^\gamma$ với $\gamma = 1.35$.<br>• **Phân ngưỡng cục bộ Sauvola (Sauvola Local Thresholding):** Tính ngưỡng biến thiên theo từng lân cận, chống cháy sáng cục bộ làm mù Otsu toàn thể. | `preprocessing.py`<br>`thresholding.py` |
+| **4. Thiếu sáng / Chụp tối** *(Low Light / Underexposure)* | Xe chụp trong hầm gửi xe, trời tối hoặc dưới bóng râm chắn bùn. | • **Kéo giãn tương phản động theo phân vị (Percentile Dynamic Stretch):** Trải đều dải sáng $P_2 - P_{98}$ về toàn dải $[0, 255]$.<br>• **Kích sáng bằng Gamma Correction ($\gamma = 0.70$).**<br>• **Cân bằng lược đồ xám toàn cục (Histogram Equalization).** | `preprocessing.py`<br>`thresholding.py` |
+| **5. Biển số bị dính bẩn / Che khuất một phần** *(Dirt / Mud / Partial Occlusion)* | Biển số lấm lem bùn đất, dầu mỡ, trầy xước làm đứt nét ký tự hoặc che khuất 1 phần. | • **Biến đổi Black-Hat Transform:** $BTH(I) = (I \bullet B) - I$ trích xuất chi tiết tối màu trên nền sáng loang lổ.<br>• **Hàn gắn hình thái học (Morphological Bridging):** Phép đóng cục bộ nối các nét chữ bị xước/đứt.<br>• **So khớp mẫu chịu lỗi (Fault-Tolerant Voting):** Nhận diện từng ký tự độc lập, chấp nhận khuyết điểm cục bộ. | `morphology.py`<br>`character_recognition.py` |
+| **6. Kích thước quá nhỏ / Resolution thấp** *(Low Resolution / Distant Plate)* | Xe ở xa camera, vùng biển số nhỏ dưới 100px chiều cao khiến nét chữ bị mất chi tiết. | • **Nội suy Bicubic Super-Sampling:** Phóng đại kích thước ảnh lên kích thước chuẩn $\ge 120$px.<br>• **Tăng cường Unsharp Masking sau nội suy** để tái tạo biên độ dốc cạnh.<br>• **Thích ứng động kích thước Structuring Element (Adaptive SE scaling)** theo kích thước thực tế của vùng biển. | `preprocessing.py`<br>`morphology.py` |
+
+---
+
+## 5. Hướng dẫn chạy chương trình
 
 Hệ thống hỗ trợ 3 cách chạy linh hoạt:
 

@@ -1,0 +1,80 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Antigravity / IDE / OS metadata
+.gemini/
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Project outputs & temporary generated files
+temp/
+temp_inspect/
+scratch/
+debug_scene_crops/
+LicensePlateDetection/output/*
+!LicensePlateDetection/output/.gitkeep
+LicensePlateDetection/output/cropped/*
+LicensePlateDetection/output/detected/*
+LicensePlateDetection/output/intermediate/*
+LicensePlateDetection/output/runs/*
+LicensePlateDetection/output/thumbnails/*
+LicensePlateDetection/output/results/*.xlsx
+LicensePlateDetection/output/results/*.csv
+
+# Root scratch / test files
+/*.png
+/*.jpg
+/*.jpeg
+test_*.py
+debug_*.py
+check_*.py
+find_*.py
+scan_*.py
+tune_*.py
+analyze_*.py
+crop_*.py
+inspect_*.py
+verify_*.py
+make_thumbnails.py
+save_scenes.py
+create_grid.py
+quick_stats.py
+list_all.py
+read_all_crops.py
+

@@ -27,6 +27,9 @@ RESULTS_DIR = OUTPUT_DIR / "results"
 for directory in [INPUT_DIR, INTERMEDIATE_DIR, DETECTED_DIR, CROPPED_DIR, RESULTS_DIR]:
     directory.mkdir(parents=True, exist_ok=True)
 
+# Tùy chọn lưu ảnh trung gian: Đặt False để không sinh file ảnh rác (Sobel, Otsu, Closing...) ra đĩa
+SAVE_INTERMEDIATE_STEPS = False
+
 
 # ==============================================================================
 # 2. CẤU HÌNH BƯỚC 1: TIỀN XỬ LÝ (PREPROCESSING)
@@ -94,32 +97,35 @@ CONNECTIVITY = 8
 # ==============================================================================
 # 6. CẤU HÌNH BƯỚC 6: BỘ LỌC ỨNG VIÊN BIỂN SỐ (CANDIDATE FILTERING)
 # ==============================================================================
-# Tỷ lệ kích thước Bounding Box (w / h):
-# Biển số 1 dòng (dài): tỷ lệ chuẩn ~4.5 - 5.0 (cho phép khoảng 2.4 - 6.5)
-SINGLE_ROW_ASPECT_RATIO_MIN = 2.4
-SINGLE_ROW_ASPECT_RATIO_MAX = 6.5
+# Tỷ lệ kích thước Bounding Box (w / h) chuẩn biển số xe Việt Nam:
+# Biển số 1 dòng (ô tô chữ nhật dài): tỷ lệ chuẩn ~3.5 - 5.5
+SINGLE_ROW_ASPECT_RATIO_MIN = 3.2
+SINGLE_ROW_ASPECT_RATIO_MAX = 5.8
 
-# Biển số 2 dòng (vuông): tỷ lệ chuẩn ~1.3 - 1.5 (cho phép 0.95 - 2.3 để bao quát góc chụp nghiêng và từ trên cao)
-DOUBLE_ROW_ASPECT_RATIO_MIN = 0.95
-DOUBLE_ROW_ASPECT_RATIO_MAX = 2.3
+# Biển số 2 dòng (xe máy, ô tô vuông): tỷ lệ chuẩn ~1.10 - 1.65 (cho phép 0.75 - 1.95 để đón nhận cả biển dính dè xe/nghiêng trước khi nắn phẳng)
+DOUBLE_ROW_ASPECT_RATIO_MIN = 0.75
+DOUBLE_ROW_ASPECT_RATIO_MAX = 1.95
 
-# Tỷ lệ diện tích Bounding Box so với toàn bộ ảnh (area / (W_img * H_img))
-MIN_AREA_RATIO = 0.0010         # Tránh các chấm nhiễu quá nhỏ
-MAX_AREA_RATIO = 0.25           # Tránh các mảng lớn như thân xe, kính xe
+# Tỷ lệ diện tích Bounding Box động so với toàn bộ ảnh (area / (W_img * H_img))
+# Đặt ngưỡng tối thiểu 0.05% (0.0005) để tránh bỏ sót các biển số khi camera chụp từ cự ly xa
+MIN_AREA_RATIO = 0.0005
+MAX_AREA_RATIO = 0.22
 
 # Giới hạn chiều rộng và chiều cao tương đối so với kích thước ảnh
-MIN_WIDTH_RATIO = 0.05
-MAX_WIDTH_RATIO = 0.80
-MIN_HEIGHT_RATIO = 0.02
+MIN_WIDTH_RATIO = 0.030
+MAX_WIDTH_RATIO = 0.85
+MIN_HEIGHT_RATIO = 0.015
 MAX_HEIGHT_RATIO = 0.45
 
 # Mật độ điểm trắng (white density / fill ratio) = số pixel trắng / (w * h)
-# Điều chỉnh từ 0.14 đến 0.95 để không bỏ sót biển số chụp nghiêng/chụp từ trên cao
-MIN_WHITE_DENSITY = 0.14
+MIN_WHITE_DENSITY = 0.12
 MAX_WHITE_DENSITY = 0.95
 
 # Ngưỡng Non-Maximum Suppression (IoU) để loại bỏ các bounding box trùng lặp nhau
 NMS_IOU_THRESHOLD = 0.35
+
+# Tỷ lệ cắt tỉa lề đáy để loại bỏ chữ phấn (301, 302, 601) hoặc bùn bẩn dè xe
+TRIM_BOTTOM_RATIO = 0.12
 
 # Độ đệm lề (margin) khi cắt ảnh biển số (tính theo % của w và h)
 CROP_MARGIN_RATIO = 0.05

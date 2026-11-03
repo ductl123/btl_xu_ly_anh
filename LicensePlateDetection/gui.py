@@ -1,19 +1,21 @@
 """
 gui.py - Giao diện đồ họa người dùng (GUI) cho hệ thống phát hiện & nhận dạng biển số xe
 Sử dụng Tkinter (chuẩn Python) và Pillow để hiển thị trực quan:
-- Chọn ảnh giao thông tùy ý từ máy tính hoặc danh sách có sẵn.
+- Chọn ảnh giao thông tùy ý từ máy tính hoặc danh sách có sẵn (chuyển ảnh tức thì, xử lý đa luồng ngầm không đơ giật UI).
 - Hiển thị song song ảnh gốc và ảnh kết quả có vẽ Bounding Box kèm số biển.
 - Xem chi tiết từng bước trung gian (Grayscale, Gaussian Blur, Sobel-X, Otsu, Closing, Opening, CCL).
 - Hiển thị danh sách các biển số nhận diện được (Biển Số Xe, Loại biển, Tọa độ, Aspect Ratio, Confidence Score).
-- Nút bấm xuất file Excel (.xlsx), nút xử lý hàng loạt và nút xem các đồ thị so sánh thực nghiệm.
+- Hỗ trợ xử lý hàng loạt chuyên nghiệp với thanh tiến trình trực quan, chạy nền không đơ, không bị thoát ứng dụng.
+- Nút bấm xuất file Excel (.xlsx), nút xem các đồ thị so sánh thực nghiệm.
 """
 
 import sys
 import os
 import threading
+import time
 from pathlib import Path
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox, scrolledtext
 import numpy as np
 from PIL import Image, ImageTk
 
@@ -25,14 +27,14 @@ if str(CURRENT_DIR) not in sys.path:
 import config
 from main import process_single_image, process_batch
 from compare import run_all_comparisons
-from utils.file_utils import get_image_paths, create_run_folders, export_results_to_excel
+from utils.file_utils import get_image_paths, create_run_folders, export_results_to_excel, export_results_to_csv
 
 
 class LicensePlateApp:
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title("Hệ Thống Phát Hiện & Nhận Dạng Biển Số Xe - Digital Image Processing")
-        self.root.geometry("1240x840")
+        self.root.geometry("1260x860")
         self.root.minsize(1050, 720)
 
         # Cấu hình màu sắc giao diện
@@ -43,6 +45,7 @@ class LicensePlateApp:
         self.current_image_path = None
         self.current_candidates = []
         self.output_dirs = create_run_folders(config.OUTPUT_DIR)
+        self.is_busy = False
 
         self._setup_ui()
         self._load_default_sample()
@@ -65,35 +68,35 @@ class LicensePlateApp:
 
         btn_style = {"font": ("Segoe UI", 9, "bold"), "padx": 10, "pady": 5, "cursor": "hand2"}
 
-        btn_open = tk.Button(
+        self.btn_open = tk.Button(
             header_frame, text="📁 Chọn Ảnh", bg="#3B82F6", fg="white",
             relief=tk.FLAT, command=self._on_choose_image, **btn_style
         )
-        btn_open.pack(side=tk.RIGHT, padx=5, pady=10)
+        self.btn_open.pack(side=tk.RIGHT, padx=5, pady=10)
 
-        btn_batch = tk.Button(
+        self.btn_batch = tk.Button(
             header_frame, text="⚡ Xử Lý Hàng Loạt", bg="#10B981", fg="white",
             relief=tk.FLAT, command=self._on_batch_process, **btn_style
         )
-        btn_batch.pack(side=tk.RIGHT, padx=5, pady=10)
+        self.btn_batch.pack(side=tk.RIGHT, padx=5, pady=10)
 
-        btn_excel = tk.Button(
+        self.btn_excel = tk.Button(
             header_frame, text="📗 Xuất Excel (.xlsx)", bg="#059669", fg="white",
             relief=tk.FLAT, command=self._on_export_excel, **btn_style
         )
-        btn_excel.pack(side=tk.RIGHT, padx=5, pady=10)
+        self.btn_excel.pack(side=tk.RIGHT, padx=5, pady=10)
 
-        btn_compare = tk.Button(
+        self.btn_compare = tk.Button(
             header_frame, text="📊 So Sánh Thực Nghiệm", bg="#8B5CF6", fg="white",
             relief=tk.FLAT, command=self._on_run_comparisons, **btn_style
         )
-        btn_compare.pack(side=tk.RIGHT, padx=5, pady=10)
+        self.btn_compare.pack(side=tk.RIGHT, padx=5, pady=10)
 
-        btn_folder = tk.Button(
+        self.btn_folder = tk.Button(
             header_frame, text="📂 Thư Mục Output", bg="#64748B", fg="white",
             relief=tk.FLAT, command=self._open_output_folder, **btn_style
         )
-        btn_folder.pack(side=tk.RIGHT, padx=5, pady=10)
+        self.btn_folder.pack(side=tk.RIGHT, padx=5, pady=10)
 
         # 2. Main Content
         main_paned = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
@@ -129,7 +132,7 @@ class LicensePlateApp:
         self.lbl_morph_img.pack(fill=tk.BOTH, expand=True)
 
         # Cột Phải: Thông tin chi tiết & danh sách biển số phát hiện được
-        right_frame = tk.Frame(main_paned, bg=self.panel_color, relief=tk.SOLID, bd=1, width=400)
+        right_frame = tk.Frame(main_paned, bg=self.panel_color, relief=tk.SOLID, bd=1, width=420)
         main_paned.add(right_frame, weight=1)
 
         info_title = tk.Label(
@@ -151,8 +154,8 @@ class LicensePlateApp:
         self.tree.heading("score", text="Độ Tin Cậy")
 
         self.tree.column("idx", width=30, anchor="center")
-        self.tree.column("plate_text", width=110, anchor="center")
-        self.tree.column("type", width=80, anchor="center")
+        self.tree.column("plate_text", width=120, anchor="center")
+        self.tree.column("type", width=75, anchor="center")
         self.tree.column("ar", width=65, anchor="center")
         self.tree.column("score", width=75, anchor="center")
         self.tree.pack(fill=tk.X, padx=10, pady=5)
@@ -183,32 +186,82 @@ class LicensePlateApp:
         )
         status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
+    def _set_buttons_state(self, enabled: bool):
+        """Khóa hoặc mở lại các nút thao tác chính khi đang xử lý nền."""
+        state = tk.NORMAL if enabled else tk.DISABLED
+        self.btn_open.config(state=state)
+        self.btn_batch.config(state=state)
+        self.btn_excel.config(state=state)
+        self.btn_compare.config(state=state)
+
     def _load_default_sample(self):
+        """Khởi động hiển thị ảnh mẫu đầu tiên nhanh chóng."""
         samples = get_image_paths(config.INPUT_DIR)
         if samples:
-            self._process_and_show(samples[0])
+            self._start_processing_image(samples[0])
 
     def _on_choose_image(self):
+        if self.is_busy:
+            messagebox.showinfo("Thông báo", "Hệ thống đang bận xử lý, vui lòng đợi trong giây lát!")
+            return
+
         file_path = filedialog.askopenfilename(
             initialdir=str(config.INPUT_DIR),
             title="Chọn ảnh giao thông",
             filetypes=[("Image files", "*.jpg;*.jpeg;*.png;*.bmp")]
         )
         if file_path:
-            self._process_and_show(Path(file_path))
+            self._start_processing_image(Path(file_path))
 
-    def _process_and_show(self, image_path: Path):
+    def _start_processing_image(self, image_path: Path):
+        """
+        TỐI ƯU HÓA TỐC ĐỘ:
+        1. Hiển thị ảnh gốc đã chọn NGAY LẬP TỨC (< 30ms) lên giao diện.
+        2. Chạy quy trình nhận diện nặng ở luồng phụ (Thread) ngầm.
+        3. Cập nhật kết quả BBox & ký tự lên giao diện an toàn khi hoàn thành.
+        """
         self.current_image_path = image_path
-        self.status_var.set(f"Đang xử lý ảnh: {image_path.name}...")
-        self.root.update_idletasks()
+        self.is_busy = True
+        self._set_buttons_state(False)
 
-        records = process_single_image(
-            image_path,
-            self.output_dirs,
-            save_intermediate=True,
-            show_plot=False
-        )
+        # 1. Hiển thị ngay ảnh gốc đã chọn để người dùng không phải chờ đợi
+        self._display_image_on_label(image_path, self.lbl_detected_img)
+        self.tab_control.select(self.tab_detected)
+
+        # Xóa bảng cũ và hiển thị thông báo đang phân tích
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+        self.tree.insert("", tk.END, values=("...", "Đang nhận diện...", "...", "...", "..."))
+
+        self.lbl_cropped_preview.configure(image="", text="Đang phân tích...")
+        self.detail_text.delete("1.0", tk.END)
+        self.detail_text.insert(tk.END, f"Đang áp dụng quy trình DIP trên ảnh {image_path.name}...\n- Gaussian Blur\n- Sobel-X Edge\n- Otsu Threshold\n- Morphological Closing & Opening\n- BFS Connected Components\n- Template Matching OCR")
+
+        self.status_var.set(f"⏳ Đang xử lý ảnh: {image_path.name}... Vui lòng đợi trong giây lát.")
+
+        # 2. Đẩy công việc nặng sang luồng phụ
+        def _worker():
+            try:
+                records = process_single_image(
+                    image_path,
+                    self.output_dirs,
+                    save_intermediate=True,
+                    show_plot=False
+                )
+            except Exception as e:
+                print(f"[!] Lỗi khi xử lý ảnh {image_path}: {e}")
+                records = []
+            
+            # Đưa kết quả về luồng chính an toàn qua root.after
+            self.root.after(0, lambda: self._apply_single_results(image_path, records))
+
+        threading.Thread(target=_worker, daemon=True).start()
+
+    def _apply_single_results(self, image_path: Path, records: list):
+        """Cập nhật toàn bộ kết quả lên giao diện trên Main Thread."""
         self.current_candidates = records
+        self.is_busy = False
+        self._set_buttons_state(True)
 
         # Cập nhật danh sách bảng
         for item in self.tree.get_children():
@@ -225,10 +278,11 @@ class LicensePlateApp:
                 tags=(str(r["plate_index"]),)
             )
 
-        # Hiển thị ảnh Detected lên giao diện
+        # Hiển thị ảnh Detected (có BBox + Text) lên giao diện
         stem = image_path.stem
         det_img_path = self.output_dirs["detected"] / f"{stem}_detected.png"
-        self._display_image_on_label(det_img_path, self.lbl_detected_img)
+        if det_img_path.is_file():
+            self._display_image_on_label(det_img_path, self.lbl_detected_img)
 
         # Hiển thị ảnh Lưới 8 bước
         grid_img_path = self.output_dirs["intermediate"] / stem / "08_pipeline_summary_grid.png"
@@ -253,14 +307,18 @@ class LicensePlateApp:
             self.detail_text.delete("1.0", tk.END)
             self.detail_text.insert(tk.END, "Không tìm thấy biển số nào thỏa mãn tiêu chuẩn kích thước và tỷ lệ.")
 
-        self.status_var.set(f"Đã xử lý xong ảnh: {image_path.name} | Phát hiện {len(detected_records)} biển số.")
+        self.status_var.set(f"✅ Đã xử lý xong ảnh: {image_path.name} | Phát hiện {len(detected_records)} biển số.")
 
     def _on_select_plate(self, event):
         selected = self.tree.selection()
         if not selected:
             return
         item = self.tree.item(selected[0])
-        idx = int(item["values"][0])
+        val = item["values"][0]
+        try:
+            idx = int(val)
+        except (ValueError, TypeError):
+            return
 
         matching = next((r for r in self.current_candidates if r["plate_index"] == idx), None)
         if matching:
@@ -288,11 +346,12 @@ class LicensePlateApp:
         if not img_path.is_file():
             return
         try:
-            im = Image.open(img_path)
-            im.thumbnail(max_size, Image.Resampling.LANCZOS)
-            photo = ImageTk.PhotoImage(im)
+            with Image.open(img_path) as im:
+                im_copy = im.copy()
+            im_copy.thumbnail(max_size, Image.Resampling.LANCZOS)
+            photo = ImageTk.PhotoImage(im_copy)
             label_widget.configure(image=photo, text="")
-            label_widget.image = photo
+            label_widget.image = photo  # Giữ tham chiếu tránh bị GC xóa
         except Exception as e:
             label_widget.configure(text=f"Lỗi hiển thị ảnh: {e}")
 
@@ -306,37 +365,175 @@ class LicensePlateApp:
         messagebox.showinfo("Thành công", f"Đã xuất file Excel kết quả thành công tại:\n{excel_path}")
 
     def _on_batch_process(self):
+        """
+        XỬ LÝ HÀNG LOẠT KHÔNG ĐƠ, KHÔNG CRASH:
+        - Sử dụng cửa sổ tiến trình chuyên biệt Toplevel.
+        - Chạy luồng phụ ngầm, cập nhật % tiến độ từng ảnh lên Main Thread.
+        - Cho phép người dùng dừng sớm nếu muốn.
+        - Lưu kết quả đầy đủ ra Excel và CSV khi hoàn tất.
+        """
+        if self.is_busy:
+            messagebox.showinfo("Thông báo", "Hệ thống đang bận xử lý, vui lòng đợi!")
+            return
+
         images = get_image_paths(config.INPUT_DIR)
         if not images:
             messagebox.showwarning("Cảnh báo", "Thư mục input/images đang trống!")
             return
 
         confirm = messagebox.askyesno(
-            "Xác nhận", f"Xử lý hàng loạt toàn bộ {len(images)} bức ảnh trong thư mục input?\n(Quá trình này có thể mất 20-30 giây)"
+            "Xác nhận xử lý hàng loạt",
+            f"Tìm thấy {len(images)} bức ảnh trong thư mục input.\nBạn có muốn bắt đầu xử lý hàng loạt không?"
         )
         if not confirm:
             return
 
-        def _worker():
-            self.status_var.set(f"Đang xử lý hàng loạt {len(images)} ảnh...")
-            process_batch(images, self.output_dirs, save_intermediate=True)
-            self.status_var.set(f"Đã hoàn thành xử lý hàng loạt {len(images)} ảnh! Đã lưu file Excel tại output/results/.")
-            messagebox.showinfo("Thành công", f"Đã xử lý xong {len(images)} bức ảnh!\nFile Excel (.xlsx) đã được cập nhật tại thư mục output/results/.")
+        total_images = len(images)
+        self.is_busy = True
+        self._set_buttons_state(False)
 
-        threading.Thread(target=_worker, daemon=True).start()
+        # Tạo Cửa sổ Tiến trình Xử lý hàng loạt (Progress Dialog)
+        prog_win = tk.Toplevel(self.root)
+        prog_win.title("Tiến Trình Xử Lý Hàng Loạt Biển Số Xe")
+        prog_win.geometry("620x420")
+        prog_win.minsize(500, 350)
+        prog_win.transient(self.root)
+        prog_win.grab_set()
+
+        lbl_batch_title = tk.Label(
+            prog_win, text=f"ĐANG XỬ LÝ HÀNG LOẠT ({total_images} ẢNH)",
+            font=("Segoe UI", 11, "bold"), fg="#1E293B", pady=10
+        )
+        lbl_batch_title.pack(fill=tk.X)
+
+        status_lbl_var = tk.StringVar(value=f"Đang chuẩn bị xử lý...")
+        lbl_current = tk.Label(prog_win, textvariable=status_lbl_var, font=("Segoe UI", 9), fg="#475569")
+        lbl_current.pack(fill=tk.X, padx=15, pady=2)
+
+        pb_var = tk.DoubleVar(value=0.0)
+        pb = ttk.Progressbar(prog_win, variable=pb_var, maximum=total_images, mode='determinate')
+        pb.pack(fill=tk.X, padx=20, pady=8)
+
+        lbl_percent_var = tk.StringVar(value=f"0% (0/{total_images})")
+        lbl_percent = tk.Label(prog_win, textvariable=lbl_percent_var, font=("Segoe UI", 9, "bold"), fg="#2563EB")
+        lbl_percent.pack()
+
+        # Khung nhật ký ghi lại các biển số phát hiện được trong thời gian thực
+        log_box = scrolledtext.ScrolledText(prog_win, height=10, font=("Consolas", 9), bg="#F8FAFC", fg="#0F172A")
+        log_box.pack(fill=tk.BOTH, expand=True, padx=15, pady=8)
+
+        cancel_flag = threading.Event()
+
+        def _on_cancel():
+            if messagebox.askyesno("Dừng lại", "Bạn có chắc muốn dừng xử lý hàng loạt sau bức ảnh hiện tại?"):
+                cancel_flag.set()
+                btn_cancel.config(state=tk.DISABLED, text="Đang dừng...")
+
+        btn_cancel = tk.Button(prog_win, text="Dừng lại", bg="#EF4444", fg="white", font=("Segoe UI", 9, "bold"), relief=tk.FLAT, command=_on_cancel, padx=15, pady=4)
+        btn_cancel.pack(side=tk.BOTTOM, pady=10)
+
+        def _batch_worker():
+            all_records = []
+            start_time = time.time()
+
+            for i, img_p in enumerate(images, start=1):
+                if cancel_flag.is_set():
+                    def _log_cancel():
+                        log_box.insert(tk.END, f"\n[!] Người dùng đã yêu cầu dừng lại tại ảnh {i-1}/{total_images}.\n")
+                        log_box.see(tk.END)
+                    self.root.after(0, _log_cancel)
+                    break
+
+                # Cập nhật nhãn trạng thái trước khi xử lý
+                def _pre_update(curr=i, name=img_p.name):
+                    status_lbl_var.set(f"Đang phân tích [{curr}/{total_images}]: {name}")
+                self.root.after(0, _pre_update)
+
+                try:
+                    records = process_single_image(img_p, self.output_dirs, save_intermediate=False, show_plot=False)
+                    all_records.extend(records)
+                except Exception as e:
+                    records = []
+                    print(f"[!] Lỗi xử lý ảnh {img_p.name}: {e}")
+
+                # Cập nhật tiến độ sau khi hoàn thành ảnh
+                def _post_update(curr=i, name=img_p.name, recs=records):
+                    pb_var.set(curr)
+                    pct = int(round(curr / total_images * 100))
+                    lbl_percent_var.set(f"{pct}% ({curr}/{total_images})")
+
+                    plates = [r.get('plate_text', 'KXD') for r in recs if r.get('plate_index', 0) > 0]
+                    plates_str = ", ".join(plates) if plates else "Không có biển số"
+                    log_box.insert(tk.END, f"[{curr:02d}/{total_images}] {name[:22]:<22} -> Biển: {plates_str}\n")
+                    log_box.see(tk.END)
+                self.root.after(0, _post_update)
+
+            # Xuất kết quả tổng hợp ra CSV & Excel
+            if all_records:
+                csv_path = self.output_dirs["main_results"] / "detection_results.csv"
+                xlsx_path = self.output_dirs["main_results"] / "detection_results.xlsx"
+                export_results_to_csv(all_records, csv_path)
+                export_results_to_excel(all_records, xlsx_path)
+
+            elapsed = time.time() - start_time
+
+            # Hoàn tất tiến trình an toàn trên Main Thread
+            def _on_done():
+                self.is_busy = False
+                self._set_buttons_state(True)
+                btn_cancel.config(text="Đóng", bg="#10B981", state=tk.NORMAL, command=prog_win.destroy)
+                lbl_batch_title.config(text="HOÀN TẤT XỬ LÝ HÀNG LOẠT!", fg="#059669")
+                status_lbl_var.set(f"Đã xử lý xong trong {elapsed:.1f} giây. Kết quả đã lưu vào Excel!")
+                self.status_var.set(f"✅ Đã xử lý xong hàng loạt! File Excel tại: {self.output_dirs['main_results'] / 'detection_results.xlsx'}")
+
+                # Tải ảnh cuối cùng lên giao diện chính
+                if images:
+                    self._start_processing_image(images[0])
+
+                messagebox.showinfo(
+                    "Hoàn tất xử lý hàng loạt",
+                    f"Đã xử lý xong các bức ảnh trong {elapsed:.1f} giây!\n\nFile kết quả chi tiết đã được cập nhật tại:\n{self.output_dirs['main_results'] / 'detection_results.xlsx'}"
+                )
+
+            self.root.after(0, _on_done)
+
+        threading.Thread(target=_batch_worker, daemon=True).start()
 
     def _on_run_comparisons(self):
+        if self.is_busy:
+            messagebox.showinfo("Thông báo", "Hệ thống đang bận xử lý tác vụ khác!")
+            return
+
         samples = get_image_paths(config.INPUT_DIR)
         target = self.current_image_path if self.current_image_path else (samples[0] if samples else None)
         if not target:
             messagebox.showwarning("Cảnh báo", "Chưa có ảnh để chạy so sánh!")
             return
 
+        self.is_busy = True
+        self._set_buttons_state(False)
+        self.status_var.set("⏳ Đang tạo 4 biểu đồ so sánh thực nghiệm DIP... Vui lòng đợi trong giây lát.")
+
         def _worker():
-            self.status_var.set(f"Đang tạo đồ thị so sánh thực nghiệm...")
-            run_all_comparisons(target, self.output_dirs["main_results"])
-            self.status_var.set(f"Đã lưu các đồ thị so sánh thực nghiệm vào output/results/!")
-            messagebox.showinfo("Hoàn tất", f"Đã xuất 4 biểu đồ so sánh chất lượng cao vào:\n{self.output_dirs['main_results']}")
+            try:
+                run_all_comparisons(target, self.output_dirs["main_results"])
+                success = True
+                err_msg = ""
+            except Exception as e:
+                success = False
+                err_msg = str(e)
+
+            def _done():
+                self.is_busy = False
+                self._set_buttons_state(True)
+                if success:
+                    self.status_var.set("✅ Đã lưu các đồ thị so sánh thực nghiệm vào output/results/!")
+                    messagebox.showinfo("Hoàn tất", f"Đã xuất 4 biểu đồ so sánh chất lượng cao vào:\n{self.output_dirs['main_results']}")
+                else:
+                    self.status_var.set(f"❌ Lỗi khi chạy so sánh: {err_msg}")
+                    messagebox.showerror("Lỗi", f"Không thể tạo đồ thị so sánh:\n{err_msg}")
+
+            self.root.after(0, _done)
 
         threading.Thread(target=_worker, daemon=True).start()
 
