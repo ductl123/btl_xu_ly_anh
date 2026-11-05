@@ -1,0 +1,28 @@
+{
+  "original_labelled_crops": 34,
+  "derived_labelled_crops": 238,
+  "derived_counts": {
+    "train": 196,
+    "validation": 14,
+    "test": 28
+  },
+  "original_source_photos_with_labels": 27,
+  "all_original_source_photos": 32,
+  "unlabelled_full_images_excluded": 35,
+  "unlabelled_source_photos_excluded": 5,
+  "training_view_counts": {
+    "train": 224,
+    "validation": 2,
+    "test": 4
+  },
+  "all_bank_counts": {
+    "train": 224,
+    "validation": 16,
+    "test": 32
+  },
+  "original_manifest_digest": "fa30b9e2529e24e3659644ca832da1a92ece78ea0c7aae9f3823f9e5580c1831",
+  "bank_manifest_digest": "e175df52700ae5c1953153ad7f74840ad3ed87b38820960f5d6875182fa09dae",
+  "source_manifest_sha256": "587d490a4a8e7284a268e2e44eeeffae6b150c18879649a3340fa6a8de06946d",
+  "no_ocr_predictions_used_as_labels": true,
+  "no_heldout_derivatives_in_training": true
+}

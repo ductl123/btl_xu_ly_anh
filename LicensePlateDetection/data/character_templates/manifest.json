@@ -1,0 +1,452 @@
+[
+  {
+    "label": "1",
+    "file": "1/1793454835155_00.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89_plate_1_double_row.png",
+    "plate_label": "18-MD2 074.73",
+    "bbox": [
+      53,
+      36,
+      47,
+      134
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "8",
+    "file": "8/1793454835155_01.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89_plate_1_double_row.png",
+    "plate_label": "18-MD2 074.73",
+    "bbox": [
+      118,
+      34,
+      67,
+      136
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "M",
+    "file": "M/1793454835155_02.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89_plate_1_double_row.png",
+    "plate_label": "18-MD2 074.73",
+    "bbox": [
+      261,
+      30,
+      71,
+      140
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "D",
+    "file": "D/1793454835155_03.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89_plate_1_double_row.png",
+    "plate_label": "18-MD2 074.73",
+    "bbox": [
+      344,
+      27,
+      65,
+      142
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "2",
+    "file": "2/1793454835155_04.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89_plate_1_double_row.png",
+    "plate_label": "18-MD2 074.73",
+    "bbox": [
+      422,
+      25,
+      69,
+      142
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "0",
+    "file": "0/1793454835155_05.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89_plate_1_double_row.png",
+    "plate_label": "18-MD2 074.73",
+    "bbox": [
+      44,
+      192,
+      65,
+      130
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "7",
+    "file": "7/1793454835155_06.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89_plate_1_double_row.png",
+    "plate_label": "18-MD2 074.73",
+    "bbox": [
+      130,
+      190,
+      62,
+      132
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "4",
+    "file": "4/1793454835155_07.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89_plate_1_double_row.png",
+    "plate_label": "18-MD2 074.73",
+    "bbox": [
+      225,
+      191,
+      62,
+      131
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "7",
+    "file": "7/1793454835155_08.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89_plate_1_double_row.png",
+    "plate_label": "18-MD2 074.73",
+    "bbox": [
+      343,
+      190,
+      65,
+      132
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "3",
+    "file": "3/1793454835155_09.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89_plate_1_double_row.png",
+    "plate_label": "18-MD2 074.73",
+    "bbox": [
+      440,
+      187,
+      71,
+      135
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "3",
+    "file": "3/1793454835188_00.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835188_43902677484248231_7370845134107454326_0eef3eae07ef96dcece9e36419d08089_plate_1_double_row.png",
+    "plate_label": "37-AC 171.24",
+    "bbox": [
+      85,
+      37,
+      60,
+      156
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "7",
+    "file": "7/1793454835188_01.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835188_43902677484248231_7370845134107454326_0eef3eae07ef96dcece9e36419d08089_plate_1_double_row.png",
+    "plate_label": "37-AC 171.24",
+    "bbox": [
+      159,
+      32,
+      63,
+      160
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "A",
+    "file": "A/1793454835188_02.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835188_43902677484248231_7370845134107454326_0eef3eae07ef96dcece9e36419d08089_plate_1_double_row.png",
+    "plate_label": "37-AC 171.24",
+    "bbox": [
+      311,
+      25,
+      60,
+      162
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "C",
+    "file": "C/1793454835188_03.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835188_43902677484248231_7370845134107454326_0eef3eae07ef96dcece9e36419d08089_plate_1_double_row.png",
+    "plate_label": "37-AC 171.24",
+    "bbox": [
+      388,
+      23,
+      64,
+      159
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "1",
+    "file": "1/1793454835188_04.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835188_43902677484248231_7370845134107454326_0eef3eae07ef96dcece9e36419d08089_plate_1_double_row.png",
+    "plate_label": "37-AC 171.24",
+    "bbox": [
+      53,
+      221,
+      42,
+      153
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "7",
+    "file": "7/1793454835188_05.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835188_43902677484248231_7370845134107454326_0eef3eae07ef96dcece9e36419d08089_plate_1_double_row.png",
+    "plate_label": "37-AC 171.24",
+    "bbox": [
+      131,
+      220,
+      60,
+      153
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "1",
+    "file": "1/1793454835188_06.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835188_43902677484248231_7370845134107454326_0eef3eae07ef96dcece9e36419d08089_plate_1_double_row.png",
+    "plate_label": "37-AC 171.24",
+    "bbox": [
+      228,
+      216,
+      41,
+      154
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "2",
+    "file": "2/1793454835188_07.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835188_43902677484248231_7370845134107454326_0eef3eae07ef96dcece9e36419d08089_plate_1_double_row.png",
+    "plate_label": "37-AC 171.24",
+    "bbox": [
+      339,
+      211,
+      64,
+      155
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "4",
+    "file": "4/1793454835188_08.png",
+    "source_crop": "output/runs/rectification_validation_20261104/cropped/1793454835188_43902677484248231_7370845134107454326_0eef3eae07ef96dcece9e36419d08089_plate_1_double_row.png",
+    "plate_label": "37-AC 171.24",
+    "bbox": [
+      428,
+      206,
+      63,
+      155
+    ],
+    "label_source": "User-provided screenshots, visually confirmed; calibration only",
+    "split": "calibration"
+  },
+  {
+    "label": "2",
+    "file": "2/docx_1793454835292_00.png",
+    "source_crop": "output/runs/docx_cases_trial_20261105/cropped/1793454835292_43902677484248231_7370845134107454326_83190ce82dc5afb7713ffea69cd33059_plate_1_double_row.png",
+    "bbox": [
+      68,
+      17,
+      63,
+      185
+    ],
+    "label_source": "Visually confirmed from loi_sai.docx image5",
+    "split": "calibration",
+    "binarization": "enhanced_otsu_frame_clean"
+  },
+  {
+    "label": "8",
+    "file": "8/docx_1793454835292_01.png",
+    "source_crop": "output/runs/docx_cases_trial_20261105/cropped/1793454835292_43902677484248231_7370845134107454326_83190ce82dc5afb7713ffea69cd33059_plate_1_double_row.png",
+    "bbox": [
+      140,
+      19,
+      65,
+      182
+    ],
+    "label_source": "Visually confirmed from loi_sai.docx image5",
+    "split": "calibration",
+    "binarization": "enhanced_otsu_frame_clean"
+  },
+  {
+    "label": "L",
+    "file": "L/docx_1793454835292_02.png",
+    "source_crop": "output/runs/docx_cases_trial_20261105/cropped/1793454835292_43902677484248231_7370845134107454326_83190ce82dc5afb7713ffea69cd33059_plate_1_double_row.png",
+    "bbox": [
+      280,
+      18,
+      58,
+      183
+    ],
+    "label_source": "Visually confirmed from loi_sai.docx image5",
+    "split": "calibration",
+    "binarization": "enhanced_otsu_frame_clean"
+  },
+  {
+    "label": "1",
+    "file": "1/docx_1793454835292_03.png",
+    "source_crop": "output/runs/docx_cases_trial_20261105/cropped/1793454835292_43902677484248231_7370845134107454326_83190ce82dc5afb7713ffea69cd33059_plate_1_double_row.png",
+    "bbox": [
+      367,
+      17,
+      43,
+      184
+    ],
+    "label_source": "Visually confirmed from loi_sai.docx image5",
+    "split": "calibration",
+    "binarization": "enhanced_otsu_frame_clean"
+  },
+  {
+    "label": "1",
+    "file": "1/docx_1793454835292_04.png",
+    "source_crop": "output/runs/docx_cases_trial_20261105/cropped/1793454835292_43902677484248231_7370845134107454326_83190ce82dc5afb7713ffea69cd33059_plate_1_double_row.png",
+    "bbox": [
+      35,
+      233,
+      37,
+      170
+    ],
+    "label_source": "Visually confirmed from loi_sai.docx image5",
+    "split": "calibration",
+    "binarization": "enhanced_otsu_frame_clean"
+  },
+  {
+    "label": "5",
+    "file": "5/docx_1793454835292_05.png",
+    "source_crop": "output/runs/docx_cases_trial_20261105/cropped/1793454835292_43902677484248231_7370845134107454326_83190ce82dc5afb7713ffea69cd33059_plate_1_double_row.png",
+    "bbox": [
+      105,
+      234,
+      60,
+      169
+    ],
+    "label_source": "Visually confirmed from loi_sai.docx image5",
+    "split": "calibration",
+    "binarization": "enhanced_otsu_frame_clean"
+  },
+  {
+    "label": "6",
+    "file": "6/docx_1793454835292_06.png",
+    "source_crop": "output/runs/docx_cases_trial_20261105/cropped/1793454835292_43902677484248231_7370845134107454326_83190ce82dc5afb7713ffea69cd33059_plate_1_double_row.png",
+    "bbox": [
+      186,
+      235,
+      59,
+      168
+    ],
+    "label_source": "Visually confirmed from loi_sai.docx image5",
+    "split": "calibration",
+    "binarization": "enhanced_otsu_frame_clean"
+  },
+  {
+    "label": "9",
+    "file": "9/docx_1793454835292_07.png",
+    "source_crop": "output/runs/docx_cases_trial_20261105/cropped/1793454835292_43902677484248231_7370845134107454326_83190ce82dc5afb7713ffea69cd33059_plate_1_double_row.png",
+    "bbox": [
+      301,
+      233,
+      63,
+      170
+    ],
+    "label_source": "Visually confirmed from loi_sai.docx image5",
+    "split": "calibration",
+    "binarization": "enhanced_otsu_frame_clean"
+  },
+  {
+    "label": "5",
+    "file": "5/docx_1793454835292_08.png",
+    "source_crop": "output/runs/docx_cases_trial_20261105/cropped/1793454835292_43902677484248231_7370845134107454326_83190ce82dc5afb7713ffea69cd33059_plate_1_double_row.png",
+    "bbox": [
+      384,
+      225,
+      64,
+      176
+    ],
+    "label_source": "Visually confirmed from loi_sai.docx image5",
+    "split": "calibration",
+    "binarization": "enhanced_otsu_frame_clean"
+  },
+  {
+    "label": "B",
+    "file": "B/docx_1793454835206_02.png",
+    "source_crop": "output/runs/docx_cases_trial_20261105/cropped/1793454835206_43902677484248231_7370845134107454326_e8660eff8dd6cc2d4488b5cab984c05c_plate_1_double_row.png",
+    "bbox": [
+      265,
+      15,
+      59,
+      142
+    ],
+    "label_source": "Visually confirmed from loi_sai.docx image1",
+    "split": "calibration",
+    "binarization": "enhanced_otsu_frame_clean"
+  },
+  {
+    "label": "G",
+    "file": "G/docx_1793454835350_02.png",
+    "source_crop": "output/runs/docx_cases_trial_20261105/cropped/1793454835350_43902677484248231_7370845134107454326_62a98a9c6b4587de423574c2d091bab8_plate_1_double_row.png",
+    "bbox": [
+      121,
+      12,
+      25,
+      54
+    ],
+    "label_source": "Visually confirmed from loi_sai.docx image11",
+    "split": "calibration",
+    "binarization": "plain_otsu_frame_clean"
+  },
+  {
+    "file": "8/user_confirmed_1793454835350_plain_otsu_frame_clean.png",
+    "label": "8",
+    "source_crop": "output/runs/docx_fixed_validation_20261105/cropped/1793454835350_43902677484248231_7370845134107454326_62a98a9c6b4587de423574c2d091bab8_plate_1_double_row.png",
+    "plate_label": "29-G1 727.58",
+    "bbox": [
+      172,
+      80,
+      25,
+      51
+    ],
+    "split": "calibration",
+    "binarization": "plain_otsu_frame_clean",
+    "label_source": "Explicitly confirmed by user in chat on 2026-11-05"
+  },
+  {
+    "file": "8/user_confirmed_1793454835350_sauvola.png",
+    "label": "8",
+    "source_crop": "output/runs/docx_fixed_validation_20261105/cropped/1793454835350_43902677484248231_7370845134107454326_62a98a9c6b4587de423574c2d091bab8_plate_1_double_row.png",
+    "plate_label": "29-G1 727.58",
+    "bbox": [
+      171,
+      76,
+      26,
+      55
+    ],
+    "split": "calibration",
+    "binarization": "sauvola",
+    "label_source": "Explicitly confirmed by user in chat on 2026-11-05"
+  }
+]

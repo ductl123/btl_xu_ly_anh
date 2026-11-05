@@ -1,0 +1,202 @@
+{
+  "pointer": {
+    "checkpoint": "runs/20261105T013552Z_5d90fd/best.pth",
+    "version": "20261105T013552Z_5d90fd",
+    "sha256": "fb590a4d57fc4121bdb073f08f908f9190d3eb94a7777d97e04d2b1ebcb2dc2d",
+    "dataset_hash": "fa30b9e2529e24e3659644ca832da1a92ece78ea0c7aae9f3823f9e5580c1831",
+    "validation": {
+      "plates": 2,
+      "correct": 2,
+      "exact_accuracy": 1.0,
+      "character_error_rate": 0.0,
+      "character_errors": 0,
+      "characters": 17,
+      "details": [
+        {
+          "id": "dbe0a2264b6941d5a74005ef",
+          "expected": "37AC17124",
+          "observed": "37AC17124"
+        },
+        {
+          "id": "c2a7dd31621c2efa82281c2f",
+          "expected": "79A36361",
+          "observed": "79A36361"
+        }
+      ]
+    },
+    "training": {
+      "plates": 28,
+      "correct": 27,
+      "exact_accuracy": 0.9642857142857143,
+      "character_error_rate": 0.004016064257028112,
+      "character_errors": 1,
+      "characters": 249,
+      "details": [
+        {
+          "id": "b2779adaec836087805208f6",
+          "expected": "18MD207473",
+          "observed": "18MD207473"
+        },
+        {
+          "id": "a936ffce74cb11b1e4be32a8",
+          "expected": "98B323451",
+          "observed": "98B323451"
+        },
+        {
+          "id": "d9bf7108f7477f42a3d4b8e7",
+          "expected": "90B331534",
+          "observed": "90B331534"
+        },
+        {
+          "id": "32bd40ff6b91e9cb91fffc46",
+          "expected": "34B476792",
+          "observed": "34B476792"
+        },
+        {
+          "id": "c5a7deb883f409f05c3d5eda",
+          "expected": "18C127711",
+          "observed": "18C127711"
+        },
+        {
+          "id": "04982ed61d08fc989fc45906",
+          "expected": "90B331534",
+          "observed": "90B331534"
+        },
+        {
+          "id": "1a93562f24be95dc43e16d16",
+          "expected": "18C127711",
+          "observed": "18C1277111"
+        },
+        {
+          "id": "e945de7d71656478f286dc91",
+          "expected": "34B476792",
+          "observed": "34B476792"
+        },
+        {
+          "id": "d941e4bc62077607fabbbb21",
+          "expected": "90B331534",
+          "observed": "90B331534"
+        },
+        {
+          "id": "f84fd057105213bf86d0dad1",
+          "expected": "98AA37554",
+          "observed": "98AA37554"
+        },
+        {
+          "id": "3e8141f8c22ed761dcfacdcb",
+          "expected": "18C127711",
+          "observed": "18C127711"
+        },
+        {
+          "id": "2766ad50a16cf1a809215b47",
+          "expected": "98G109088",
+          "observed": "98G109088"
+        },
+        {
+          "id": "aa65fedd0d88b2cfa1aa3ec2",
+          "expected": "19E106057",
+          "observed": "19E106057"
+        },
+        {
+          "id": "334af2665d7d89379e555e09",
+          "expected": "98N66762",
+          "observed": "98N66762"
+        },
+        {
+          "id": "1d812e631f35ff82f7bc7768",
+          "expected": "21FA01738",
+          "observed": "21FA01738"
+        },
+        {
+          "id": "9292f94a9b79c6fba3369bf0",
+          "expected": "21FA01738",
+          "observed": "21FA01738"
+        },
+        {
+          "id": "79e9d72c4ad3b941993cc138",
+          "expected": "29G172758",
+          "observed": "29G172758"
+        },
+        {
+          "id": "929aa4c0e811aa8fef56ba08",
+          "expected": "29G172758",
+          "observed": "29G172758"
+        },
+        {
+          "id": "5613383eaa342d1088b04b52",
+          "expected": "29G172758",
+          "observed": "29G172758"
+        },
+        {
+          "id": "36b97bc593c9ec7cb88cc64c",
+          "expected": "29C124579",
+          "observed": "29C124579"
+        },
+        {
+          "id": "3694400327a966e91ea475aa",
+          "expected": "18B182866",
+          "observed": "18B182866"
+        },
+        {
+          "id": "798276f3c18cd61c72826325",
+          "expected": "18MD207473",
+          "observed": "18MD207473"
+        },
+        {
+          "id": "c8220cdba0f68b4731342b94",
+          "expected": "34A78922",
+          "observed": "34A78922"
+        },
+        {
+          "id": "25b798d25d144935a960fa77",
+          "expected": "30F51286",
+          "observed": "30F51286"
+        },
+        {
+          "id": "a1c71c10369a6de39fba67dc",
+          "expected": "89E187010",
+          "observed": "89E187010"
+        },
+        {
+          "id": "38768ac472094f1ae41fbce4",
+          "expected": "29T159736",
+          "observed": "29T159736"
+        },
+        {
+          "id": "133dc7bdb8eb8a114b8c7561",
+          "expected": "60C55555",
+          "observed": "60C55555"
+        },
+        {
+          "id": "0e0aa4731b4b63b810487fc1",
+          "expected": "T6167960",
+          "observed": "T6167960"
+        }
+      ]
+    },
+    "trained_character_counts": {
+      "1": 36,
+      "8": 23,
+      "M": 2,
+      "D": 2,
+      "2": 24,
+      "0": 16,
+      "7": 30,
+      "4": 13,
+      "3": 21,
+      "9": 21,
+      "B": 7,
+      "5": 18,
+      "6": 14,
+      "C": 5,
+      "A": 5,
+      "G": 4,
+      "E": 2,
+      "N": 1,
+      "F": 3,
+      "T": 2
+    }
+  },
+  "pointer_sha256": "49eeb0b876f281a80985668afd830d7ccd778750c746676045d41ae800fb6ac4",
+  "checkpoint_sha256": "fb590a4d57fc4121bdb073f08f908f9190d3eb94a7777d97e04d2b1ebcb2dc2d"
+}

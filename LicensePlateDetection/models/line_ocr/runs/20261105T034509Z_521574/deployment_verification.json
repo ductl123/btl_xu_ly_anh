@@ -1,0 +1,24 @@
+{
+  "active_version_verified": "20261105T034509Z_521574",
+  "original_34_labels_unchanged": true,
+  "training_counts": {
+    "train": 224,
+    "validation": 2,
+    "test": 4
+  },
+  "model_and_dataset_hashes_verified": true,
+  "pipeline_smoke": [
+    {
+      "image": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\input\\images\\1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89.jpg",
+      "predictions": [
+        "18MD207473"
+      ]
+    },
+    {
+      "image": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\data\\augmented_real\\real32_7_conditions_20261105\\01_mo\\anh_01__01_mo.jpg",
+      "predictions": [
+        "18MD207473"
+      ]
+    }
+  ]
+}

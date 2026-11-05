@@ -1,0 +1,31 @@
+{
+  "version": "20261105T034509Z_521574",
+  "plates": 4,
+  "correct": 4,
+  "exact_accuracy": 1.0,
+  "character_error_rate": 0.0,
+  "character_errors": 0,
+  "characters": 34,
+  "details": [
+    {
+      "id": "457fb280bad5c99d0e170878",
+      "expected": "98E183445",
+      "observed": "98E183445"
+    },
+    {
+      "id": "3b509f70529d7356f455a6ad",
+      "expected": "28L115695",
+      "observed": "28L115695"
+    },
+    {
+      "id": "18a72cbe402c2bf49551a445",
+      "expected": "29A14608",
+      "observed": "29A14608"
+    },
+    {
+      "id": "6069bcbf760bb2b3b9330660",
+      "expected": "29C88888",
+      "observed": "29C88888"
+    }
+  ]
+}

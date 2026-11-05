@@ -1,0 +1,4 @@
+# CPU inference/training works on the project's Python 3.14.
+# A compatible CUDA build can be installed separately when GPU training is wanted.
+torch==2.15.0
+filelock>=3.13

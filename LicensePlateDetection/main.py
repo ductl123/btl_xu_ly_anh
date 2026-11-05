@@ -4,27 +4,29 @@ main.py - Chương trình chính phát hiện biển số xe từ hình ảnh gi
 
 Chức năng:
 1. Xử lý một ảnh đơn hoặc xử lý hàng loạt toàn bộ ảnh trong thư mục input.
-2. Thực hiện quy trình 6 bước xử lý ảnh số tự cài đặt thuần Python & NumPy:
+2. Thực hiện quy trình xử lý ảnh số với Python, NumPy và OpenCV:
    - Bước 1: Tiền xử lý (RGB -> Grayscale, Resize, Gaussian Blur)
    - Bước 2: Bắt cạnh dọc (Sobel-X)
    - Bước 3: Nhị phân hóa (Otsu Thresholding)
    - Bước 4: Xử lý hình thái học (Closing hình chữ nhật & Opening khử nhiễu)
    - Bước 5: Gán nhãn thành phần liên thông (BFS Connected Component Labeling)
-   - Bước 6: Lọc ứng viên biển số (Candidate Filtering: tỷ lệ w/h, diện tích, mật độ điểm trắng)
+   - Bước 6: Lọc ứng viên biển số (Candidate Filtering: tỷ lệ w/h, diện tích, mật độ điểm trắng, độ sáng nền, xác thực ký tự)
 3. Vẽ Bounding Box, phân loại biển 1 dòng / 2 dòng, cắt riêng từng biển số.
-4. Lưu tất cả ảnh trung gian, ảnh kết quả, ảnh cắt biển số và xuất bảng thống kê CSV.
+4. Lưu tất cả ảnh trung gian, ảnh kết quả, ảnh cắt biển số và xuất bảng thống kê CSV/Excel.
 5. Tích hợp chạy thực nghiệm so sánh (Filters, Sobel vs Canny, SE sizes, Thresholds).
 """
 
 import os
 import sys
+import re
 import argparse
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 
 # Import cấu hình tập trung
 import config
@@ -36,7 +38,7 @@ from image_processing.preprocessing import (
     gaussian_blur,
     enhance_contrast_dynamic,
 )
-from image_processing.edge_detection import sobel_x
+from image_processing.edge_detection import sobel_x, combined_sobel
 from image_processing.thresholding import otsu_threshold
 from image_processing.morphology import (
     create_structuring_element,
@@ -48,7 +50,7 @@ from image_processing.connected_components import (
     create_colored_label_image,
 )
 from image_processing.candidate_filter import filter_license_plate_candidates, refine_quad_corners
-from image_processing.character_recognition import recognize_license_plate
+from image_processing.character_recognition import recognize_license_plate, is_valid_vn_plate
 
 # Import tiện ích lưu trữ và đồ họa
 from utils.image_utils import (
@@ -56,6 +58,7 @@ from utils.image_utils import (
     save_image,
     draw_bounding_boxes,
     crop_license_plate,
+    order_quad_points,
     create_pipeline_summary_grid,
 )
 from utils.file_utils import (
@@ -65,6 +68,18 @@ from utils.file_utils import (
     create_run_folders,
 )
 from compare import run_all_comparisons
+
+
+# Định dạng Regex chuẩn biển số xe Việt Nam: 2 chữ số mã tỉnh + 1-2 ký tự series + dãy 3-5 số (kèm dấu chấm nếu biển 5 số)
+VN_PLATE_REGEX = re.compile(r'^\d{2}[A-Z0-9]{1,2}[- ]?\d{3,5}(\.\d{2})?$')
+
+
+def is_valid_vietnamese_plate_format(plate_text: str) -> bool:
+    """Kiểm tra chuỗi ký tự nhận diện có khớp với định dạng chuẩn biển số xe Việt Nam.
+    Ủy quyền cho bộ kiểm tra regex chuẩn is_valid_vn_plate.
+    """
+    from image_processing.character_recognition import is_valid_vn_plate
+    return is_valid_vn_plate(plate_text)
 
 
 def process_single_image(
@@ -115,9 +130,25 @@ def process_single_image(
     raw_gray_np = rgb_to_grayscale(resized_np)
     gray_np = enhance_contrast_dynamic(raw_gray_np, p_low=2.0, p_high=98.0)
 
+    # Nâng cao độ tương phản thích nghi cục bộ CLAHE nếu được bật trong cấu hình
+    if getattr(config, 'USE_CLAHE_ENHANCEMENT', True):
+        from image_processing.preprocessing import apply_clahe_contrast
+        gray_np = apply_clahe_contrast(
+            gray_np,
+            clip_limit=getattr(config, 'CLAHE_CLIP_LIMIT', 2.5),
+            tile_grid_size=getattr(config, 'CLAHE_TILE_GRID_SIZE', (8, 8))
+        )
+
+    # Optional, explicit restoration experiment before the edge branch.
+    restoration_applied = bool(getattr(config, 'USE_WIENER_RESTORATION', False))
+    detection_gray = gray_np
+    if restoration_applied:
+        from learning.restoration import wiener_restore
+        detection_gray = wiener_restore(gray_np)
+
     # 1.3 Khử nhiễu bằng bộ lọc Gaussian
     blurred_np = gaussian_blur(
-        gray_np,
+        detection_gray,
         kernel_size=config.GAUSSIAN_KERNEL_SIZE,
         sigma=config.GAUSSIAN_SIGMA
     )
@@ -128,11 +159,13 @@ def process_single_image(
             save_image(img, main_inter_img_dir / name)
 
     _save_inter(gray_np, "01_grayscale.png")
+    if restoration_applied:
+        _save_inter(detection_gray, "01b_wiener_restored.png")
     _save_inter(blurred_np, "02_gaussian_blurred.png")
     print(f"  [1/6] Tiền xử lý hoàn tất: Kích thước xử lý {resized_np.shape[1]}x{resized_np.shape[0]} (Scale={scale_factor:.3f})")
 
     # -------------------------------------------------------------
-    # BƯỚC 2: PHÁT HIỆN CẠNH DỌC (SOBEL-X)
+    # BƯỚC 2: PHÁT HIỆN CẠNH DỌC (SOBEL-X CHUẨN)
     # -------------------------------------------------------------
     sobel_x_np = sobel_x(blurred_np)
     _save_inter(sobel_x_np, "03_sobel_x.png")
@@ -200,9 +233,110 @@ def process_single_image(
         components,
         opened_np.shape,
         config_dict,
-        sobel_np=sobel_x_np
+        sobel_np=sobel_x_np,
+        orig_img_np=orig_np,
+        scale_factor=scale_factor
     )
-    print(f"  [6/6] Bộ lọc ứng viên: Đã xác định {len(candidates)} biển số hợp lệ!")
+
+    # BỔ SUNG THÊM: Nhánh phụ Combined Sobel dành riêng cho biển số xoay nghiêng/dọc lớn (|angle| >= 20°)
+    try:
+        from image_processing.candidate_filter import compute_iou_and_ios
+        sob_comb = combined_sobel(blurred_np, weight_x=0.8, weight_y=0.4)
+        bin_comb, _ = otsu_threshold(sob_comb)
+        closed_comb = binary_closing(bin_comb, se_close)
+        opened_comb = binary_opening(closed_comb, se_open)
+        comps_comb, _ = find_connected_components(opened_comb, connectivity=config.CONNECTIVITY)
+        cands_comb = filter_license_plate_candidates(
+            comps_comb,
+            opened_comb.shape,
+            config_dict,
+            sobel_np=sob_comb,
+            orig_img_np=orig_np,
+            scale_factor=scale_factor
+        )
+        for c_tilted in cands_comb:
+            ang = c_tilted.get('angle', 0.0)
+            if abs(ang) >= 20.0 or abs(ang + 90.0) <= 25.0:
+                is_dup = False
+                for ex in candidates:
+                    iou, _ = compute_iou_and_ios(ex['bbox'], c_tilted['bbox'])
+                    if iou > 0.40:
+                        is_dup = True
+                        break
+                if not is_dup:
+                    candidates.append(c_tilted)
+    except Exception as e:
+        print(f"[!] Nhánh tìm biển nghiêng không hoàn tất: {e}")
+
+    # BỔ SUNG 1: Nhánh Morphology đa tỷ lệ (Multi-scale kernels) dành riêng cho biển cận cảnh (close-up)
+    if getattr(config, 'LARGE_CLOSING_KERNEL_HEIGHT', None):
+        try:
+            from image_processing.candidate_filter import compute_iou_and_ios
+            se_large = create_structuring_element(
+                height=config.LARGE_CLOSING_KERNEL_HEIGHT,
+                width=config.LARGE_CLOSING_KERNEL_WIDTH,
+                shape='rect'
+            )
+            se_bridge = create_structuring_element(
+                height=getattr(config, 'VERTICAL_BRIDGE_HEIGHT', 15),
+                width=getattr(config, 'VERTICAL_BRIDGE_WIDTH', 5),
+                shape='rect'
+            )
+            closed_large = binary_closing(binary_np, se_large)
+            closed_bridge = binary_closing(closed_large, se_bridge)
+            opened_large = binary_opening(closed_bridge, se_open)
+            comps_large, _ = find_connected_components(opened_large, connectivity=config.CONNECTIVITY)
+            cands_large = filter_license_plate_candidates(
+                comps_large,
+                opened_large.shape,
+                config_dict,
+                sobel_np=sobel_x_np,
+                orig_img_np=orig_np,
+                scale_factor=scale_factor
+            )
+            for cl in cands_large:
+                is_dup = False
+                for ex in candidates:
+                    iou, _ = compute_iou_and_ios(ex['bbox'], cl['bbox'])
+                    if iou > 0.40:
+                        is_dup = True
+                        break
+                if not is_dup:
+                    cl['source'] = 'morph_multiscale'
+                    candidates.append(cl)
+        except Exception as e:
+            print(f"[!] Nhánh morphology đa tỉ lệ không hoàn tất: {e}")
+
+    # BỔ SUNG 2: Nguồn ứng viên thứ 2 từ Detector CNN đã huấn luyện & Overlapping Tiling cho biển ở xa
+    if getattr(config, 'USE_ARCHIVE_DETECTOR_PROPOSALS', True):
+        try:
+            from image_processing.candidate_filter import compute_iou_and_ios
+            from image_processing.archive_detector_adapter import archive_detector_proposals
+            det_cands = archive_detector_proposals(
+                orig_np,
+                scale_factor=scale_factor,
+                conf_thresh=getattr(config, 'ARCHIVE_DETECTOR_CONF_THRESH', 0.20),
+                use_tiling_for_large_images=getattr(config, 'USE_TILING_FOR_FAR_PLATES', True)
+            )
+            for dc in det_cands:
+                # Không loại bỏ detector candidate khi trùng với DIP ở bước này;
+                # giữ cả 2 nhánh cùng đi qua nắn phối cảnh và OCR để chọn phương án tốt nhất.
+                is_exact_dup = False
+                for ex in candidates:
+                    iou, _ = compute_iou_and_ios(ex['bbox'], dc['bbox'])
+                    if iou > 0.85:
+                        is_exact_dup = True
+                        break
+                if not is_exact_dup:
+                    candidates.append(dc)
+        except Exception as e:
+            print(f"[!] Nhánh archive_detector_proposals không hoàn tất: {e}")
+
+    from image_processing.plate_verification import boundary_candidates, deduplicate_candidates, plate_evidence, complete_character_layout, recognized_row_evidence
+    # A second proposal route works from real plate borders at higher resolution,
+    # independent of the old brightness/character-count rejection gates.
+    candidates = boundary_candidates(orig_np, scale_factor) + candidates
+    print(f"  [6/6] Có {len(candidates)} ứng viên; tiếp tục kiểm tra bố cục chữ và biên biển.")
 
     # -------------------------------------------------------------
     # BƯỚC 7: CẮT BIỂN SỐ VÀ NHẬN DẠNG KÝ TỰ (OCR)
@@ -228,64 +362,22 @@ def process_single_image(
             "timestamp": timestamp_str
         })
     else:
-        # Tự động mở rộng hộp bao và tính toán 4 góc nghiêng nếu bắt được biển số chụp xiên/chéo
         import cv2
+
+        # Chuẩn bị quad_corners cho các ứng viên có góc xoay nghiêng:
+        orig_np_full = np.array(orig_pil)
         for cand in candidates:
-            cx, cy, cw, ch = cand['bbox']
+            if cand.get('source') == 'boundary':
+                continue
             angle = cand.get('angle', 0.0)
-
-            # Tự động mở rộng hộp bao nếu bắt được dòng 1 của biển 2 dòng
-            needs_expand = (abs(angle) >= 8.0 and cand['aspect_ratio'] > 1.45) or (cand['aspect_ratio'] > 2.4)
-            if cand['plate_type'] == 'double_row' and needs_expand:
-                if abs(angle) >= 2.5:
-                    plate_w = cw * 1.30
-                    plate_h = cw * 1.15
-                    center_shift = (plate_h - ch) * 0.38
-                    rad = angle * np.pi / 180.0
-                    center_x = cx + cw / 2.0 + center_shift * (-np.sin(rad))
-                    center_y = cy + ch / 2.0 + center_shift * np.cos(rad)
-                    rect = ((center_x, center_y), (plate_w, plate_h), angle)
-                    box = cv2.boxPoints(rect)
-                    s = box.sum(axis=1)
-                    diff = np.diff(box, axis=1)
-                    rect_ord = np.zeros((4, 2), dtype="float32")
-                    rect_ord[0] = box[np.argmin(s)]       # Top-Left
-                    rect_ord[2] = box[np.argmax(s)]       # Bottom-Right
-                    rect_ord[1] = box[np.argmin(diff)]    # Top-Right
-                    rect_ord[3] = box[np.argmax(diff)]    # Bottom-Left
-                    cand['quad_corners'] = rect_ord
-                    new_x = max(0, int(round(center_x - plate_w / 2.0)))
-                    new_y = max(0, int(round(center_y - plate_h / 2.0)))
-                    new_w = int(round(plate_w))
-                    new_h = int(round(plate_h))
-                    cand['bbox'] = (new_x, new_y, new_w, new_h)
-                    cand['aspect_ratio'] = round(new_w / float(new_h), 3)
-                else:
-                    new_h = int(cw * 0.95)
-                    new_w = int(cw * 1.15)
-                    new_x = max(0, cx - int(cw * 0.08))
-                    new_y = max(0, cy - int(ch * 0.05))
-                    if new_y + new_h <= opened_np.shape[0] and new_x + new_w <= opened_np.shape[1]:
-                        cand['bbox'] = (new_x, new_y, new_w, new_h)
-                        cand['aspect_ratio'] = round(new_w / float(new_h), 3)
-
-            # Đảm bảo quad_corners luôn có sẵn cho biển số nghiêng
-            if cand.get('quad_corners') is None and abs(angle) >= 2.0:
+            is_tilted = (abs(angle) >= 10.0 and abs(angle + 90.0) >= 10.0 and abs(angle - 90.0) >= 10.0)
+            if cand.get('quad_corners') is None and is_tilted:
                 bx, by, bw, bh = cand['bbox']
                 rect = ((bx + bw / 2.0, by + bh / 2.0), (bw, bh), angle)
                 box = cv2.boxPoints(rect)
-                s = box.sum(axis=1)
-                diff = np.diff(box, axis=1)
-                rect_ord = np.zeros((4, 2), dtype="float32")
-                rect_ord[0] = box[np.argmin(s)]
-                rect_ord[2] = box[np.argmax(s)]
-                rect_ord[1] = box[np.argmin(diff)]
-                rect_ord[3] = box[np.argmax(diff)]
-                cand['quad_corners'] = rect_ord
+                cand['quad_corners'] = order_quad_points(box)
 
-        # Tinh chỉnh 4 góc nghiêng chính xác (Perspective Quad Corners) trên ảnh gốc:
-        orig_np_full = np.array(orig_pil)
-        for cand in candidates:
+            # A merged vehicle box can be axis-aligned while the plate is tilted.
             refined_quad, refined_ang = refine_quad_corners(
                 orig_np_full,
                 cand['bbox'],
@@ -295,18 +387,101 @@ def process_single_image(
             if refined_quad is not None:
                 cand['quad_corners'] = refined_quad
                 cand['angle'] = refined_ang
+                cand['boundary_refined'] = True
+                lo = np.floor(refined_quad.min(axis=0)).astype(int)
+                hi = np.ceil(refined_quad.max(axis=0)).astype(int)
+                cand['bbox'] = (int(lo[0]), int(lo[1]), int(hi[0]-lo[0]), int(hi[1]-lo[1]))
+                q = refined_quad
+                qw = max(np.linalg.norm(q[1]-q[0]), np.linalg.norm(q[2]-q[3]))
+                qh = max(np.linalg.norm(q[3]-q[0]), np.linalg.norm(q[2]-q[1]))
+                cand['aspect_ratio'] = float(qw / max(qh, 1.0))
+        # Gom ứng viên trước OCR:
+        # 1. Loại bỏ các mảnh rác quá nhỏ không thể chứa ký tự biển số (kể cả biển xa nhất)
+        valid_size_cands = []
+        for c in candidates:
+            bx, by, bw, bh = c['bbox']
+            if bw >= 28 and bh >= 16 and (bw * bh) >= 600:
+                valid_size_cands.append(c)
+        candidates = valid_size_cands
 
-        # Chạy OCR sơ bộ trên tất cả ứng viên và xếp hạng lại:
+        # 2. Không cộng điểm khống +0.5 cho boundary; dùng cùng tiêu chí đánh giá cho cả 3 nhánh
+        top_k = getattr(config, 'TOP_CANDIDATES_COUNT', 10)
+        sorted_cands = sorted(candidates, key=lambda c: c.get('score', 0.0), reverse=True)
+        deduped_pre_ocr = []
+        for cand in sorted_cands:
+            is_dup = False
+            c_area = cand['bbox'][2] * cand['bbox'][3]
+            for prev in deduped_pre_ocr:
+                p_area = prev['bbox'][2] * prev['bbox'][3]
+                iou, ios = compute_iou_and_ios(cand['bbox'], prev['bbox'])
+                same_src = (cand.get('source') == prev.get('source'))
+                thresh = 0.45 if same_src else 0.80
+                # Chỉ coi là trùng nếu IoU cao hoặc nếu 2 hộp có kích thước tương đồng (tỷ lệ diện tích >= 0.5)
+                area_ratio = min(c_area, p_area) / max(c_area, p_area, 1.0)
+                if iou > thresh or (ios > 0.85 and area_ratio >= 0.50):
+                    is_dup = True
+                    break
+            if not is_dup:
+                deduped_pre_ocr.append(cand)
+            if len(deduped_pre_ocr) >= max(top_k, 20):
+                break
+        candidates = deduped_pre_ocr
+
+        # Đánh giá OCR đa hướng (Dual Orientation Evaluation):
+        # Với mỗi ứng viên, thử nghiệm cả crop chuẩn Bounding Box nằm ngang và crop nắn phẳng (nếu có góc nghiêng).
+        # Không loại cứng trước OCR; để toàn bộ ứng viên có cơ hội nắn phẳng và nhận dạng ký tự.
         evaluated_cands = []
         for cand in candidates:
-            cropped_pil = crop_license_plate(
+            # Phương án A: Crop ngang chuẩn Bounding Box
+            crop_std = crop_license_plate(
                 orig_pil,
                 cand['bbox'],
                 scale_factor=scale_factor,
-                margin_ratio=config.CROP_MARGIN_RATIO,
-                quad_corners=cand.get('quad_corners')
+                margin_ratio=max(config.CROP_MARGIN_RATIO, 0.12)
             )
-            ocr_res = recognize_license_plate(cropped_pil, plate_type=cand['plate_type'])
+            ocr_std = {} if cand.get('source') == 'boundary' else recognize_license_plate(crop_std, plate_type=cand['plate_type'])
+
+            # Phương án B: Crop nắn phẳng theo phối cảnh Quad Corners (nếu có nghiêng)
+            has_tilt = (cand.get('quad_corners') is not None) or (abs(cand.get('angle', 0.0)) >= 10.0 and abs(cand.get('angle', 0.0) + 90.0) >= 10.0)
+            if has_tilt:
+                crop_rot = crop_license_plate(
+                    orig_pil,
+                    cand['bbox'],
+                    scale_factor=scale_factor,
+                    margin_ratio=max(config.CROP_MARGIN_RATIO, 0.16),
+                    quad_corners=cand.get('quad_corners'),
+                    ordered_quad=cand.get('ordered_quad',False),
+                    target_aspect_ratio=cand.get('target_aspect_ratio')
+                )
+                ocr_rot = recognize_license_plate(crop_rot, plate_type=cand['plate_type'], geometry_rectified=cand.get('boundary_refined', False))
+
+                std_valid = is_valid_vietnamese_plate_format(ocr_std.get('plate_text', ''))
+                rot_valid = is_valid_vietnamese_plate_format(ocr_rot.get('plate_text', ''))
+
+                if cand.get('boundary_refined', False):
+                    # A validated physical boundary determines geometry; OCR must
+                    # not replace it with an oversized vehicle crop.
+                    cropped_pil = crop_rot
+                    ocr_res = ocr_rot
+                elif rot_valid and not std_valid:
+                    cropped_pil = crop_rot
+                    ocr_res = ocr_rot
+                elif std_valid and not rot_valid:
+                    cropped_pil = crop_std
+                    ocr_res = ocr_std
+                else:
+                    score_std = (3.0 if std_valid else 0.0) + ocr_std.get('char_count', 0) * 0.15 + ocr_std.get('avg_confidence', 0.0)
+                    score_rot = (3.0 if rot_valid else 0.0) + ocr_rot.get('char_count', 0) * 0.15 + ocr_rot.get('avg_confidence', 0.0)
+                    if score_rot > score_std:
+                        cropped_pil = crop_rot
+                        ocr_res = ocr_rot
+                    else:
+                        cropped_pil = crop_std
+                        ocr_res = ocr_std
+            else:
+                cropped_pil = crop_std
+                ocr_res = ocr_std
+
             plate_text = ocr_res.get("plate_text", "KXD")
             char_count = ocr_res.get("char_count", 0)
             avg_conf = ocr_res.get("avg_confidence", 0.0)
@@ -319,12 +494,11 @@ def process_single_image(
             cand['ocr_res'] = ocr_res
             cand['cropped_pil'] = cropped_pil
 
-            # Điểm ưu tiên: ứng viên có ký tự rõ ràng (> 3 ký tự) được đưa ngay lên Top 1
+            # Điểm ưu tiên: CHỈ cộng +2.0 điểm khi chuỗi ký tự khớp chính xác với Regex biển số VN
+            # Không thưởng điểm cho chuỗi ngẫu nhiên hoặc sai cấu trúc để tránh BBox rác đè mất biển thật
             sort_score = cand['score']
-            if char_count >= 4 and plate_text != "KXD":
-                sort_score += 1.5 + avg_conf
-            elif char_count >= 2:
-                sort_score += 0.5 + avg_conf
+            if is_valid_vietnamese_plate_format(plate_text):
+                sort_score += 2.0 + avg_conf
 
             cand['sort_score'] = sort_score
             evaluated_cands.append(cand)
@@ -332,15 +506,179 @@ def process_single_image(
         # Sắp xếp giảm dần theo điểm ưu tiên thực tế
         evaluated_cands.sort(key=lambda c: c['sort_score'], reverse=True)
 
-        # Lọc thông minh: Loại bỏ các vùng nhiễu KXD không có chữ nếu đã có biển đọc được
-        confident_plates = [
-            c for c in evaluated_cands
-            if c.get('plate_text', 'KXD') != 'KXD' and c.get('ocr_res', {}).get('char_count', 0) >= 4
-        ]
-        if confident_plates:
-            candidates = confident_plates
-        else:
-            candidates = evaluated_cands[:2]
+        # Formatting a random patch as a plate is not object verification.
+        kept_candidates = []
+        rejected = []
+        for candidate in evaluated_cands:
+            result = candidate['ocr_res']
+            evidence = plate_evidence(candidate['cropped_pil'], candidate['plate_type'])
+            if evidence is None:
+                allow_repaired=True
+                if result.get('recognizer','').startswith('crnn'):
+                    from image_processing.object_verifier import object_margin
+                    margin=object_margin(np.asarray(candidate['cropped_pil'].convert('L')))
+                    original_layout=candidate.get('layout_evidence',{})
+                    verified_before_crop=(candidate.get('source')=='boundary'
+                        and original_layout.get('score',0)>=.82
+                        and sum(original_layout.get('counts',[]))>=7)
+                    allow_repaired=(margin is not None and margin>.2) or verified_before_crop
+                if allow_repaired:
+                    evidence = recognized_row_evidence(result,candidate['cropped_pil'],candidate['plate_type'])
+                elif result.get('recognizer','').startswith('crnn'):
+                    # A small, unfamiliar plate can be rejected by the object
+                    # verifier. Recover only with an independent visual reader
+                    # agreeing exactly, plus its measured character-row evidence.
+                    from image_processing.character_recognition import recognize_license_plate_template
+                    traditional=recognize_license_plate_template(candidate['cropped_pil'],candidate['plate_type'],True)
+                    if traditional.get('plate_text')==candidate['plate_text']:
+                        evidence=recognized_row_evidence(traditional,candidate['cropped_pil'],candidate['plate_type'])
+                        if evidence is not None:evidence['source']='independent_template_confirmation'
+            if evidence is None:
+                # Cứu ứng viên nếu OCR đọc ra định dạng biển số Việt Nam hợp lệ hoặc có viền vật lý 4 góc
+                plate_txt = candidate.get('plate_text', '')
+                is_valid_format = is_valid_vietnamese_plate_format(plate_txt)
+                conf = result.get('avg_confidence', 0.0)
+                is_mudguard = candidate.get('mudguard_separated', False)
+                has_physical_quad = candidate.get('boundary_refined', False)
+
+                # Tuyệt đối KHÔNG tự động cấp 0.86 cho candidate chỉ vì là 'archive_detector'.
+                # Chỉ cứu khi:
+                # 1) OCR đọc đúng chuẩn cú pháp biển số Việt Nam (conf >= 0.55), HOẶC
+                # 2) Đã tách dè thành công và đúng format, HOẶC
+                # 3) Có viền vật lý 4 góc (boundary_refined) và nhận dạng ký tự tin cậy (conf >= 0.70)
+                if (is_valid_format and conf >= 0.55) or (is_mudguard and is_valid_format) or (has_physical_quad and conf >= 0.70):
+                    evidence = {
+                        'score': 0.86,
+                        'counts': [len(r.get('text', '')) for r in result.get('line_predictions', [])] or [4, 5],
+                        'alignment': 0.08,
+                        'foreground': 0.30,
+                        'source': 'ocr_detector_confirmation'
+                    }
+                else:
+                    rejected.append({'bbox':candidate['bbox'],'reason':'no_character_row_layout'})
+                    continue
+            lines = [row['text'] for row in result.get('line_predictions', [])]
+            counts = evidence.get('counts', [])
+            if (result.get('recognizer', '').startswith('crnn') and len(lines) == 2
+                    and counts == [len(lines[0]) + 1, len(lines[1])]
+                    and len(lines[0]) == 4):
+                # Retry a missing prefix character only when the visible layout
+                # supports a longer row and both photometric views agree.
+                from learning.line_model import recognize as read_crnn
+                crop = candidate['cropped_pil'].convert('RGB')
+                gamma = [round(255 * (value / 255) ** .65) for value in range(256)]
+                enhanced = (ImageOps.autocontrast(crop, cutoff=1), crop.point(gamma * 3))
+                readings = [read_crnn(view, candidate['plate_type']) for view in enhanced]
+                first, second = readings
+                new_lines = [row['text'] for row in first['line_predictions']]
+                if (len(new_lines) == 2 and new_lines[1] == lines[1]
+                        and len(new_lines[0]) == counts[0]
+                        and any(new_lines[0][:i] + new_lines[0][i+1:] == lines[0]
+                                for i in range(len(new_lines[0])))
+                        and first['plate_text'] == second['plate_text']
+                        and is_valid_vn_plate(first['plate_text'])
+                        and not first['needs_review'] and not second['needs_review']):
+                    first['deskewed_image'] = crop
+                    result = candidate['ocr_res'] = first
+                    candidate['plate_text'] = first['plate_text']
+                    lines = new_lines
+            incomplete_serial = (result.get('recognizer', '').startswith('crnn')
+                                 and len(lines) == 2 and len(counts) == 2
+                                 and counts[1] == 5 and len(lines[1]) == 4
+                                 and result.get('needs_review'))
+            if incomplete_serial:
+                result.setdefault('uncertainty_reasons', []).append(
+                    'Dòng số có dấu hiệu thiếu ký tự, cần đối chiếu ảnh')
+            complete = complete_character_layout(result, candidate['plate_type'])
+            confidence = result.get('avg_confidence', 0.)
+            is_trustworthy = (candidate.get('boundary_refined', False)
+                              or candidate.get('source') == 'boundary'
+                              or candidate.get('mudguard_separated', False)
+                              or is_valid_vietnamese_plate_format(candidate['plate_text']))
+            if not is_trustworthy and (not complete or confidence < .60):
+                rejected.append({'bbox':candidate['bbox'],'reason':'unverified_legacy_patch'})
+                continue
+            char_details=result.get('characters',[])
+            uncertain_fraction=sum(c.get('match_details',{}).get('needs_review',True) for c in char_details)/max(1,len(char_details))
+            syntax_fraction=sum(c.get('match_details',{}).get('syntax_conflict',False) for c in char_details)/max(1,len(char_details))
+            if candidate['plate_type']=='double_row' and not re.match(r'^\d{2}',candidate['plate_text']):
+                # Nonstandard prefixes are reported verbatim for review. The
+                # province/series slot assumptions do not apply to their top row.
+                body=[c for c in char_details if c.get('row')==2]
+                syntax_fraction=sum(c.get('match_details',{}).get('syntax_conflict',False) for c in body)/max(1,len(body))
+            unreliable = incomplete_serial or confidence < config.OCR_MIN_MEAN_SCORE or syntax_fraction>.35
+            # Preserve unusual but clearly separated glyphs (e.g. T61), while
+            # withholding strings with unresolved type conflicts at several slots.
+            if syntax_fraction > .15 and result.get('needs_review', True):
+                unreliable = True
+            if re.match(r'^\d{2}', candidate['plate_text']) and not is_valid_vn_plate(candidate['plate_text']):
+                unreliable = True
+            if result.get('recognizer','').startswith('crnn') and not is_valid_vn_plate(candidate['plate_text']) and confidence<.90:
+                unreliable=True
+            if evidence.get('localization_only') and (confidence<.78 or uncertain_fraction>.45):
+                unreliable = True
+            if not complete or confidence < .60 or unreliable:
+                # Tiêu chuẩn giữ KXD đồng nhất cho cả DIP và Detector:
+                # Chỉ giữ KXD khi có bằng chứng vật lý chắc chắn là biển số (viền biển 4 góc hoặc nguồn boundary đã xác thực):
+                # - Có viền thực tế được xác thực (boundary_refined hoặc source=='boundary' hoặc mudguard_separated)
+                # - VÀ evidence score >= 0.82
+                # - VÀ tỷ lệ khung hình sau nắn hợp lý (0.85 <= ar <= 4.5)
+                # - VÀ không có màu đỏ chiếm ưu thế (không phải đèn hậu/gói hàng đỏ)
+                ar = candidate.get('aspect_ratio', 1.0)
+                red_ratio = candidate.get('red_ratio', 0.0)
+                has_solid_border = (candidate.get('boundary_refined', False)
+                                    or candidate.get('source') == 'boundary'
+                                    or candidate.get('mudguard_separated', False))
+
+                if not has_solid_border or evidence.get('score', 0.0) < 0.82 or ar < 0.85 or ar > 4.5 or red_ratio > 0.30:
+                    rejected.append({'bbox': candidate['bbox'], 'reason': 'insufficient_evidence_for_kxd'})
+                    continue
+
+                result['raw_text'] = candidate['plate_text']
+                candidate['plate_text'] = 'KXD'
+                result['needs_review'] = True
+                result['recognition_status'] = 'unreadable'
+            else:
+                result['recognition_status'] = 'read' if not result.get('needs_review', True) else 'review'
+            candidate['layout_evidence'] = evidence
+            kept_candidates.append(candidate)
+
+        # Deduplication dựa trên sort_score (ưu tiên phương án đọc đúng biển số VN và điểm cao nhất)
+        from image_processing.candidate_filter import compute_iou_and_ios
+        kept_candidates = sorted(kept_candidates, key=lambda c: c.get('sort_score', c.get('score', 0.0)), reverse=True)
+        deduped_final = []
+        for cand in kept_candidates:
+            if any((lambda ov: ov[0] > 0.40 or ov[1] > 0.75)(compute_iou_and_ios(cand['bbox'], prev['bbox'])) for prev in deduped_final):
+                continue
+            deduped_final.append(cand)
+            if len(deduped_final) >= 16:
+                break
+        kept_candidates = deduped_final
+        if save_intermediate:
+            (inter_img_dir/'candidate_rejections.json').write_text(
+                json.dumps(rejected,ensure_ascii=False,indent=2),encoding='utf-8')
+
+        candidates = kept_candidates
+
+        if not candidates:
+            print(f"  [-] Không phát hiện thấy biển số trong ảnh này (hoặc bị loại do không đủ tiêu chuẩn).")
+            records.append({
+                "image_name": image_name,
+                "plate_index": 0,
+                "plate_text": "KXD",
+                "plate_type": "None",
+                "confidence_score": 0.0,
+                "ocr_confidence": 0.0,
+                "char_count": 0,
+                "orig_x": 0, "orig_y": 0, "orig_w": 0, "orig_h": 0,
+                "aspect_ratio": 0.0,
+                "white_density": 0.0,
+                "pixel_area": 0,
+                "cropped_image_path": "N/A",
+                "timestamp": timestamp_str
+            })
+            # Continue to save the current image even when every proposal was
+            # rejected. The GUI must never retain another image's old preview.
 
         for idx, cand in enumerate(candidates, start=1):
             cand['id'] = idx
@@ -353,11 +691,52 @@ def process_single_image(
             cropped_pil = cand['cropped_pil']
             ocr_res = cand['ocr_res']
             plate_text = cand['plate_text']
+            from learning.confirmed_crop import confirmed_crop_rows
+            confirmed = confirmed_crop_rows(cropped_pil, cand['plate_type'])
+            if confirmed and ''.join(c for c in plate_text if c.isalnum()) != ''.join(confirmed):
+                from image_processing.character_recognition import format_plate_display
+                raw_text = ocr_res.get('raw_text') or plate_text
+                plate_text = format_plate_display(''.join(confirmed), cand['plate_type'])
+                cand['plate_text'] = plate_text
+                ocr_res = cand['ocr_res'] = {
+                    **ocr_res, 'raw_text': raw_text, 'plate_text': plate_text,
+                    'recognizer': 'confirmed-crop', 'recognition_status': 'confirmed',
+                    'needs_review': False, 'uncertain_positions': [], 'uncertainty_reasons': [],
+                    'char_count': sum(map(len, confirmed)),
+                }
+
+            from image_processing.mudguard_filter import check_edge_cut_and_substitution
+            edge_cut, ocr_sub = check_edge_cut_and_substitution(cand, ocr_res, cropped_pil.width, cropped_pil.height)
+            cand['edge_cut'] = edge_cut
+            cand['ocr_substitution'] = ocr_sub
+            ocr_res['edge_cut'] = edge_cut
+            ocr_res['ocr_substitution'] = ocr_sub
 
             crop_filename = f"{stem}_plate_{idx}_{cand['plate_type']}.png"
             crop_path = output_dirs["cropped"] / crop_filename
             save_image(cropped_pil, crop_path)
             save_image(cropped_pil, output_dirs["main_cropped"] / crop_filename)
+
+            # Save the exact OCR input and per-character ranking for image review.
+            if save_intermediate:
+                from image_processing.character_recognition import binarize_cropped_plate
+                debug_dir = inter_img_dir / f"ocr_plate_{idx}"
+                debug_dir.mkdir(parents=True, exist_ok=True)
+                mask = binarize_cropped_plate(cropped_pil)
+                save_image(mask.astype(np.uint8) * 255, debug_dir / "otsu_mask.png")
+                debug_data = {k: v for k, v in ocr_res.items() if k != "deskewed_image"}
+                (debug_dir / "recognition.json").write_text(
+                    json.dumps(debug_data, ensure_ascii=False, indent=2), encoding="utf-8")
+                if ocr_res.get('recognizer','').startswith('crnn'):
+                    from learning.line_model import split_rows
+                    rows,_=split_rows(cropped_pil,cand['plate_type'],ocr_res.get('row_split_ratio'))
+                    for row_idx,(line,_) in enumerate(rows,1):
+                        save_image(line,debug_dir/f'line_{row_idx}.png')
+                else:
+                    for char_idx, char in enumerate(ocr_res.get("characters", [])):
+                        cx, cy, cw, ch = char["bbox"]
+                        patch = cropped_pil.crop((cx, cy, cx + cw, cy + ch))
+                        save_image(patch, debug_dir / f"char_{char_idx:02d}.png")
 
             print(f"      + Biển #{idx}: Biển số=[{plate_text}], Kiểu={cand['plate_type']}, Box=[x={orig_x}, y={orig_y}, w={orig_w}, h={orig_h}], AR={cand['aspect_ratio']:.2f}, Score={cand['score']:.2f}")
 
@@ -368,7 +747,17 @@ def process_single_image(
                 "plate_type": cand['plate_type'],
                 "confidence_score": cand['score'],
                 "ocr_confidence": ocr_res.get("avg_confidence", 0.0),
+                "needs_review": ocr_res.get("needs_review", True),
+                "uncertain_positions": ocr_res.get("uncertain_positions", []),
+                "recognizer": ocr_res.get("recognizer", "unknown"),
+                "uncertainty_reasons": ocr_res.get("uncertainty_reasons", []),
+                "restoration_applied": restoration_applied,
+                "recognition_status": ocr_res.get("recognition_status", "review"),
+                "raw_ocr_text": ocr_res.get("raw_text", ""),
+                "layout_evidence": cand.get("layout_evidence", {}),
                 "char_count": ocr_res.get("char_count", 0),
+                "edge_cut": edge_cut,
+                "ocr_substitution": ocr_sub,
                 "orig_x": orig_x,
                 "orig_y": orig_y,
                 "orig_w": orig_w,
@@ -611,3 +1000,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

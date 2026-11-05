@@ -1,0 +1,11 @@
+{
+  "published": true,
+  "active_version": "20261105T034509Z_521574",
+  "run_id": "20261105T034509Z_521574",
+  "run_dir": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\models\\line_ocr\\runs\\20261105T034509Z_521574",
+  "backup_dir": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\backups\\augmented_training_20261105T034509Z_521574",
+  "new_training_crops_imported": 196,
+  "total_active_label_records": 230,
+  "evaluation_bank": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\data\\ocr_training_augmented_20261105T034509Z_521574",
+  "old_active_preserved_in_backup": true
+}

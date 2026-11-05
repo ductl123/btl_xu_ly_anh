@@ -1,0 +1,1906 @@
+[
+  {
+    "id": "142d7a3702dcd00803b5f362",
+    "parent_id": "b2779adaec836087805208f6",
+    "source_group": "d632768529d346d5b02a508813f8aad1e68c751f91645ae3e8750bd9a1a94ba4",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_01__01_mo.jpg"
+  },
+  {
+    "id": "f6b0342e60e0a795523c7a76",
+    "parent_id": "b2779adaec836087805208f6",
+    "source_group": "d632768529d346d5b02a508813f8aad1e68c751f91645ae3e8750bd9a1a94ba4",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_01__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "4c5b7fed2823a8be6ec22819",
+    "parent_id": "b2779adaec836087805208f6",
+    "source_group": "d632768529d346d5b02a508813f8aad1e68c751f91645ae3e8750bd9a1a94ba4",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_01__03_lam_sang.jpg"
+  },
+  {
+    "id": "9703c726a13756d9e465e3d0",
+    "parent_id": "b2779adaec836087805208f6",
+    "source_group": "d632768529d346d5b02a508813f8aad1e68c751f91645ae3e8750bd9a1a94ba4",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_01__04_lam_toi.jpg"
+  },
+  {
+    "id": "300e5e100d434df3e7338fbb",
+    "parent_id": "b2779adaec836087805208f6",
+    "source_group": "d632768529d346d5b02a508813f8aad1e68c751f91645ae3e8750bd9a1a94ba4",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_01__05_loa_sang.jpg"
+  },
+  {
+    "id": "9bc17b14730e65149f2084c2",
+    "parent_id": "b2779adaec836087805208f6",
+    "source_group": "d632768529d346d5b02a508813f8aad1e68c751f91645ae3e8750bd9a1a94ba4",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_01__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "06218d2fc4e74d92484d2b00",
+    "parent_id": "b2779adaec836087805208f6",
+    "source_group": "d632768529d346d5b02a508813f8aad1e68c751f91645ae3e8750bd9a1a94ba4",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_01__07_ban.jpg"
+  },
+  {
+    "id": "34a44d6919918364ca5fb9e0",
+    "parent_id": "dbe0a2264b6941d5a74005ef",
+    "source_group": "505684afb4382d72d7edf2340ff8af16aaa73417cc7ad665cdcca06710928843",
+    "category": "01_mo",
+    "split": "validation",
+    "full_image": "01_mo/anh_02__01_mo.jpg"
+  },
+  {
+    "id": "8c4b5d0e1040326c0b8ab4c7",
+    "parent_id": "dbe0a2264b6941d5a74005ef",
+    "source_group": "505684afb4382d72d7edf2340ff8af16aaa73417cc7ad665cdcca06710928843",
+    "category": "02_xien_duoi_45",
+    "split": "validation",
+    "full_image": "02_xien_duoi_45/anh_02__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "c0cafbe724b28dd522e2dbbc",
+    "parent_id": "dbe0a2264b6941d5a74005ef",
+    "source_group": "505684afb4382d72d7edf2340ff8af16aaa73417cc7ad665cdcca06710928843",
+    "category": "03_lam_sang",
+    "split": "validation",
+    "full_image": "03_lam_sang/anh_02__03_lam_sang.jpg"
+  },
+  {
+    "id": "1607b4b940d161343e999a6c",
+    "parent_id": "dbe0a2264b6941d5a74005ef",
+    "source_group": "505684afb4382d72d7edf2340ff8af16aaa73417cc7ad665cdcca06710928843",
+    "category": "04_lam_toi",
+    "split": "validation",
+    "full_image": "04_lam_toi/anh_02__04_lam_toi.jpg"
+  },
+  {
+    "id": "bddc4df1b3d4d1853a23123b",
+    "parent_id": "dbe0a2264b6941d5a74005ef",
+    "source_group": "505684afb4382d72d7edf2340ff8af16aaa73417cc7ad665cdcca06710928843",
+    "category": "05_loa_sang",
+    "split": "validation",
+    "full_image": "05_loa_sang/anh_02__05_loa_sang.jpg"
+  },
+  {
+    "id": "7a185fc779d2172a2402202f",
+    "parent_id": "dbe0a2264b6941d5a74005ef",
+    "source_group": "505684afb4382d72d7edf2340ff8af16aaa73417cc7ad665cdcca06710928843",
+    "category": "06_xoay_45_90",
+    "split": "validation",
+    "full_image": "06_xoay_45_90/anh_02__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "f722130688bb66eca55dfe8a",
+    "parent_id": "dbe0a2264b6941d5a74005ef",
+    "source_group": "505684afb4382d72d7edf2340ff8af16aaa73417cc7ad665cdcca06710928843",
+    "category": "07_ban",
+    "split": "validation",
+    "full_image": "07_ban/anh_02__07_ban.jpg"
+  },
+  {
+    "id": "e983a0e14ca0e81a4b3c3a45",
+    "parent_id": "a936ffce74cb11b1e4be32a8",
+    "source_group": "48f72aa3bacb6d37c8cc63900ae1f0e7f7e8eee3a60bfdc63297e228b61f9024",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_03__01_mo.jpg"
+  },
+  {
+    "id": "128863f98b47b7ccda376d6d",
+    "parent_id": "a936ffce74cb11b1e4be32a8",
+    "source_group": "48f72aa3bacb6d37c8cc63900ae1f0e7f7e8eee3a60bfdc63297e228b61f9024",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_03__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "2e5a6867c859a5f41fa118ca",
+    "parent_id": "a936ffce74cb11b1e4be32a8",
+    "source_group": "48f72aa3bacb6d37c8cc63900ae1f0e7f7e8eee3a60bfdc63297e228b61f9024",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_03__03_lam_sang.jpg"
+  },
+  {
+    "id": "54b034f7e35c68cbf76b53e3",
+    "parent_id": "a936ffce74cb11b1e4be32a8",
+    "source_group": "48f72aa3bacb6d37c8cc63900ae1f0e7f7e8eee3a60bfdc63297e228b61f9024",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_03__04_lam_toi.jpg"
+  },
+  {
+    "id": "19ad08a747a20b075d078656",
+    "parent_id": "a936ffce74cb11b1e4be32a8",
+    "source_group": "48f72aa3bacb6d37c8cc63900ae1f0e7f7e8eee3a60bfdc63297e228b61f9024",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_03__05_loa_sang.jpg"
+  },
+  {
+    "id": "73dadad0ce5d79e5c7c4dead",
+    "parent_id": "a936ffce74cb11b1e4be32a8",
+    "source_group": "48f72aa3bacb6d37c8cc63900ae1f0e7f7e8eee3a60bfdc63297e228b61f9024",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_03__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "71d6fb0e88d47398686ea2b6",
+    "parent_id": "a936ffce74cb11b1e4be32a8",
+    "source_group": "48f72aa3bacb6d37c8cc63900ae1f0e7f7e8eee3a60bfdc63297e228b61f9024",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_03__07_ban.jpg"
+  },
+  {
+    "id": "7d891fa58d26dcacf4a58966",
+    "parent_id": "d9bf7108f7477f42a3d4b8e7",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_04__01_mo.jpg"
+  },
+  {
+    "id": "d84600323b5a688c37f3ba6d",
+    "parent_id": "32bd40ff6b91e9cb91fffc46",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_04__01_mo.jpg"
+  },
+  {
+    "id": "fc73bae94e12801f344fbc1e",
+    "parent_id": "c5a7deb883f409f05c3d5eda",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_04__01_mo.jpg"
+  },
+  {
+    "id": "cc2650d5a832672394263d12",
+    "parent_id": "d9bf7108f7477f42a3d4b8e7",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_04__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "cd855c631264c5ec0141b7a1",
+    "parent_id": "32bd40ff6b91e9cb91fffc46",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_04__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "798ac80b255d3a672f487b3c",
+    "parent_id": "c5a7deb883f409f05c3d5eda",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_04__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "b7d8ab3a81be0d71fc78031e",
+    "parent_id": "d9bf7108f7477f42a3d4b8e7",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_04__03_lam_sang.jpg"
+  },
+  {
+    "id": "16e5812637a95cf85575de99",
+    "parent_id": "32bd40ff6b91e9cb91fffc46",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_04__03_lam_sang.jpg"
+  },
+  {
+    "id": "c5503cc4e653dae822eb5a12",
+    "parent_id": "c5a7deb883f409f05c3d5eda",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_04__03_lam_sang.jpg"
+  },
+  {
+    "id": "c8ba1a5dae739dc81279eb77",
+    "parent_id": "d9bf7108f7477f42a3d4b8e7",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_04__04_lam_toi.jpg"
+  },
+  {
+    "id": "684c57d14b6eeba47611b6e2",
+    "parent_id": "32bd40ff6b91e9cb91fffc46",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_04__04_lam_toi.jpg"
+  },
+  {
+    "id": "e58a72d92a6f4b0814dbc314",
+    "parent_id": "c5a7deb883f409f05c3d5eda",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_04__04_lam_toi.jpg"
+  },
+  {
+    "id": "8e4b6fe4c4ab3712b55b59a2",
+    "parent_id": "d9bf7108f7477f42a3d4b8e7",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_04__05_loa_sang.jpg"
+  },
+  {
+    "id": "ad5e959178a0d7fca1ef5174",
+    "parent_id": "32bd40ff6b91e9cb91fffc46",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_04__05_loa_sang.jpg"
+  },
+  {
+    "id": "2d28ab131a4abec7d9e7469b",
+    "parent_id": "c5a7deb883f409f05c3d5eda",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_04__05_loa_sang.jpg"
+  },
+  {
+    "id": "a7f03463bbf320ff29adc430",
+    "parent_id": "d9bf7108f7477f42a3d4b8e7",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_04__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "fff7a4c31c7e2139646b6c98",
+    "parent_id": "32bd40ff6b91e9cb91fffc46",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_04__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "507de00718a973910f377982",
+    "parent_id": "c5a7deb883f409f05c3d5eda",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_04__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "38b6be98fa605843891c8b3b",
+    "parent_id": "d9bf7108f7477f42a3d4b8e7",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_04__07_ban.jpg"
+  },
+  {
+    "id": "a1c067ab27512f455582498d",
+    "parent_id": "32bd40ff6b91e9cb91fffc46",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_04__07_ban.jpg"
+  },
+  {
+    "id": "704e706449fae6cc4e692ec9",
+    "parent_id": "c5a7deb883f409f05c3d5eda",
+    "source_group": "107854515b5671aed674c71ed84c343af0e234d5d231caee5f18db6dd216bd9a",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_04__07_ban.jpg"
+  },
+  {
+    "id": "fedda68984249533ffaef752",
+    "parent_id": "04982ed61d08fc989fc45906",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_05__01_mo.jpg"
+  },
+  {
+    "id": "d587aee039da9cfeba84b1e8",
+    "parent_id": "1a93562f24be95dc43e16d16",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_05__01_mo.jpg"
+  },
+  {
+    "id": "42afb06433840b90ee10aeab",
+    "parent_id": "e945de7d71656478f286dc91",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_05__01_mo.jpg"
+  },
+  {
+    "id": "1919658de0cca50e92635f4b",
+    "parent_id": "04982ed61d08fc989fc45906",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_05__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "043c3a25ca51738750697cbc",
+    "parent_id": "1a93562f24be95dc43e16d16",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_05__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "77216003a31710055faf06ea",
+    "parent_id": "e945de7d71656478f286dc91",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_05__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "92c09fd08e052d878941c3ef",
+    "parent_id": "04982ed61d08fc989fc45906",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_05__03_lam_sang.jpg"
+  },
+  {
+    "id": "694bd9fd1968a215fc59b697",
+    "parent_id": "1a93562f24be95dc43e16d16",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_05__03_lam_sang.jpg"
+  },
+  {
+    "id": "fdaccfb9766c1bc8369ae894",
+    "parent_id": "e945de7d71656478f286dc91",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_05__03_lam_sang.jpg"
+  },
+  {
+    "id": "934f383116d3c720b6bfd7b1",
+    "parent_id": "04982ed61d08fc989fc45906",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_05__04_lam_toi.jpg"
+  },
+  {
+    "id": "78f48d01663b4144694a3ed1",
+    "parent_id": "1a93562f24be95dc43e16d16",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_05__04_lam_toi.jpg"
+  },
+  {
+    "id": "dc90dc032288c0497e6f9138",
+    "parent_id": "e945de7d71656478f286dc91",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_05__04_lam_toi.jpg"
+  },
+  {
+    "id": "be1ab1e8b0281092d2d8629d",
+    "parent_id": "04982ed61d08fc989fc45906",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_05__05_loa_sang.jpg"
+  },
+  {
+    "id": "0f8ec54e0326c74b8482bcc8",
+    "parent_id": "1a93562f24be95dc43e16d16",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_05__05_loa_sang.jpg"
+  },
+  {
+    "id": "62334917209138fc7e6d6801",
+    "parent_id": "e945de7d71656478f286dc91",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_05__05_loa_sang.jpg"
+  },
+  {
+    "id": "be44b89624e1fee1e09e049c",
+    "parent_id": "04982ed61d08fc989fc45906",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_05__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "c65e17d906bbc737ce2a75dd",
+    "parent_id": "1a93562f24be95dc43e16d16",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_05__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "81997d3d8c14239f9e02ea53",
+    "parent_id": "e945de7d71656478f286dc91",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_05__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "4b72ad541aad178c40382cb8",
+    "parent_id": "04982ed61d08fc989fc45906",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_05__07_ban.jpg"
+  },
+  {
+    "id": "89a8ac837092b8f2f35ec07e",
+    "parent_id": "1a93562f24be95dc43e16d16",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_05__07_ban.jpg"
+  },
+  {
+    "id": "7eb2c43577bc781df84b2b31",
+    "parent_id": "e945de7d71656478f286dc91",
+    "source_group": "f54c3e19175206a1a8b76223c6967f5254ed44d9a1287a4e652936816bb66e46",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_05__07_ban.jpg"
+  },
+  {
+    "id": "91c7db2934d168912b711c5c",
+    "parent_id": "d941e4bc62077607fabbbb21",
+    "source_group": "0fbc780e25a4b55ac311ec7e72157d44a25093c1208e833cfce65bc004465dc7",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_06__01_mo.jpg"
+  },
+  {
+    "id": "3c7e62da99bf995a80e58fe0",
+    "parent_id": "d941e4bc62077607fabbbb21",
+    "source_group": "0fbc780e25a4b55ac311ec7e72157d44a25093c1208e833cfce65bc004465dc7",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_06__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "60f9eb2f02078628e49fa8f3",
+    "parent_id": "d941e4bc62077607fabbbb21",
+    "source_group": "0fbc780e25a4b55ac311ec7e72157d44a25093c1208e833cfce65bc004465dc7",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_06__03_lam_sang.jpg"
+  },
+  {
+    "id": "f88f04935209b2200e4f9ebc",
+    "parent_id": "d941e4bc62077607fabbbb21",
+    "source_group": "0fbc780e25a4b55ac311ec7e72157d44a25093c1208e833cfce65bc004465dc7",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_06__04_lam_toi.jpg"
+  },
+  {
+    "id": "03862ba1231ed2ea11b19235",
+    "parent_id": "d941e4bc62077607fabbbb21",
+    "source_group": "0fbc780e25a4b55ac311ec7e72157d44a25093c1208e833cfce65bc004465dc7",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_06__05_loa_sang.jpg"
+  },
+  {
+    "id": "21f551ff039fae7403f7ef25",
+    "parent_id": "d941e4bc62077607fabbbb21",
+    "source_group": "0fbc780e25a4b55ac311ec7e72157d44a25093c1208e833cfce65bc004465dc7",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_06__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "a513bd7175d3344e5c64991b",
+    "parent_id": "d941e4bc62077607fabbbb21",
+    "source_group": "0fbc780e25a4b55ac311ec7e72157d44a25093c1208e833cfce65bc004465dc7",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_06__07_ban.jpg"
+  },
+  {
+    "id": "0cc4a3b101e7c653125ce449",
+    "parent_id": "f84fd057105213bf86d0dad1",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_07__01_mo.jpg"
+  },
+  {
+    "id": "142cc1e86bb7002cd2bba119",
+    "parent_id": "3e8141f8c22ed761dcfacdcb",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_07__01_mo.jpg"
+  },
+  {
+    "id": "d4a976be886fc4cb8dffee57",
+    "parent_id": "f84fd057105213bf86d0dad1",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_07__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "b83adaa5b8ba9045272ab1bf",
+    "parent_id": "3e8141f8c22ed761dcfacdcb",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_07__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "d073e177d8229bf27d420631",
+    "parent_id": "f84fd057105213bf86d0dad1",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_07__03_lam_sang.jpg"
+  },
+  {
+    "id": "0208392e05b4cb591e02d73e",
+    "parent_id": "3e8141f8c22ed761dcfacdcb",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_07__03_lam_sang.jpg"
+  },
+  {
+    "id": "f2709554d7846eaf215a1e98",
+    "parent_id": "f84fd057105213bf86d0dad1",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_07__04_lam_toi.jpg"
+  },
+  {
+    "id": "c46977d7e5a400dfbdc14bed",
+    "parent_id": "3e8141f8c22ed761dcfacdcb",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_07__04_lam_toi.jpg"
+  },
+  {
+    "id": "9cf9641213c410f2f12b9688",
+    "parent_id": "f84fd057105213bf86d0dad1",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_07__05_loa_sang.jpg"
+  },
+  {
+    "id": "972621ffd0f518c075839abb",
+    "parent_id": "3e8141f8c22ed761dcfacdcb",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_07__05_loa_sang.jpg"
+  },
+  {
+    "id": "bce8d3387a6a47d8463ea101",
+    "parent_id": "f84fd057105213bf86d0dad1",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_07__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "6b6d292a685fbf0e47e63749",
+    "parent_id": "3e8141f8c22ed761dcfacdcb",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_07__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "381cea721d193b6fa1224523",
+    "parent_id": "f84fd057105213bf86d0dad1",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_07__07_ban.jpg"
+  },
+  {
+    "id": "5dd7b285de996fa09f3b6c93",
+    "parent_id": "3e8141f8c22ed761dcfacdcb",
+    "source_group": "69cf0ac04a78d8503b0bf7d6342bb48541c531a4a9b683b0ae53999542151309",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_07__07_ban.jpg"
+  },
+  {
+    "id": "4b4c993ad09686086345d4d2",
+    "parent_id": "2766ad50a16cf1a809215b47",
+    "source_group": "85b7541606d10615c6eb3d6ce37bb2fed934eb9bceda03d7607c004810a6f85a",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_08__01_mo.jpg"
+  },
+  {
+    "id": "6bb1b3181cdcfd16a8da1482",
+    "parent_id": "2766ad50a16cf1a809215b47",
+    "source_group": "85b7541606d10615c6eb3d6ce37bb2fed934eb9bceda03d7607c004810a6f85a",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_08__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "690683780ca8ea600a194a21",
+    "parent_id": "2766ad50a16cf1a809215b47",
+    "source_group": "85b7541606d10615c6eb3d6ce37bb2fed934eb9bceda03d7607c004810a6f85a",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_08__03_lam_sang.jpg"
+  },
+  {
+    "id": "de5c5a88dd04cabbc512ae79",
+    "parent_id": "2766ad50a16cf1a809215b47",
+    "source_group": "85b7541606d10615c6eb3d6ce37bb2fed934eb9bceda03d7607c004810a6f85a",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_08__04_lam_toi.jpg"
+  },
+  {
+    "id": "70dda45b66e15774cd45d7d6",
+    "parent_id": "2766ad50a16cf1a809215b47",
+    "source_group": "85b7541606d10615c6eb3d6ce37bb2fed934eb9bceda03d7607c004810a6f85a",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_08__05_loa_sang.jpg"
+  },
+  {
+    "id": "3af2138fac58fb2bfd349252",
+    "parent_id": "2766ad50a16cf1a809215b47",
+    "source_group": "85b7541606d10615c6eb3d6ce37bb2fed934eb9bceda03d7607c004810a6f85a",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_08__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "778a9b23b3a63cef9561fa11",
+    "parent_id": "2766ad50a16cf1a809215b47",
+    "source_group": "85b7541606d10615c6eb3d6ce37bb2fed934eb9bceda03d7607c004810a6f85a",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_08__07_ban.jpg"
+  },
+  {
+    "id": "f04783ebb61fa493c6ad3892",
+    "parent_id": "457fb280bad5c99d0e170878",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "01_mo",
+    "split": "test",
+    "full_image": "01_mo/anh_09__01_mo.jpg"
+  },
+  {
+    "id": "791943553cffc0b7a51a8adc",
+    "parent_id": "3b509f70529d7356f455a6ad",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "01_mo",
+    "split": "test",
+    "full_image": "01_mo/anh_09__01_mo.jpg"
+  },
+  {
+    "id": "c697901ca3e47f6ad2f1fc58",
+    "parent_id": "457fb280bad5c99d0e170878",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "02_xien_duoi_45",
+    "split": "test",
+    "full_image": "02_xien_duoi_45/anh_09__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "8fbdee2e9c709ff0107ab69d",
+    "parent_id": "3b509f70529d7356f455a6ad",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "02_xien_duoi_45",
+    "split": "test",
+    "full_image": "02_xien_duoi_45/anh_09__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "23a1da1bd839fc40495ff86e",
+    "parent_id": "457fb280bad5c99d0e170878",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "03_lam_sang",
+    "split": "test",
+    "full_image": "03_lam_sang/anh_09__03_lam_sang.jpg"
+  },
+  {
+    "id": "c04ac137346c9ec714e4b562",
+    "parent_id": "3b509f70529d7356f455a6ad",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "03_lam_sang",
+    "split": "test",
+    "full_image": "03_lam_sang/anh_09__03_lam_sang.jpg"
+  },
+  {
+    "id": "3babfe2ebe1d30eeeee7aff5",
+    "parent_id": "457fb280bad5c99d0e170878",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "04_lam_toi",
+    "split": "test",
+    "full_image": "04_lam_toi/anh_09__04_lam_toi.jpg"
+  },
+  {
+    "id": "bd8947c80e047a066d669406",
+    "parent_id": "3b509f70529d7356f455a6ad",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "04_lam_toi",
+    "split": "test",
+    "full_image": "04_lam_toi/anh_09__04_lam_toi.jpg"
+  },
+  {
+    "id": "a167fbd80c9f63ffb436987e",
+    "parent_id": "457fb280bad5c99d0e170878",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "05_loa_sang",
+    "split": "test",
+    "full_image": "05_loa_sang/anh_09__05_loa_sang.jpg"
+  },
+  {
+    "id": "eefe6df89da880dcb16a5b9a",
+    "parent_id": "3b509f70529d7356f455a6ad",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "05_loa_sang",
+    "split": "test",
+    "full_image": "05_loa_sang/anh_09__05_loa_sang.jpg"
+  },
+  {
+    "id": "8d100e2c1b9388bb2fa8bed6",
+    "parent_id": "457fb280bad5c99d0e170878",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "06_xoay_45_90",
+    "split": "test",
+    "full_image": "06_xoay_45_90/anh_09__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "640d16c995773b4abfcc47d5",
+    "parent_id": "3b509f70529d7356f455a6ad",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "06_xoay_45_90",
+    "split": "test",
+    "full_image": "06_xoay_45_90/anh_09__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "a06b120efe77a1299016d72d",
+    "parent_id": "457fb280bad5c99d0e170878",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "07_ban",
+    "split": "test",
+    "full_image": "07_ban/anh_09__07_ban.jpg"
+  },
+  {
+    "id": "a7a85eefa4d3c466fb07ccb9",
+    "parent_id": "3b509f70529d7356f455a6ad",
+    "source_group": "979d6f75fbd3046d699c52f990c1018af01d93ed0ea576e5c69e9852cae06688",
+    "category": "07_ban",
+    "split": "test",
+    "full_image": "07_ban/anh_09__07_ban.jpg"
+  },
+  {
+    "id": "6e8ee0cf949aa5d2e9ac2bee",
+    "parent_id": "aa65fedd0d88b2cfa1aa3ec2",
+    "source_group": "b856c0e71b69bafc669bfb01418cec8ea04b2535d94c19cd8833437bee9de3e8",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_10__01_mo.jpg"
+  },
+  {
+    "id": "1cfbe880c6c4f4603665cdfd",
+    "parent_id": "aa65fedd0d88b2cfa1aa3ec2",
+    "source_group": "b856c0e71b69bafc669bfb01418cec8ea04b2535d94c19cd8833437bee9de3e8",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_10__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "7ddd04a72b1d5845060479b2",
+    "parent_id": "aa65fedd0d88b2cfa1aa3ec2",
+    "source_group": "b856c0e71b69bafc669bfb01418cec8ea04b2535d94c19cd8833437bee9de3e8",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_10__03_lam_sang.jpg"
+  },
+  {
+    "id": "3dab89f0d75b01bd9820db2c",
+    "parent_id": "aa65fedd0d88b2cfa1aa3ec2",
+    "source_group": "b856c0e71b69bafc669bfb01418cec8ea04b2535d94c19cd8833437bee9de3e8",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_10__04_lam_toi.jpg"
+  },
+  {
+    "id": "d20e13e6b276a3a3a9265a08",
+    "parent_id": "aa65fedd0d88b2cfa1aa3ec2",
+    "source_group": "b856c0e71b69bafc669bfb01418cec8ea04b2535d94c19cd8833437bee9de3e8",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_10__05_loa_sang.jpg"
+  },
+  {
+    "id": "b25fcddb721e7f70945d76aa",
+    "parent_id": "aa65fedd0d88b2cfa1aa3ec2",
+    "source_group": "b856c0e71b69bafc669bfb01418cec8ea04b2535d94c19cd8833437bee9de3e8",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_10__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "c243a6a89f0b096a86d99810",
+    "parent_id": "aa65fedd0d88b2cfa1aa3ec2",
+    "source_group": "b856c0e71b69bafc669bfb01418cec8ea04b2535d94c19cd8833437bee9de3e8",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_10__07_ban.jpg"
+  },
+  {
+    "id": "5ec95fc960c275f884b89e8a",
+    "parent_id": "334af2665d7d89379e555e09",
+    "source_group": "9df3c8a2a6ad3e544154b178630f1db6ff88f72931e2c325a9327fd0388f182e",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_11__01_mo.jpg"
+  },
+  {
+    "id": "ee291971f655d95078820223",
+    "parent_id": "334af2665d7d89379e555e09",
+    "source_group": "9df3c8a2a6ad3e544154b178630f1db6ff88f72931e2c325a9327fd0388f182e",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_11__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "0119560bb5c54b04015e9812",
+    "parent_id": "334af2665d7d89379e555e09",
+    "source_group": "9df3c8a2a6ad3e544154b178630f1db6ff88f72931e2c325a9327fd0388f182e",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_11__03_lam_sang.jpg"
+  },
+  {
+    "id": "ee736764cd11eb0c380a0128",
+    "parent_id": "334af2665d7d89379e555e09",
+    "source_group": "9df3c8a2a6ad3e544154b178630f1db6ff88f72931e2c325a9327fd0388f182e",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_11__04_lam_toi.jpg"
+  },
+  {
+    "id": "18031ae683f93be5d8d41cb0",
+    "parent_id": "334af2665d7d89379e555e09",
+    "source_group": "9df3c8a2a6ad3e544154b178630f1db6ff88f72931e2c325a9327fd0388f182e",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_11__05_loa_sang.jpg"
+  },
+  {
+    "id": "e0cc3412e654e1b812f09b6e",
+    "parent_id": "334af2665d7d89379e555e09",
+    "source_group": "9df3c8a2a6ad3e544154b178630f1db6ff88f72931e2c325a9327fd0388f182e",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_11__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "e1ebbde797816ff1962a6d1d",
+    "parent_id": "334af2665d7d89379e555e09",
+    "source_group": "9df3c8a2a6ad3e544154b178630f1db6ff88f72931e2c325a9327fd0388f182e",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_11__07_ban.jpg"
+  },
+  {
+    "id": "878c7a4d2f7cc22305b5a625",
+    "parent_id": "1d812e631f35ff82f7bc7768",
+    "source_group": "0d4fffcb597a698f13c25300cec90cdedda762528b4159342d6a92c816fc049e",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_12__01_mo.jpg"
+  },
+  {
+    "id": "845f95d6ab46f370ee54bb57",
+    "parent_id": "1d812e631f35ff82f7bc7768",
+    "source_group": "0d4fffcb597a698f13c25300cec90cdedda762528b4159342d6a92c816fc049e",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_12__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "2be23035cb5f1ab67b000ddf",
+    "parent_id": "1d812e631f35ff82f7bc7768",
+    "source_group": "0d4fffcb597a698f13c25300cec90cdedda762528b4159342d6a92c816fc049e",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_12__03_lam_sang.jpg"
+  },
+  {
+    "id": "e66e22cb0f32e07f2f7dcd0f",
+    "parent_id": "1d812e631f35ff82f7bc7768",
+    "source_group": "0d4fffcb597a698f13c25300cec90cdedda762528b4159342d6a92c816fc049e",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_12__04_lam_toi.jpg"
+  },
+  {
+    "id": "3abbb0693c399835ccd3ccb3",
+    "parent_id": "1d812e631f35ff82f7bc7768",
+    "source_group": "0d4fffcb597a698f13c25300cec90cdedda762528b4159342d6a92c816fc049e",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_12__05_loa_sang.jpg"
+  },
+  {
+    "id": "46843f7b8255cf158db9bfac",
+    "parent_id": "1d812e631f35ff82f7bc7768",
+    "source_group": "0d4fffcb597a698f13c25300cec90cdedda762528b4159342d6a92c816fc049e",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_12__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "3ea48cff391008b8b8a06a6b",
+    "parent_id": "1d812e631f35ff82f7bc7768",
+    "source_group": "0d4fffcb597a698f13c25300cec90cdedda762528b4159342d6a92c816fc049e",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_12__07_ban.jpg"
+  },
+  {
+    "id": "c6a9f27d4a23497061d1573c",
+    "parent_id": "9292f94a9b79c6fba3369bf0",
+    "source_group": "e60c097d64851f294b5efe943a025676a5c4a1c878f6241be98f53de2d9b5c92",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_13__01_mo.jpg"
+  },
+  {
+    "id": "5f019b4bfd23cdc182d4bc01",
+    "parent_id": "9292f94a9b79c6fba3369bf0",
+    "source_group": "e60c097d64851f294b5efe943a025676a5c4a1c878f6241be98f53de2d9b5c92",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_13__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "42cdd57669ecd82ebf4f2406",
+    "parent_id": "9292f94a9b79c6fba3369bf0",
+    "source_group": "e60c097d64851f294b5efe943a025676a5c4a1c878f6241be98f53de2d9b5c92",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_13__03_lam_sang.jpg"
+  },
+  {
+    "id": "833cd9876ba30dc6b270117a",
+    "parent_id": "9292f94a9b79c6fba3369bf0",
+    "source_group": "e60c097d64851f294b5efe943a025676a5c4a1c878f6241be98f53de2d9b5c92",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_13__04_lam_toi.jpg"
+  },
+  {
+    "id": "7f933a26652a823155fb3579",
+    "parent_id": "9292f94a9b79c6fba3369bf0",
+    "source_group": "e60c097d64851f294b5efe943a025676a5c4a1c878f6241be98f53de2d9b5c92",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_13__05_loa_sang.jpg"
+  },
+  {
+    "id": "f7f680bebda2629ac3115c7e",
+    "parent_id": "9292f94a9b79c6fba3369bf0",
+    "source_group": "e60c097d64851f294b5efe943a025676a5c4a1c878f6241be98f53de2d9b5c92",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_13__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "4084723bc0f06b3cc5e72658",
+    "parent_id": "9292f94a9b79c6fba3369bf0",
+    "source_group": "e60c097d64851f294b5efe943a025676a5c4a1c878f6241be98f53de2d9b5c92",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_13__07_ban.jpg"
+  },
+  {
+    "id": "29ea9473656225b92a4b4342",
+    "parent_id": "79e9d72c4ad3b941993cc138",
+    "source_group": "edae5358702408d63498bbf42c12bc33ed00226cfcc3df3ea39e223cfa45691e",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_15__01_mo.jpg"
+  },
+  {
+    "id": "c914395e4fffb35debb83efd",
+    "parent_id": "79e9d72c4ad3b941993cc138",
+    "source_group": "edae5358702408d63498bbf42c12bc33ed00226cfcc3df3ea39e223cfa45691e",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_15__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "dc4eb6bede662cba79c834db",
+    "parent_id": "79e9d72c4ad3b941993cc138",
+    "source_group": "edae5358702408d63498bbf42c12bc33ed00226cfcc3df3ea39e223cfa45691e",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_15__03_lam_sang.jpg"
+  },
+  {
+    "id": "e19aed40e219085516e9e873",
+    "parent_id": "79e9d72c4ad3b941993cc138",
+    "source_group": "edae5358702408d63498bbf42c12bc33ed00226cfcc3df3ea39e223cfa45691e",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_15__04_lam_toi.jpg"
+  },
+  {
+    "id": "84f9bda482db5a1971238ad4",
+    "parent_id": "79e9d72c4ad3b941993cc138",
+    "source_group": "edae5358702408d63498bbf42c12bc33ed00226cfcc3df3ea39e223cfa45691e",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_15__05_loa_sang.jpg"
+  },
+  {
+    "id": "619e11a23203def99a94a97b",
+    "parent_id": "79e9d72c4ad3b941993cc138",
+    "source_group": "edae5358702408d63498bbf42c12bc33ed00226cfcc3df3ea39e223cfa45691e",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_15__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "7daaf94379589d7f571295a4",
+    "parent_id": "79e9d72c4ad3b941993cc138",
+    "source_group": "edae5358702408d63498bbf42c12bc33ed00226cfcc3df3ea39e223cfa45691e",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_15__07_ban.jpg"
+  },
+  {
+    "id": "eab6ea8bccd43a8dbf72cd58",
+    "parent_id": "929aa4c0e811aa8fef56ba08",
+    "source_group": "7f692c543d63a27850f0db2bf1698acdcd7f4c9214c75f13fe2faa5448e01439",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_16__01_mo.jpg"
+  },
+  {
+    "id": "c9cec666758eaa6b1e2203fa",
+    "parent_id": "929aa4c0e811aa8fef56ba08",
+    "source_group": "7f692c543d63a27850f0db2bf1698acdcd7f4c9214c75f13fe2faa5448e01439",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_16__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "ccbea3e3e2259b634c6c02d7",
+    "parent_id": "929aa4c0e811aa8fef56ba08",
+    "source_group": "7f692c543d63a27850f0db2bf1698acdcd7f4c9214c75f13fe2faa5448e01439",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_16__03_lam_sang.jpg"
+  },
+  {
+    "id": "8e935ec85c0181f01a691a2a",
+    "parent_id": "929aa4c0e811aa8fef56ba08",
+    "source_group": "7f692c543d63a27850f0db2bf1698acdcd7f4c9214c75f13fe2faa5448e01439",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_16__04_lam_toi.jpg"
+  },
+  {
+    "id": "27518e8dbcaa5d89a31840fd",
+    "parent_id": "929aa4c0e811aa8fef56ba08",
+    "source_group": "7f692c543d63a27850f0db2bf1698acdcd7f4c9214c75f13fe2faa5448e01439",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_16__05_loa_sang.jpg"
+  },
+  {
+    "id": "d9caaea14ffa103253dc1681",
+    "parent_id": "929aa4c0e811aa8fef56ba08",
+    "source_group": "7f692c543d63a27850f0db2bf1698acdcd7f4c9214c75f13fe2faa5448e01439",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_16__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "056377d14c74b4ca414d8bb8",
+    "parent_id": "929aa4c0e811aa8fef56ba08",
+    "source_group": "7f692c543d63a27850f0db2bf1698acdcd7f4c9214c75f13fe2faa5448e01439",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_16__07_ban.jpg"
+  },
+  {
+    "id": "2f03f13856d3fffb54d356f8",
+    "parent_id": "5613383eaa342d1088b04b52",
+    "source_group": "96dc5ce2a4fe9072bdea4d488852072f5734b161af2534d38c6b8bd87f5cc281",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_17__01_mo.jpg"
+  },
+  {
+    "id": "c3dcab42bce04071c70801f8",
+    "parent_id": "5613383eaa342d1088b04b52",
+    "source_group": "96dc5ce2a4fe9072bdea4d488852072f5734b161af2534d38c6b8bd87f5cc281",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_17__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "7047cccea35b6f1fc1801df1",
+    "parent_id": "5613383eaa342d1088b04b52",
+    "source_group": "96dc5ce2a4fe9072bdea4d488852072f5734b161af2534d38c6b8bd87f5cc281",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_17__03_lam_sang.jpg"
+  },
+  {
+    "id": "734c6bb056dd93340135dcbd",
+    "parent_id": "5613383eaa342d1088b04b52",
+    "source_group": "96dc5ce2a4fe9072bdea4d488852072f5734b161af2534d38c6b8bd87f5cc281",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_17__04_lam_toi.jpg"
+  },
+  {
+    "id": "162010b72986fece98524749",
+    "parent_id": "5613383eaa342d1088b04b52",
+    "source_group": "96dc5ce2a4fe9072bdea4d488852072f5734b161af2534d38c6b8bd87f5cc281",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_17__05_loa_sang.jpg"
+  },
+  {
+    "id": "f8570032b301bacfc508817d",
+    "parent_id": "5613383eaa342d1088b04b52",
+    "source_group": "96dc5ce2a4fe9072bdea4d488852072f5734b161af2534d38c6b8bd87f5cc281",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_17__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "20f5100e4b4adab65d6c9bdc",
+    "parent_id": "5613383eaa342d1088b04b52",
+    "source_group": "96dc5ce2a4fe9072bdea4d488852072f5734b161af2534d38c6b8bd87f5cc281",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_17__07_ban.jpg"
+  },
+  {
+    "id": "c14ab773807e119d3aaa67ce",
+    "parent_id": "36b97bc593c9ec7cb88cc64c",
+    "source_group": "df722b49d609c698107dd12b66fdcb4c29baa0e76e0f4b7116d9c25b51897997",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_18__01_mo.jpg"
+  },
+  {
+    "id": "b9307ec50f71266b64cadf18",
+    "parent_id": "36b97bc593c9ec7cb88cc64c",
+    "source_group": "df722b49d609c698107dd12b66fdcb4c29baa0e76e0f4b7116d9c25b51897997",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_18__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "52670d2a7fc18f4871faea86",
+    "parent_id": "36b97bc593c9ec7cb88cc64c",
+    "source_group": "df722b49d609c698107dd12b66fdcb4c29baa0e76e0f4b7116d9c25b51897997",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_18__03_lam_sang.jpg"
+  },
+  {
+    "id": "954b423b66d021f0ad81f913",
+    "parent_id": "36b97bc593c9ec7cb88cc64c",
+    "source_group": "df722b49d609c698107dd12b66fdcb4c29baa0e76e0f4b7116d9c25b51897997",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_18__04_lam_toi.jpg"
+  },
+  {
+    "id": "30a1e03406c1ff85241b3ccc",
+    "parent_id": "36b97bc593c9ec7cb88cc64c",
+    "source_group": "df722b49d609c698107dd12b66fdcb4c29baa0e76e0f4b7116d9c25b51897997",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_18__05_loa_sang.jpg"
+  },
+  {
+    "id": "48ca74787471bfdd9e8f1bc8",
+    "parent_id": "36b97bc593c9ec7cb88cc64c",
+    "source_group": "df722b49d609c698107dd12b66fdcb4c29baa0e76e0f4b7116d9c25b51897997",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_18__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "1ccd55d8f13fe560fe1c2ade",
+    "parent_id": "36b97bc593c9ec7cb88cc64c",
+    "source_group": "df722b49d609c698107dd12b66fdcb4c29baa0e76e0f4b7116d9c25b51897997",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_18__07_ban.jpg"
+  },
+  {
+    "id": "b656155e7f5232723f5e6400",
+    "parent_id": "3694400327a966e91ea475aa",
+    "source_group": "1c74a693be76624cf9b2c76c20041619c7ccc820a9096f508ffc94fd7963dc0f",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_23__01_mo.jpg"
+  },
+  {
+    "id": "9dc665603f4b3726d4fdf7d5",
+    "parent_id": "3694400327a966e91ea475aa",
+    "source_group": "1c74a693be76624cf9b2c76c20041619c7ccc820a9096f508ffc94fd7963dc0f",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_23__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "184b8eebe2bd1ef7d4b1a1e6",
+    "parent_id": "3694400327a966e91ea475aa",
+    "source_group": "1c74a693be76624cf9b2c76c20041619c7ccc820a9096f508ffc94fd7963dc0f",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_23__03_lam_sang.jpg"
+  },
+  {
+    "id": "efe7259523031f86bc3efce5",
+    "parent_id": "3694400327a966e91ea475aa",
+    "source_group": "1c74a693be76624cf9b2c76c20041619c7ccc820a9096f508ffc94fd7963dc0f",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_23__04_lam_toi.jpg"
+  },
+  {
+    "id": "844bb3d2824fbb8db6768ab2",
+    "parent_id": "3694400327a966e91ea475aa",
+    "source_group": "1c74a693be76624cf9b2c76c20041619c7ccc820a9096f508ffc94fd7963dc0f",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_23__05_loa_sang.jpg"
+  },
+  {
+    "id": "091ac77d99aef9124fd60754",
+    "parent_id": "3694400327a966e91ea475aa",
+    "source_group": "1c74a693be76624cf9b2c76c20041619c7ccc820a9096f508ffc94fd7963dc0f",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_23__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "10ff55d0f222e226792236e5",
+    "parent_id": "3694400327a966e91ea475aa",
+    "source_group": "1c74a693be76624cf9b2c76c20041619c7ccc820a9096f508ffc94fd7963dc0f",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_23__07_ban.jpg"
+  },
+  {
+    "id": "2ee9d300767b025c59e10552",
+    "parent_id": "798276f3c18cd61c72826325",
+    "source_group": "8a5364ad6d8bbb5fd5c53f440afbf2e0908872f3c75fc6f2b4231bdcfe948db0",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_24__01_mo.jpg"
+  },
+  {
+    "id": "c0a59963d2fd1ad565e3c072",
+    "parent_id": "798276f3c18cd61c72826325",
+    "source_group": "8a5364ad6d8bbb5fd5c53f440afbf2e0908872f3c75fc6f2b4231bdcfe948db0",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_24__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "cf0772e2ffd9379eb7c05b33",
+    "parent_id": "798276f3c18cd61c72826325",
+    "source_group": "8a5364ad6d8bbb5fd5c53f440afbf2e0908872f3c75fc6f2b4231bdcfe948db0",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_24__03_lam_sang.jpg"
+  },
+  {
+    "id": "6762b327b0bac8abf1053422",
+    "parent_id": "798276f3c18cd61c72826325",
+    "source_group": "8a5364ad6d8bbb5fd5c53f440afbf2e0908872f3c75fc6f2b4231bdcfe948db0",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_24__04_lam_toi.jpg"
+  },
+  {
+    "id": "9ae1354ce69b5e98b98224fc",
+    "parent_id": "798276f3c18cd61c72826325",
+    "source_group": "8a5364ad6d8bbb5fd5c53f440afbf2e0908872f3c75fc6f2b4231bdcfe948db0",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_24__05_loa_sang.jpg"
+  },
+  {
+    "id": "10dd7c6dc04f401c590487de",
+    "parent_id": "798276f3c18cd61c72826325",
+    "source_group": "8a5364ad6d8bbb5fd5c53f440afbf2e0908872f3c75fc6f2b4231bdcfe948db0",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_24__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "696e2099c7cdaf1d8134534a",
+    "parent_id": "798276f3c18cd61c72826325",
+    "source_group": "8a5364ad6d8bbb5fd5c53f440afbf2e0908872f3c75fc6f2b4231bdcfe948db0",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_24__07_ban.jpg"
+  },
+  {
+    "id": "47869068b0f96f6dba633588",
+    "parent_id": "c8220cdba0f68b4731342b94",
+    "source_group": "47196da8ebfe70b5de9667d46ed7bc9ead994cd013671ca1b086b73237d180d2",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_25__01_mo.jpg"
+  },
+  {
+    "id": "e1aa7155b12f0e3631970e08",
+    "parent_id": "c8220cdba0f68b4731342b94",
+    "source_group": "47196da8ebfe70b5de9667d46ed7bc9ead994cd013671ca1b086b73237d180d2",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_25__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "7f633819a6976291de8a01a0",
+    "parent_id": "c8220cdba0f68b4731342b94",
+    "source_group": "47196da8ebfe70b5de9667d46ed7bc9ead994cd013671ca1b086b73237d180d2",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_25__03_lam_sang.jpg"
+  },
+  {
+    "id": "c3b9af1718fc011ef595dd5b",
+    "parent_id": "c8220cdba0f68b4731342b94",
+    "source_group": "47196da8ebfe70b5de9667d46ed7bc9ead994cd013671ca1b086b73237d180d2",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_25__04_lam_toi.jpg"
+  },
+  {
+    "id": "c4a332cbe68b633b2da3036c",
+    "parent_id": "c8220cdba0f68b4731342b94",
+    "source_group": "47196da8ebfe70b5de9667d46ed7bc9ead994cd013671ca1b086b73237d180d2",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_25__05_loa_sang.jpg"
+  },
+  {
+    "id": "f66141cf43f29f66a10a1fb9",
+    "parent_id": "c8220cdba0f68b4731342b94",
+    "source_group": "47196da8ebfe70b5de9667d46ed7bc9ead994cd013671ca1b086b73237d180d2",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_25__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "34b11213652340e74dbe0042",
+    "parent_id": "c8220cdba0f68b4731342b94",
+    "source_group": "47196da8ebfe70b5de9667d46ed7bc9ead994cd013671ca1b086b73237d180d2",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_25__07_ban.jpg"
+  },
+  {
+    "id": "2c49e00def9e7f597c7f79e2",
+    "parent_id": "25b798d25d144935a960fa77",
+    "source_group": "976037ac25bb8de14735427e205acfe04e35f6a0d0635efd74c79a07e655cba7",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_26__01_mo.jpg"
+  },
+  {
+    "id": "5309109e31301a6e076d11cb",
+    "parent_id": "25b798d25d144935a960fa77",
+    "source_group": "976037ac25bb8de14735427e205acfe04e35f6a0d0635efd74c79a07e655cba7",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_26__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "3cd8cdce15735dfaf9577af2",
+    "parent_id": "25b798d25d144935a960fa77",
+    "source_group": "976037ac25bb8de14735427e205acfe04e35f6a0d0635efd74c79a07e655cba7",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_26__03_lam_sang.jpg"
+  },
+  {
+    "id": "db31d4a6ff86004f98432b0b",
+    "parent_id": "25b798d25d144935a960fa77",
+    "source_group": "976037ac25bb8de14735427e205acfe04e35f6a0d0635efd74c79a07e655cba7",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_26__04_lam_toi.jpg"
+  },
+  {
+    "id": "d0a94d27ca2529263486e88d",
+    "parent_id": "25b798d25d144935a960fa77",
+    "source_group": "976037ac25bb8de14735427e205acfe04e35f6a0d0635efd74c79a07e655cba7",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_26__05_loa_sang.jpg"
+  },
+  {
+    "id": "4f6288cc018bfe2c09de73fd",
+    "parent_id": "25b798d25d144935a960fa77",
+    "source_group": "976037ac25bb8de14735427e205acfe04e35f6a0d0635efd74c79a07e655cba7",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_26__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "ed40869c70d8358eaae05cae",
+    "parent_id": "25b798d25d144935a960fa77",
+    "source_group": "976037ac25bb8de14735427e205acfe04e35f6a0d0635efd74c79a07e655cba7",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_26__07_ban.jpg"
+  },
+  {
+    "id": "bd6785847a6a027ed56ab687",
+    "parent_id": "c2a7dd31621c2efa82281c2f",
+    "source_group": "1f6b5320e7191ee4eeda7e52fb1ad890c9febe54424c99e689775c2d0f5b5cc0",
+    "category": "01_mo",
+    "split": "validation",
+    "full_image": "01_mo/anh_27__01_mo.jpg"
+  },
+  {
+    "id": "768d57e588ab4b1abfb3a35f",
+    "parent_id": "c2a7dd31621c2efa82281c2f",
+    "source_group": "1f6b5320e7191ee4eeda7e52fb1ad890c9febe54424c99e689775c2d0f5b5cc0",
+    "category": "02_xien_duoi_45",
+    "split": "validation",
+    "full_image": "02_xien_duoi_45/anh_27__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "1f58e11078cf693dde6b6742",
+    "parent_id": "c2a7dd31621c2efa82281c2f",
+    "source_group": "1f6b5320e7191ee4eeda7e52fb1ad890c9febe54424c99e689775c2d0f5b5cc0",
+    "category": "03_lam_sang",
+    "split": "validation",
+    "full_image": "03_lam_sang/anh_27__03_lam_sang.jpg"
+  },
+  {
+    "id": "8b70e731d381367b20035632",
+    "parent_id": "c2a7dd31621c2efa82281c2f",
+    "source_group": "1f6b5320e7191ee4eeda7e52fb1ad890c9febe54424c99e689775c2d0f5b5cc0",
+    "category": "04_lam_toi",
+    "split": "validation",
+    "full_image": "04_lam_toi/anh_27__04_lam_toi.jpg"
+  },
+  {
+    "id": "a65033a43d63164a159bdc05",
+    "parent_id": "c2a7dd31621c2efa82281c2f",
+    "source_group": "1f6b5320e7191ee4eeda7e52fb1ad890c9febe54424c99e689775c2d0f5b5cc0",
+    "category": "05_loa_sang",
+    "split": "validation",
+    "full_image": "05_loa_sang/anh_27__05_loa_sang.jpg"
+  },
+  {
+    "id": "c6ffabc9d0c647b4f3d54291",
+    "parent_id": "c2a7dd31621c2efa82281c2f",
+    "source_group": "1f6b5320e7191ee4eeda7e52fb1ad890c9febe54424c99e689775c2d0f5b5cc0",
+    "category": "06_xoay_45_90",
+    "split": "validation",
+    "full_image": "06_xoay_45_90/anh_27__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "a760c931c6fed9aa48baa279",
+    "parent_id": "c2a7dd31621c2efa82281c2f",
+    "source_group": "1f6b5320e7191ee4eeda7e52fb1ad890c9febe54424c99e689775c2d0f5b5cc0",
+    "category": "07_ban",
+    "split": "validation",
+    "full_image": "07_ban/anh_27__07_ban.jpg"
+  },
+  {
+    "id": "f13c0044e8cb2231a6ada200",
+    "parent_id": "18a72cbe402c2bf49551a445",
+    "source_group": "80787cb8f452b37ce82f692c9987288d69967f715f8663db5d50207a969002d2",
+    "category": "01_mo",
+    "split": "test",
+    "full_image": "01_mo/anh_28__01_mo.jpg"
+  },
+  {
+    "id": "7e4708af9ec277f5e83c24a7",
+    "parent_id": "18a72cbe402c2bf49551a445",
+    "source_group": "80787cb8f452b37ce82f692c9987288d69967f715f8663db5d50207a969002d2",
+    "category": "02_xien_duoi_45",
+    "split": "test",
+    "full_image": "02_xien_duoi_45/anh_28__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "28ebc3a83f5761eed6272238",
+    "parent_id": "18a72cbe402c2bf49551a445",
+    "source_group": "80787cb8f452b37ce82f692c9987288d69967f715f8663db5d50207a969002d2",
+    "category": "03_lam_sang",
+    "split": "test",
+    "full_image": "03_lam_sang/anh_28__03_lam_sang.jpg"
+  },
+  {
+    "id": "b276560795faefc4745cd1bf",
+    "parent_id": "18a72cbe402c2bf49551a445",
+    "source_group": "80787cb8f452b37ce82f692c9987288d69967f715f8663db5d50207a969002d2",
+    "category": "04_lam_toi",
+    "split": "test",
+    "full_image": "04_lam_toi/anh_28__04_lam_toi.jpg"
+  },
+  {
+    "id": "b5aa478d92adb6f622cb8a4d",
+    "parent_id": "18a72cbe402c2bf49551a445",
+    "source_group": "80787cb8f452b37ce82f692c9987288d69967f715f8663db5d50207a969002d2",
+    "category": "05_loa_sang",
+    "split": "test",
+    "full_image": "05_loa_sang/anh_28__05_loa_sang.jpg"
+  },
+  {
+    "id": "0efc5d0fb01a25ec6081b3fc",
+    "parent_id": "18a72cbe402c2bf49551a445",
+    "source_group": "80787cb8f452b37ce82f692c9987288d69967f715f8663db5d50207a969002d2",
+    "category": "06_xoay_45_90",
+    "split": "test",
+    "full_image": "06_xoay_45_90/anh_28__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "de493ba18bd0d949e92077bc",
+    "parent_id": "18a72cbe402c2bf49551a445",
+    "source_group": "80787cb8f452b37ce82f692c9987288d69967f715f8663db5d50207a969002d2",
+    "category": "07_ban",
+    "split": "test",
+    "full_image": "07_ban/anh_28__07_ban.jpg"
+  },
+  {
+    "id": "7a65c781d9fc7af25d6ab260",
+    "parent_id": "a1c71c10369a6de39fba67dc",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_29__01_mo.jpg"
+  },
+  {
+    "id": "59072e8da26fa0224e646117",
+    "parent_id": "38768ac472094f1ae41fbce4",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_29__01_mo.jpg"
+  },
+  {
+    "id": "826dd22f992e2815d39fc22c",
+    "parent_id": "a1c71c10369a6de39fba67dc",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_29__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "c90c4cb95df294761d7b22b0",
+    "parent_id": "38768ac472094f1ae41fbce4",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_29__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "f2683a03decb9ebbffe13cc5",
+    "parent_id": "a1c71c10369a6de39fba67dc",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_29__03_lam_sang.jpg"
+  },
+  {
+    "id": "3fb462f8e912b7c0b0777868",
+    "parent_id": "38768ac472094f1ae41fbce4",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_29__03_lam_sang.jpg"
+  },
+  {
+    "id": "49f882229b58d68a7e3e052c",
+    "parent_id": "a1c71c10369a6de39fba67dc",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_29__04_lam_toi.jpg"
+  },
+  {
+    "id": "b8ffbefb7387106a2ac530af",
+    "parent_id": "38768ac472094f1ae41fbce4",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_29__04_lam_toi.jpg"
+  },
+  {
+    "id": "fbdaadf8f0d1466cd101fe43",
+    "parent_id": "a1c71c10369a6de39fba67dc",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_29__05_loa_sang.jpg"
+  },
+  {
+    "id": "557e595917de07cc8d513c07",
+    "parent_id": "38768ac472094f1ae41fbce4",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_29__05_loa_sang.jpg"
+  },
+  {
+    "id": "a306005cefabdda18e4bc204",
+    "parent_id": "a1c71c10369a6de39fba67dc",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_29__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "23c5d1f92eda30b185360fb8",
+    "parent_id": "38768ac472094f1ae41fbce4",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_29__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "1ad4aeaa7929f2c6e6575d6a",
+    "parent_id": "a1c71c10369a6de39fba67dc",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_29__07_ban.jpg"
+  },
+  {
+    "id": "24120956d243bab947b843ce",
+    "parent_id": "38768ac472094f1ae41fbce4",
+    "source_group": "b4799bb424fb06d1c0639ebda959b2fc68668cca91649897e818958d841f88ed",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_29__07_ban.jpg"
+  },
+  {
+    "id": "b1e7b905d66e292155584199",
+    "parent_id": "133dc7bdb8eb8a114b8c7561",
+    "source_group": "baf16f40ab6e4527666fa4082aee1550cc3188a2e6975ebe484de829fa341870",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_30__01_mo.jpg"
+  },
+  {
+    "id": "365cb30eb3a6223391843135",
+    "parent_id": "133dc7bdb8eb8a114b8c7561",
+    "source_group": "baf16f40ab6e4527666fa4082aee1550cc3188a2e6975ebe484de829fa341870",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_30__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "34d2c0c68182259fc79b7a55",
+    "parent_id": "133dc7bdb8eb8a114b8c7561",
+    "source_group": "baf16f40ab6e4527666fa4082aee1550cc3188a2e6975ebe484de829fa341870",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_30__03_lam_sang.jpg"
+  },
+  {
+    "id": "5ea1763657d461a19edb2d7b",
+    "parent_id": "133dc7bdb8eb8a114b8c7561",
+    "source_group": "baf16f40ab6e4527666fa4082aee1550cc3188a2e6975ebe484de829fa341870",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_30__04_lam_toi.jpg"
+  },
+  {
+    "id": "85b7d6fac7d1b1a86cd0bdcd",
+    "parent_id": "133dc7bdb8eb8a114b8c7561",
+    "source_group": "baf16f40ab6e4527666fa4082aee1550cc3188a2e6975ebe484de829fa341870",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_30__05_loa_sang.jpg"
+  },
+  {
+    "id": "9170ff0d60b391e8f54605ca",
+    "parent_id": "133dc7bdb8eb8a114b8c7561",
+    "source_group": "baf16f40ab6e4527666fa4082aee1550cc3188a2e6975ebe484de829fa341870",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_30__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "022ee7cab8986fa5107a2aa7",
+    "parent_id": "133dc7bdb8eb8a114b8c7561",
+    "source_group": "baf16f40ab6e4527666fa4082aee1550cc3188a2e6975ebe484de829fa341870",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_30__07_ban.jpg"
+  },
+  {
+    "id": "ec2d9e7b64f9c136bc7d745a",
+    "parent_id": "0e0aa4731b4b63b810487fc1",
+    "source_group": "14814720c8557f4edc1261b5a93143d235341b2a38e99df54b1fc857f85e301b",
+    "category": "01_mo",
+    "split": "train",
+    "full_image": "01_mo/anh_31__01_mo.jpg"
+  },
+  {
+    "id": "4970689d4a746e8c674a938f",
+    "parent_id": "0e0aa4731b4b63b810487fc1",
+    "source_group": "14814720c8557f4edc1261b5a93143d235341b2a38e99df54b1fc857f85e301b",
+    "category": "02_xien_duoi_45",
+    "split": "train",
+    "full_image": "02_xien_duoi_45/anh_31__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "a55cb7a6aeb5edfd79c762ca",
+    "parent_id": "0e0aa4731b4b63b810487fc1",
+    "source_group": "14814720c8557f4edc1261b5a93143d235341b2a38e99df54b1fc857f85e301b",
+    "category": "03_lam_sang",
+    "split": "train",
+    "full_image": "03_lam_sang/anh_31__03_lam_sang.jpg"
+  },
+  {
+    "id": "1977b29d311daeb48b8b7228",
+    "parent_id": "0e0aa4731b4b63b810487fc1",
+    "source_group": "14814720c8557f4edc1261b5a93143d235341b2a38e99df54b1fc857f85e301b",
+    "category": "04_lam_toi",
+    "split": "train",
+    "full_image": "04_lam_toi/anh_31__04_lam_toi.jpg"
+  },
+  {
+    "id": "2df7e4241048663bad994bec",
+    "parent_id": "0e0aa4731b4b63b810487fc1",
+    "source_group": "14814720c8557f4edc1261b5a93143d235341b2a38e99df54b1fc857f85e301b",
+    "category": "05_loa_sang",
+    "split": "train",
+    "full_image": "05_loa_sang/anh_31__05_loa_sang.jpg"
+  },
+  {
+    "id": "176d38765e1ee7af6a1e3f63",
+    "parent_id": "0e0aa4731b4b63b810487fc1",
+    "source_group": "14814720c8557f4edc1261b5a93143d235341b2a38e99df54b1fc857f85e301b",
+    "category": "06_xoay_45_90",
+    "split": "train",
+    "full_image": "06_xoay_45_90/anh_31__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "5dc6fd9c1c5669b1131aa7f2",
+    "parent_id": "0e0aa4731b4b63b810487fc1",
+    "source_group": "14814720c8557f4edc1261b5a93143d235341b2a38e99df54b1fc857f85e301b",
+    "category": "07_ban",
+    "split": "train",
+    "full_image": "07_ban/anh_31__07_ban.jpg"
+  },
+  {
+    "id": "a57d8e86aa193d84880cbd4e",
+    "parent_id": "6069bcbf760bb2b3b9330660",
+    "source_group": "28a482a9b3fbc5f655b948efda16b957fe09619286ea880b35d5cba785dda14e",
+    "category": "01_mo",
+    "split": "test",
+    "full_image": "01_mo/anh_32__01_mo.jpg"
+  },
+  {
+    "id": "a3bfd6ef294ddf690231e517",
+    "parent_id": "6069bcbf760bb2b3b9330660",
+    "source_group": "28a482a9b3fbc5f655b948efda16b957fe09619286ea880b35d5cba785dda14e",
+    "category": "02_xien_duoi_45",
+    "split": "test",
+    "full_image": "02_xien_duoi_45/anh_32__02_xien_duoi_45.jpg"
+  },
+  {
+    "id": "ac73224935e592dedde0f89f",
+    "parent_id": "6069bcbf760bb2b3b9330660",
+    "source_group": "28a482a9b3fbc5f655b948efda16b957fe09619286ea880b35d5cba785dda14e",
+    "category": "03_lam_sang",
+    "split": "test",
+    "full_image": "03_lam_sang/anh_32__03_lam_sang.jpg"
+  },
+  {
+    "id": "7bdcfe6e816c19d537d96b6e",
+    "parent_id": "6069bcbf760bb2b3b9330660",
+    "source_group": "28a482a9b3fbc5f655b948efda16b957fe09619286ea880b35d5cba785dda14e",
+    "category": "04_lam_toi",
+    "split": "test",
+    "full_image": "04_lam_toi/anh_32__04_lam_toi.jpg"
+  },
+  {
+    "id": "bfc78734e35ed7d40965ddd4",
+    "parent_id": "6069bcbf760bb2b3b9330660",
+    "source_group": "28a482a9b3fbc5f655b948efda16b957fe09619286ea880b35d5cba785dda14e",
+    "category": "05_loa_sang",
+    "split": "test",
+    "full_image": "05_loa_sang/anh_32__05_loa_sang.jpg"
+  },
+  {
+    "id": "7c4efa5cad361b0a044f12bf",
+    "parent_id": "6069bcbf760bb2b3b9330660",
+    "source_group": "28a482a9b3fbc5f655b948efda16b957fe09619286ea880b35d5cba785dda14e",
+    "category": "06_xoay_45_90",
+    "split": "test",
+    "full_image": "06_xoay_45_90/anh_32__06_xoay_45_90.jpg"
+  },
+  {
+    "id": "1b1580dc46168ed021d8218c",
+    "parent_id": "6069bcbf760bb2b3b9330660",
+    "source_group": "28a482a9b3fbc5f655b948efda16b957fe09619286ea880b35d5cba785dda14e",
+    "category": "07_ban",
+    "split": "test",
+    "full_image": "07_ban/anh_32__07_ban.jpg"
+  }
+]

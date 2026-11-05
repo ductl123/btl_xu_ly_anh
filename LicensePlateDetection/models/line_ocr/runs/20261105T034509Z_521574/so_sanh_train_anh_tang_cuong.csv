@@ -1,0 +1,22 @@
+﻿category,split,before_correct,after_correct,total
+Mờ,test,4,4,4
+Mờ,train,13,24,28
+Mờ,validation,1,1,2
+Xiên dưới 45°,test,4,4,4
+Xiên dưới 45°,train,27,28,28
+Xiên dưới 45°,validation,2,2,2
+Làm sáng,test,4,4,4
+Làm sáng,train,22,27,28
+Làm sáng,validation,2,2,2
+Làm tối,test,4,4,4
+Làm tối,train,18,25,28
+Làm tối,validation,1,2,2
+Loá sáng,test,1,1,4
+Loá sáng,train,4,25,28
+Loá sáng,validation,0,0,2
+Xoay 45–90° (đã chỉnh thẳng),test,4,4,4
+Xoay 45–90° (đã chỉnh thẳng),train,28,28,28
+Xoay 45–90° (đã chỉnh thẳng),validation,2,2,2
+Bẩn,test,2,2,4
+Bẩn,train,16,25,28
+Bẩn,validation,1,1,2

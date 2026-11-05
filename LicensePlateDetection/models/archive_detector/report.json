@@ -1,0 +1,44 @@
+{
+  "architecture": "archive_plate_detector_v1",
+  "image_size": 320,
+  "stride": 8,
+  "seed": 20261105,
+  "image_counts": {
+    "train": 2036,
+    "val": 146,
+    "test": 73
+  },
+  "augmented_train": 1527,
+  "manifest_sha256": "39930541941db83b3fba4242c740d9c88b0d522276519193e97123c7eab702bf",
+  "epochs_requested": 16,
+  "device": "cpu",
+  "epochs_completed": 16,
+  "best_epoch": 9,
+  "validation": {
+    "ap": 0.7958348757528328,
+    "precision": 0.8987341772151899,
+    "recall": 0.743455497382199,
+    "f1": 0.8137535816618912,
+    "threshold": 0.5280968546867371,
+    "tp": 142,
+    "fp": 16,
+    "fn": 49,
+    "ground_truth": 191
+  },
+  "test": {
+    "ap": 0.7884208800566951,
+    "precision": 0.922077922077922,
+    "recall": 0.7553191489361702,
+    "f1": 0.830409356725146,
+    "threshold": 0.5280968546867371,
+    "tp": 71,
+    "fp": 6,
+    "fn": 23,
+    "ground_truth": 94,
+    "ap75": 0.40144328654777356,
+    "map_50_95": 0.4166600978312478
+  },
+  "test_used_for_selection": false,
+  "elapsed_seconds": 219.20235259993933,
+  "best_sha256": "49015e518c225588dcaee1438be3dc7d730fec72e2768b263319b554a033eb42"
+}

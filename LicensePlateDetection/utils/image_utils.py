@@ -6,16 +6,38 @@ Sử dụng Pillow (PIL) và Matplotlib theo đúng yêu cầu công nghệ bắ
 from pathlib import Path
 from typing import List, Dict, Any, Tuple, Union, Optional
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 import matplotlib
 matplotlib.use('Agg')  # Headless backend an toàn cho đa luồng và tránh xung đột với Tkinter
 import matplotlib.pyplot as plt
 
 
+def order_quad_points(pts):
+    """Order a convex quad cyclically, assigning the longer edge to width.
+
+    Keeps winding at near-vertical angles; never pairs corners independently.
+    The remaining 180-degree reading direction is resolved by OCR.
+    """
+    points=np.asarray(pts,dtype=np.float32)
+    if points.shape!=(4,2) or not np.isfinite(points).all() or len(np.unique(points,axis=0))!=4:
+        raise ValueError("Expected four distinct finite corners")
+    center=points.mean(axis=0)
+    angles=np.arctan2(points[:,1]-center[1],points[:,0]-center[0])
+    cycle=points[np.argsort(angles)]
+    edges=np.roll(cycle,-1,axis=0)-cycle
+    cross=edges[:,0]*np.roll(edges[:,1],-1)-edges[:,1]*np.roll(edges[:,0],-1)
+    if not (np.all(cross>1e-3) or np.all(cross< -1e-3)):
+        raise ValueError("Corners must form a convex quadrilateral")
+    lengths=np.linalg.norm(edges,axis=1)
+    eligible=[0,2] if lengths[[0,2]].mean()>=lengths[[1,3]].mean() else [1,3]
+    start=min(eligible,key=lambda i:(float((cycle[i]+cycle[(i+1)%4])[1]),float((cycle[i]+cycle[(i+1)%4])[0])))
+    return np.roll(cycle,-start,axis=0).copy()
+
+
 def load_image(file_path: Union[str, Path]) -> Tuple[Image.Image, np.ndarray]:
     """
-    Đọc ảnh từ file bằng Pillow và chuyển thành RGB NumPy array.
+    Đọc ảnh từ file bằng Pillow, chuẩn hóa hướng chụp EXIF (P14) và chuyển thành RGB NumPy array.
 
     Args:
         file_path: Đường dẫn tới file ảnh (JPG, PNG, JPEG, ...).
@@ -28,7 +50,9 @@ def load_image(file_path: Union[str, Path]) -> Tuple[Image.Image, np.ndarray]:
         raise FileNotFoundError(f"Không tìm thấy file ảnh: {file_path}")
 
     with Image.open(path) as img:
-        img_rgb = img.convert("RGB")
+        # Chuẩn hóa hướng chụp theo thông tin EXIF (chống xoay ngược trên ảnh điện thoại - P14)
+        transposed = ImageOps.exif_transpose(img)
+        img_rgb = (transposed if transposed is not None else img).convert("RGB")
         img_np = np.array(img_rgb)
         return img_rgb.copy(), img_np
 
@@ -147,13 +171,16 @@ def crop_license_plate(
     scale_factor: float = 1.0,
     margin_ratio: float = 0.05,
     quad_corners: Optional[Any] = None,
-    trim_bottom_ratio: float = 0.0
+    trim_bottom_ratio: float = 0.0,
+    ordered_quad: bool = False,
+    target_aspect_ratio: Optional[float] = None
 ) -> Image.Image:
     """
     Cắt riêng vùng biển số được phát hiện từ ảnh gốc với độ phân giải cao nhất.
-    Nếu phát hiện biển số bị nghiêng (có quad_corners), tự động cắt bám theo đúng 4 góc nghiêng
-    và nắn phẳng bằng phép biến đổi phối cảnh (Perspective Transform / Warp).
-    Có tùy chọn trim_bottom_ratio để cắt bỏ vết phấn / vết bẩn ở mép dưới đuôi dè xe.
+    Nếu phát hiện biển số bị nghiêng (có quad_corners), tự động gọi hàm order_quad_points
+    để sắp thứ tự góc theo chu vi rồi nắn bằng phép biến đổi phối cảnh.
+    ordered_quad=True giữ các trục đã được xác nhận từ bố cục dòng chữ;
+    ảnh có thể còn ngược 180 độ và được kiểm tra ở bước nhận dạng.
 
     Args:
         original_pil: Ảnh gốc PIL.
@@ -164,7 +191,7 @@ def crop_license_plate(
         trim_bottom_ratio: Tỷ lệ chiều cao ở mép dưới cần cắt bỏ (loại trừ chữ phấn 301, 302, 601).
 
     Returns:
-        Ảnh PIL của vùng biển số đã cắt và nắn phẳng.
+        Ảnh PIL của vùng biển số đã cắt và nắn phẳng đúng chiều.
     """
     orig_w, orig_h = original_pil.size
     x, y, w, h = bbox
@@ -175,6 +202,10 @@ def crop_license_plate(
             import cv2
             corners_orig = np.array(quad_corners, dtype="float32") / scale_factor
 
+            # Giữ thứ tự trục do bộ phát hiện xác nhận; trường hợp còn lại sắp theo chu vi.
+            if not ordered_quad:
+                corners_orig = order_quad_points(corners_orig)
+
             # Mở rộng các góc nghiêng ra ngoài theo margin_ratio để không bị cắt xén mép chữ
             if margin_ratio > 0.0:
                 center_pt = np.mean(corners_orig, axis=0)
@@ -182,7 +213,7 @@ def crop_license_plate(
 
             tl, tr, br, bl = corners_orig
 
-            # Tính chiều dài và chiều cao thực tế của biển nghiêng
+            # Tính chiều dài và chiều cao thực tế của biển nghiêng từ các cạnh chuẩn hóa (P02)
             w_top = np.linalg.norm(tr - tl)
             w_bot = np.linalg.norm(br - bl)
             target_w = int(round(max(w_top, w_bot)))
@@ -190,13 +221,12 @@ def crop_license_plate(
             h_left = np.linalg.norm(tl - bl)
             h_right = np.linalg.norm(tr - br)
             target_h = int(round(max(h_left, h_right)))
+            if target_aspect_ratio is not None:
+                if not .5 <= target_aspect_ratio <= 8.:
+                    raise ValueError("Invalid target plate aspect ratio")
+                target_w=max(20,int(round(target_h*target_aspect_ratio)))
 
             if target_w >= 20 and target_h >= 15:
-                # Chuẩn hóa nếu trục bị lật 90 độ
-                if target_w < target_h and float(target_w) / target_h < 0.85:
-                    target_w, target_h = target_h, target_w
-                    corners_orig = np.roll(corners_orig, -1, axis=0)
-
                 orig_np = np.array(original_pil)
                 dst_pts = np.array([
                     [0, 0],
@@ -205,9 +235,14 @@ def crop_license_plate(
                     [0, target_h - 1]
                 ], dtype="float32")
 
+                # Tính ma trận biến đổi phối cảnh và warp về hình chữ nhật chuẩn
                 M = cv2.getPerspectiveTransform(corners_orig, dst_pts)
-                warped_np = cv2.warpPerspective(orig_np, M, (target_w, target_h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
-                
+                warped_np = cv2.warpPerspective(
+                    orig_np, M, (target_w, target_h),
+                    flags=cv2.INTER_CUBIC,
+                    borderMode=cv2.BORDER_REPLICATE
+                )
+
                 # Cắt bỏ mép dưới nếu có yêu cầu loại bỏ chữ phấn/nhiễu dè xe
                 if trim_bottom_ratio > 0.0:
                     keep_h = max(10, int(round(target_h * (1.0 - trim_bottom_ratio))))
@@ -298,9 +333,5 @@ def create_pipeline_summary_grid(
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(path, dpi=200, bbox_inches='tight')
-
-    if show_plot:
-        plt.show()
-
-    plt.close(fig)
-
+    if not show_plot:
+        plt.close(fig)

@@ -1,0 +1,303 @@
+[
+  {
+    "file": "positive/00.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835155_43902677484248231_7370845134107454326_e0cbc15b2b15e2409bbeb56ffc895f89_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/01.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835188_43902677484248231_7370845134107454326_0eef3eae07ef96dcece9e36419d08089_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/02.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793704680434_43902677484248231_7370845134107454326_9524b6930b51f76b3b45e170e6f2faa9_plate_1_single_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/03.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\dich-nghia-bien-so-xe-tai_plate_1_single_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/04.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835206_43902677484248231_7370845134107454326_e8660eff8dd6cc2d4488b5cab984c05c_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/05.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835223_43902677484248231_7370845134107454326_b6ff4fcc92589fe1198b01a3fe46d98c_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/06.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835266_43902677484248231_7370845134107454326_7c18471e52257008d0ab7cccb44fae2b_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/07.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835292_43902677484248231_7370845134107454326_83190ce82dc5afb7713ffea69cd33059_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/08.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835303_43902677484248231_7370845134107454326_b23332303a49e179f08a977f78a8ca8f_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/09.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835313_43902677484248231_7370845134107454326_a921ec1b400c00a06d039cb8a4ba381b_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/10.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835322_43902677484248231_7370845134107454326_eee6c32084475abd4d21919a8b43e3ec_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/11.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835350_43902677484248231_7370845134107454326_62a98a9c6b4587de423574c2d091bab8_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/12.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835379_43902677484248231_7370845134107454326_88cb42b37f5f4b59cec4117b75deead7_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/13.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793704680418_43902677484248231_7370845134107454326_5350711b70ee3e4df3be5ccdae1c5fbb_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/14.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793704680450_43902677484248231_7370845134107454326_7c9f3f303dad5cd3749e6911f126f4d8_plate_1_double_row.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "positive/15.png",
+    "source": "work\\emboss_12.png",
+    "label": 1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/00.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835340_43902677484248231_7370845134107454326_8df1d608e887571f8676d7aafcb2dc43_plate_1_single_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/01.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835350_43902677484248231_7370845134107454326_62a98a9c6b4587de423574c2d091bab8_plate_2_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/02.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835350_43902677484248231_7370845134107454326_62a98a9c6b4587de423574c2d091bab8_plate_3_single_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/03.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835350_43902677484248231_7370845134107454326_62a98a9c6b4587de423574c2d091bab8_plate_4_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/04.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835350_43902677484248231_7370845134107454326_62a98a9c6b4587de423574c2d091bab8_plate_5_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/05.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835359_43902677484248231_7370845134107454326_e785047999c02209250e9912684b9a0c_plate_1_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/06.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835359_43902677484248231_7370845134107454326_e785047999c02209250e9912684b9a0c_plate_2_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/07.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835359_43902677484248231_7370845134107454326_e785047999c02209250e9912684b9a0c_plate_3_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/08.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835379_43902677484248231_7370845134107454326_88cb42b37f5f4b59cec4117b75deead7_plate_2_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/09.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835379_43902677484248231_7370845134107454326_88cb42b37f5f4b59cec4117b75deead7_plate_3_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/10.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835379_43902677484248231_7370845134107454326_88cb42b37f5f4b59cec4117b75deead7_plate_4_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/11.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835388_43902677484248231_7370845134107454326_2a013093ff2da2380bb22d3c98254123_plate_1_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/12.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835388_43902677484248231_7370845134107454326_2a013093ff2da2380bb22d3c98254123_plate_2_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/13.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835388_43902677484248231_7370845134107454326_2a013093ff2da2380bb22d3c98254123_plate_3_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/14.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835397_43902677484248231_7370845134107454326_32523360c9367d8d595ef17908aceb8d_plate_1_single_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/15.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835397_43902677484248231_7370845134107454326_32523360c9367d8d595ef17908aceb8d_plate_2_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/16.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835397_43902677484248231_7370845134107454326_32523360c9367d8d595ef17908aceb8d_plate_3_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/17.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835397_43902677484248231_7370845134107454326_32523360c9367d8d595ef17908aceb8d_plate_4_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/18.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793454835397_43902677484248231_7370845134107454326_32523360c9367d8d595ef17908aceb8d_plate_5_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/19.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793704680381_43902677484248231_7370845134107454326_2992417f61a9187cb53522334cf6ba7c_plate_1_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/20.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793704680418_43902677484248231_7370845134107454326_5350711b70ee3e4df3be5ccdae1c5fbb_plate_2_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/21.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793704680450_43902677484248231_7370845134107454326_7c9f3f303dad5cd3749e6911f126f4d8_plate_3_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/22.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793704680450_43902677484248231_7370845134107454326_7c9f3f303dad5cd3749e6911f126f4d8_plate_4_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/23.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\common_ocr_final_20261105\\cropped\\1793704680450_43902677484248231_7370845134107454326_7c9f3f303dad5cd3749e6911f126f4d8_plate_5_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed against user-provided error screenshots; object label only"
+  },
+  {
+    "file": "negative/reviewed_1793454835379.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835379_43902677484248231_7370845134107454326_88cb42b37f5f4b59cec4117b75deead7_plate_1_single_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed: shelf, blank wall or corrugated roof; not a plate"
+  },
+  {
+    "file": "negative/reviewed_1793454835388.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835388_43902677484248231_7370845134107454326_2a013093ff2da2380bb22d3c98254123_plate_2_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed: shelf, blank wall or corrugated roof; not a plate"
+  },
+  {
+    "file": "negative/reviewed_1793454835397.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\1793454835397_43902677484248231_7370845134107454326_32523360c9367d8d595ef17908aceb8d_plate_1_double_row.png",
+    "label": -1,
+    "split": "calibration",
+    "provenance": "Visually reviewed: shelf, blank wall or corrugated roof; not a plate"
+  }
+]
