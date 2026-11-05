@@ -1,0 +1,11 @@
+{
+  "project": "JaidedAI/EasyOCR",
+  "source_commit": "363afb184047ce452e436f4224f3098422df872e",
+  "source_url": "https://github.com/JaidedAI/EasyOCR",
+  "model": "english_g2",
+  "architecture": "VGG-BiLSTM-CTC",
+  "model_url": "https://github.com/JaidedAI/EasyOCR/releases/download/v1.3/english_g2.zip",
+  "md5": "5864788e1821be9e454ec108d61b887d",
+  "sha256": "e2272681d9d67a04e2dff396b6e95077bc19001f8f6d3593c307b9852e1c29e8",
+  "license": "Apache-2.0"
+}

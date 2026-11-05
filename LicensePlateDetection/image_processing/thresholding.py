@@ -53,15 +53,21 @@ def otsu_threshold(image_gray: np.ndarray) -> Tuple[np.ndarray, int]:
     valid_mask = (omega > 0.0) & (omega < 1.0)
     variance_between = np.zeros(256, dtype=np.float64)
 
-    numerator = (mu_total * omega[valid_mask] - mu_accum[valid_mask]) ** 2
-    denominator = omega[valid_mask] * (1.0 - omega[valid_mask])
-    variance_between[valid_mask] = numerator / denominator
+    if np.any(valid_mask):
+        numerator = (mu_total * omega[valid_mask] - mu_accum[valid_mask]) ** 2
+        denominator = omega[valid_mask] * (1.0 - omega[valid_mask])
+        variance_between[valid_mask] = numerator / denominator
+
+    # Nếu ảnh hằng hoặc không có tương phản (phương sai toàn 0)
+    if not np.any(valid_mask) or np.max(variance_between) == 0.0:
+        return np.zeros_like(img_uint8), 0
 
     # 6. Tìm ngưỡng tối ưu t*
     t_star = int(np.argmax(variance_between))
 
-    # 7. Nhị phân hóa: pixel >= t_star gán 255 (trắng), ngược lại gán 0 (đen)
-    binary_img = np.where(img_uint8 >= t_star, np.uint8(255), np.uint8(0))
+    # 7. Nhị phân hóa (P01): Phù hợp với phân lớp histogram (Lớp 0: <= t, Lớp 1: > t)
+    # pixel > t_star gán 255 (tiền cảnh), pixel <= t_star gán 0 (nền)
+    binary_img = np.where(img_uint8 > t_star, np.uint8(255), np.uint8(0))
 
     return binary_img, t_star
 

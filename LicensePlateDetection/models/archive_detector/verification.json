@@ -1,0 +1,8 @@
+{
+  "checkpoint_sha256_verified": true,
+  "geometry_roundtrip_verified": true,
+  "finite_gradient_verified": true,
+  "sample_image": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\archive\\splits\\test\\images\\106_jpg.rf.ZpYCA7jEO6oaIB1wYYJ0.jpg",
+  "sample_prediction_count": 1,
+  "sample_correct": 1
+}

@@ -57,7 +57,7 @@ class LicensePlateApp:
 
         title_lbl = tk.Label(
             header_frame,
-            text="NHẬN DIỆN BIỂN SỐ XE TỪ ẢNH GIAO THÔNG (SOBEL - MORPHOLOGY - TEMPLATE MATCHING)",
+            text="NHẬN DIỆN BIỂN SỐ: XỬ LÝ ẢNH + OCR HỌC SÂU",
             fg="#F8FAFC",
             bg="#1E293B",
             font=("Segoe UI", 12, "bold"),
@@ -97,6 +97,21 @@ class LicensePlateApp:
             relief=tk.FLAT, command=self._open_output_folder, **btn_style
         )
         self.btn_folder.pack(side=tk.RIGHT, padx=5, pady=10)
+
+        learning_bar = tk.Frame(self.root,bg="#E2E8F0")
+        learning_bar.pack(fill=tk.X)
+        tk.Label(learning_bar,text="Bộ đọc:",bg="#E2E8F0").pack(side=tk.LEFT,padx=(12,4))
+        self.reader_choice = tk.StringVar(value="Học sâu CRNN" if config.OCR_BACKEND=='crnn' else "Truyền thống")
+        self.reader_combo = ttk.Combobox(learning_bar,textvariable=self.reader_choice,
+                                       values=["Học sâu CRNN","Truyền thống"],state="readonly",width=22)
+        self.reader_combo.pack(side=tk.LEFT,padx=4,pady=5)
+        self.reader_combo.bind('<<ComboboxSelected>>',lambda _:setattr(config,'OCR_BACKEND','crnn' if self.reader_choice.get()=="Học sâu CRNN" else 'template'))
+        self.btn_learning = ttk.Button(learning_bar,text="Gán nhãn & Huấn luyện",command=self._open_learning)
+        self.btn_learning.pack(side=tk.LEFT,padx=12)
+        self.restore_choice = tk.BooleanVar(value=config.USE_WIENER_RESTORATION)
+        self.restore_check = ttk.Checkbutton(learning_bar,text="Thử khôi phục Wiener ảnh mờ",
+            variable=self.restore_choice,command=lambda:setattr(config,'USE_WIENER_RESTORATION',self.restore_choice.get()))
+        self.restore_check.pack(side=tk.LEFT,padx=10)
 
         # 2. Main Content
         main_paned = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
@@ -151,7 +166,7 @@ class LicensePlateApp:
         self.tree.heading("plate_text", text="Biển Số Xe")
         self.tree.heading("type", text="Loại Biển")
         self.tree.heading("ar", text="Tỷ Lệ w/h")
-        self.tree.heading("score", text="Độ Tin Cậy")
+        self.tree.heading("score", text="Điểm Vùng Biển")
 
         self.tree.column("idx", width=30, anchor="center")
         self.tree.column("plate_text", width=120, anchor="center")
@@ -193,6 +208,16 @@ class LicensePlateApp:
         self.btn_batch.config(state=state)
         self.btn_excel.config(state=state)
         self.btn_compare.config(state=state)
+        self.btn_learning.config(state=state)
+        self.reader_combo.config(state='readonly' if enabled else 'disabled')
+        self.restore_check.config(state=state)
+
+    def _open_learning(self):
+        if self.is_busy:return
+        if getattr(self,'training_window',None) is not None and self.training_window.winfo_exists():
+            self.training_window.lift();return
+        from learning.training_ui import TrainingWindow
+        self.training_window=TrainingWindow(self)
 
     def _load_default_sample(self):
         """Khởi động hiển thị ảnh mẫu đầu tiên nhanh chóng."""
@@ -272,6 +297,10 @@ class LicensePlateApp:
         for r in detected_records:
             type_str = "1 Dòng" if r["plate_type"] == "single_row" else "2 Dòng"
             plate_text = r.get("plate_text", "KXD")
+            if r.get("recognition_status") == "unreadable":
+                plate_text = "Chưa đọc rõ"
+            elif r.get("needs_review", True):
+                plate_text += " (?)"
             self.tree.insert(
                 "", tk.END,
                 values=(r["plate_index"], plate_text, type_str, f"{r['aspect_ratio']:.2f}", f"{r['confidence_score']:.2f}"),
@@ -283,6 +312,8 @@ class LicensePlateApp:
         det_img_path = self.output_dirs["detected"] / f"{stem}_detected.png"
         if det_img_path.is_file():
             self._display_image_on_label(det_img_path, self.lbl_detected_img)
+        else:
+            self._display_image_on_label(image_path, self.lbl_detected_img)
 
         # Hiển thị ảnh Lưới 8 bước
         grid_img_path = self.output_dirs["intermediate"] / stem / "08_pipeline_summary_grid.png"
@@ -305,7 +336,7 @@ class LicensePlateApp:
         else:
             self.lbl_cropped_preview.configure(image="", text="Không phát hiện biển số phù hợp")
             self.detail_text.delete("1.0", tk.END)
-            self.detail_text.insert(tk.END, "Không tìm thấy biển số nào thỏa mãn tiêu chuẩn kích thước và tỷ lệ.")
+            self.detail_text.insert(tk.END, "Chưa tìm thấy vùng biển có đủ bằng chứng trong ảnh này.")
 
         self.status_var.set(f"✅ Đã xử lý xong ảnh: {image_path.name} | Phát hiện {len(detected_records)} biển số.")
 
@@ -326,12 +357,25 @@ class LicensePlateApp:
             if crop_path.is_file():
                 self._display_image_on_label(crop_path, self.lbl_cropped_preview, max_size=(320, 120))
 
+            review = matching.get("needs_review", False)
+            review_status = "Cần đối chiếu lại ký tự mơ hồ" if review else "Chưa thấy ký tự có điểm sát nhau"
+            if matching.get("recognition_status") == "unreadable":
+                review_status = "Đã tìm thấy vùng biển nhưng chưa đọc rõ ký tự"
+            positions = ", ".join(str(i+1) for i in matching.get("uncertain_positions", []))
+            ocr_score = f"{matching.get('ocr_confidence', 0.0):.3f}"
+            if matching.get('recognition_status') == 'confirmed':
+                review_status = 'Đã đối chiếu với nhãn xác nhận của ảnh cắt trùng khớp'
+                ocr_score = '— (dùng nhãn đã xác nhận)'
             info_str = (
+                f"• Kiểm tra kết quả: {review_status}\n"
+                f"• Vị trí cần xem:   {positions or '—'}\n"
                 f"--- THÔNG SỐ BIỂN SỐ #{idx} ---\n"
                 f"★ BIỂN SỐ NHẬN DIỆN: {matching.get('plate_text', 'KXD')}\n"
                 f"• Phân loại:         {matching['plate_type']}\n"
-                f"• Điểm tin cậy BBox: {matching['confidence_score']:.3f}\n"
-                f"• Độ tin cậy ký tự:  {matching.get('ocr_confidence', 0.0):.3f}\n"
+                f"• Điểm vùng biển: {matching['confidence_score']:.3f}\n"
+                f"• Điểm khớp ký tự:   {ocr_score}\n"
+                f"• Bộ đọc:             {matching.get('recognizer', 'unknown')}\n"
+                f"• Lý do kiểm tra:     {'; '.join(matching.get('uncertainty_reasons', [])) or '—'}\n"
                 f"• Tọa độ gốc x,y:    ({matching['orig_x']}, {matching['orig_y']})\n"
                 f"• Kích thước w,h:    {matching['orig_w']} x {matching['orig_h']} px\n"
                 f"• Tỷ lệ w/h:         {matching['aspect_ratio']:.3f}\n"

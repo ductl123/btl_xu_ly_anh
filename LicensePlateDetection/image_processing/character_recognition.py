@@ -1,48 +1,89 @@
-"""
-image_processing/character_recognition.py - Nhận dạng ký tự biển số xe (Optical Character Recognition - OCR)
-Phương pháp thuần xử lý ảnh số kinh điển:
-1. Phân đoạn ký tự (Character Segmentation):
-   - Tính ngưỡng Otsu tự động trên bề mặt lòng biển số (loại trừ khung viền xe).
-   - Tách các nét ký tự tối màu trên nền sáng: char_bin = (gray < t).
-   - Khử nhiễu biên mép ngoài (khung viền kim loại, ốc vít).
-   - Trích xuất ký tự bằng Connected Component Labeling và lọc theo tỷ lệ hình học.
-   - Sắp xếp thứ tự đọc (biển 1 dòng xếp trái->phải; biển 2 dòng tách dòng trên và dòng dưới).
-2. Khớp mẫu tương quan đa phông (Multi-Font Tight Template Matching) thuần NumPy:
-   - Cắt khung bao sát (tight crop) từng ký tự và chuẩn hóa về kích thước 20x32.
-   - Kho mẫu đa phông chữ giao thông (Bahnschrift DIN 1451, Arial Bold, Segoe UI).
-   - Kết hợp chỉ số IoU, tương quan chuẩn hóa và phân biệt cấu trúc hình học (lỗ rỗng, thanh ngang, thanh đứng).
+"""Plate character segmentation and OCR.
+
+Recognition uses glyph_matcher.TemplateMatcher: shape similarity across font
+and labelled real glyphs. No unconditional per-character rewrite rules.
 """
 
+import re
 from typing import List, Tuple, Dict, Any, Optional
 from pathlib import Path
 import numpy as np
+import cv2
 from PIL import Image, ImageDraw, ImageFont
 
-from .preprocessing import rgb_to_grayscale, unsharp_mask, gamma_correction, enhance_contrast_dynamic
+from .preprocessing import rgb_to_grayscale, unsharp_mask, enhance_contrast_dynamic
 from .thresholding import otsu_threshold, adaptive_local_threshold
-from .morphology import bridge_broken_characters, black_hat_transform, create_structuring_element
+from .morphology import bridge_broken_characters
 from .connected_components import find_connected_components
 
 
-def crop_tight(binary_array: np.ndarray) -> np.ndarray:
+# Common layouts supported by this project; this is not a legal registry check.
+VN_PLATE_REGEX = re.compile(r'^\d{2}[ABCDEFGHKLMNPSTUVXYZ]{1,2}\d?\d{3,6}$')
+
+
+def is_valid_vn_plate(text: str) -> bool:
+    if not text or text == 'KXD':
+        return False
+    parts = text.strip().split()
+    if len(parts) >= 2:
+        prefix = ''.join(parts[:-1]).replace('-', '')
+        body = parts[-1].replace('.', '')
+        return bool(re.fullmatch(r'\d{2}[ABCDEFGHKLMNPSTUVXYZ]{1,2}\d?', prefix)
+                    and re.fullmatch(r'\d{3,6}', body))
+    compact = re.sub(r'[- .]', '', text)
+    return bool(VN_PLATE_REGEX.fullmatch(compact))
+
+
+def format_plate_display(text: str, plate_type: Optional[str] = None) -> str:
+    """Định dạng chuỗi biển số hiển thị theo yêu cầu:
+    Thay toàn bộ dấu gạch ngang (-) thành dấu cách (khoảng trống) để các cụm số và chữ dễ nhìn.
+    - Biển 1 dòng: ví dụ '30F 123.45', '29A 146.08', '51G 1234'
+    - Biển 2 dòng: ví dụ '18 MD2 074.73', '29 A1 123.45', '59 G2 622.33'
     """
-    Cắt sát viền thật của ký tự (loại bỏ toàn bộ lề trống xung quanh).
-    """
-    rows = np.any(binary_array, axis=1)
-    cols = np.any(binary_array, axis=0)
+    if not text or text == "KXD":
+        return text or "KXD"
+
+    if '-' in text:
+        text = text.replace('-', ' ')
+        return re.sub(r'\s+', ' ', text).strip()
+
+    clean = re.sub(r'[^A-Z0-9]', '', text.upper())
+    if not clean:
+        return text
+
+    if plate_type == 'double_row':
+        m = re.match(r'^(\d{2})([A-Z]{1,2}\d?)(.*)$', clean)
+        if m:
+            prov, ser, num = m.group(1), m.group(2), m.group(3)
+            if len(num) == 5:
+                num = f"{num[:3]}.{num[3:]}"
+            return f"{prov} {ser} {num}".strip()
+
+    m1 = re.match(r'^(\d{2}[A-Z]{1,2})(\d{3,6})$', clean)
+    if m1:
+        prefix, num = m1.group(1), m1.group(2)
+        if len(num) == 5:
+            num = f"{num[:3]}.{num[3:]}"
+        return f"{prefix} {num}"
+
+    return text.replace('-', ' ')
+
+
+def tight_crop_binary(arr: np.ndarray) -> np.ndarray:
+    """Cắt sát viền pixel trắng (bounding box chặt nhất)."""
+    rows = np.any(arr, axis=1)
+    cols = np.any(arr, axis=0)
     if not np.any(rows) or not np.any(cols):
-        return binary_array
-    rmin, rmax = np.where(rows)[0][[0, -1]]
-    cmin, cmax = np.where(cols)[0][[0, -1]]
-    return binary_array[rmin : rmax + 1, cmin : cmax + 1]
+        return arr
+    ymin, ymax = np.where(rows)[0][[0, -1]]
+    xmin, xmax = np.where(cols)[0][[0, -1]]
+    return arr[ymin:ymax+1, xmin:xmax+1]
 
 
 def normalize_char_patch(arr: np.ndarray, target_size=(20, 32)) -> np.ndarray:
-    """
-    Chuẩn hóa ảnh nhị phân ký tự về kích thước chuẩn (20, 32) sau khi đã cắt sát biên.
-    """
-    tight = crop_tight(arr > 0)
-    if tight.size == 0 or tight.shape[0] < 2 or tight.shape[1] < 2:
+    """Chuẩn hóa patch ký tự nhị phân về kích thước cố định W=20, H=32 sau khi tight crop."""
+    tight = tight_crop_binary(arr)
+    if tight.shape[0] < 2 or tight.shape[1] < 2:
         return np.zeros((target_size[1], target_size[0]), dtype=bool)
 
     im = Image.fromarray((tight.astype(np.uint8) * 255), mode="L")
@@ -50,158 +91,73 @@ def normalize_char_patch(arr: np.ndarray, target_size=(20, 32)) -> np.ndarray:
     return (np.array(resized) > 100)
 
 
-class TemplateMatcher:
+def D(P: np.ndarray, y1: int, y2: int, x1: int, x2: int) -> float:
     """
-    Quản lý kho mẫu chữ số và chữ cái đa phông, kết hợp giải thuật đối chứng cấu trúc.
+    Mật độ diện tích cục bộ (Area Density Metric - D):
+    D(y1, y2, x1, x2) = 1 / ((y2 - y1 + 1)(x2 - x1 + 1)) * sum(P[y, x])
+    với 0 <= y1 <= y2 <= 31 và 0 <= x1 <= x2 <= 19.
     """
-    TEMPLATE_W = 20
-    TEMPLATE_H = 32
-    CHARS = "0123456789ABCDEFGHKLMNPSTUVXYZ"
+    sub = P[y1:y2+1, x1:x2+1]
+    return float(np.mean(sub)) if sub.size > 0 else 0.0
 
-    def __init__(self):
-        self.templates: Dict[str, List[np.ndarray]] = {ch: [] for ch in self.CHARS}
-        self._init_templates()
 
-    def _init_templates(self):
-        """
-        Sinh mẫu nhị phân từ các phông chữ chuẩn biển số giao thông.
-        """
-        font_paths = [
-            "C:/Windows/Fonts/bahnschrift.ttf",  # DIN 1451 chuẩn biển số quốc tế
-            "C:/Windows/Fonts/arialbd.ttf",     # Arial Bold
-            "C:/Windows/Fonts/consola.ttf",     # Consolas
-        ]
-        loaded_fonts = []
-        for fp in font_paths:
-            if Path(fp).is_file():
-                try:
-                    loaded_fonts.append(ImageFont.truetype(fp, 42))
-                except Exception:
-                    continue
+def calculate_metrics(p_norm: np.ndarray) -> Dict[str, Any]:
+    """
+    Trích xuất các vectơ chiếu và độ đối xứng toàn cục:
+    1. Horizontal Projection (HP)
+    2. Vertical Projection (VP)
+    3. Horizontal Symmetry (Sym_X)
+    4. Vertical Symmetry (Sym_Y)
+    """
+    P = p_norm.astype(float)
+    W, H = 20, 32
+    HP = P.sum(axis=1)
+    VP = P.sum(axis=0)
 
-        if not loaded_fonts:
-            loaded_fonts.append(ImageFont.load_default())
+    # Đối xứng ngang Sym_X (qua trục x = 9.5)
+    diff_x = np.abs(P[:, :10] - P[:, 19:9:-1])
+    sym_x = float(np.sum(diff_x)) / (W * H)
 
-        for font in loaded_fonts:
-            for ch in self.CHARS:
-                im = Image.new("L", (50, 60), 0)
-                draw = ImageDraw.Draw(im)
-                draw.text((5, 5), ch, fill=255, font=font)
-                arr = (np.array(im) > 128)
-                norm = normalize_char_patch(arr, (self.TEMPLATE_W, self.TEMPLATE_H))
-                self.templates[ch].append(norm)
+    # Đối xứng dọc Sym_Y (qua trục y = 15.5)
+    diff_y = np.abs(P[:16, :] - P[31:15:-1, :])
+    sym_y = float(np.sum(diff_y)) / (W * H)
 
-    def match(self, patch: np.ndarray, is_digit_only: bool = False, is_letter_only: bool = False) -> Tuple[str, float]:
-        """
-        So khớp một mảng nhị phân ký tự với kho mẫu và tinh chỉnh bằng đặc trưng cấu trúc.
-        """
-        p_norm = normalize_char_patch(patch, (self.TEMPLATE_W, self.TEMPLATE_H))
-        scores: Dict[str, float] = {}
+    return {
+        "P": P,
+        "HP": HP,
+        "VP": VP,
+        "sym_x": sym_x,
+        "sym_y": sym_y,
+    }
 
-        for ch, tmpl_list in self.templates.items():
-            if is_digit_only and not ch.isdigit():
-                continue
-            if is_letter_only and ch.isdigit():
-                continue
 
-            max_sim = 0.0
-            for tmpl in tmpl_list:
-                intersection = np.sum(p_norm & tmpl)
-                union = np.sum(p_norm | tmpl)
-                iou = intersection / float(union) if union > 0 else 0.0
+def compute_euler_holes(patch_20x32: np.ndarray) -> int:
+    """
+    Đếm lỗ rỗng khép kín quan sát được; không suy lỗ từ vùng tâm rỗng
+    (Euler Noise Resilience theo Mục 2 của tài liệu nghiệp vụ):
+    - 2 lỗ: 8, B
+    - 1 lỗ: 0, 4, 6, 9, A, D, P, Q
+    - 0 lỗ: 1, 2, 3, 5, 7, C, E, F, G, H, K, L, M, N, S, T, U, V, X, Y, Z
+    """
+    try:
+        arr = (patch_20x32.astype(np.uint8) * 255)
+        padded = np.pad(arr, 1, mode='constant', constant_values=0)
+        contours, hierarchy = cv2.findContours(padded, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+        if hierarchy is None or len(contours) == 0:
+            raw_holes = 0
+        else:
+            holes = 0
+            for h_info in hierarchy[0]:
+                if h_info[3] != -1:
+                    holes += 1
+            raw_holes = min(2, holes)
 
-                # Normalized Cross-Correlation
-                denom = np.sqrt(np.sum(p_norm.astype(float)) * np.sum(tmpl.astype(float)))
-                ncc = intersection / denom if denom > 0 else 0.0
+        return raw_holes
+    except Exception:
+        return 0
 
-                sim = 0.65 * iou + 0.35 * ncc
-                if sim > max_sim:
-                    max_sim = sim
 
-            scores[ch] = max_sim
-
-        if not scores:
-            return "?", 0.0
-
-        ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-        best_ch = ranked[0][0]
-        best_score = ranked[0][1]
-
-        # -------------------------------------------------------------
-        # QUY TẮC TINH CHỈNH ĐẶC TRƯNG HÌNH HỌC (STRUCTURAL DISAMBIGUATION)
-        # -------------------------------------------------------------
-        mid_center_val = p_norm[14:18, 7:13].mean()  # Tâm ký tự
-
-        # Quy tắc 1: Nhận diện chữ số 4 (thanh ngang đậm và góc trên bên phải rỗng)
-        if is_digit_only and (best_ch in ['4', '0', '5', '6', '8', '9']):
-            crossbar = max([p_norm[r, :].sum() for r in range(16, 28)])
-            top_right_gap = p_norm[:14, 12:].mean()
-            if crossbar >= 14 and top_right_gap < 0.15:
-                best_ch = '4'
-
-        # Quy tắc 2: Phân biệt 1 vs 7 và 1 vs 3 (số 1 luôn mảnh ar <= 0.42, số 7 có thanh ngang trên, số 3 có thanh giữa)
-        if is_digit_only and best_ch == '1':
-            h_p, w_p = patch.shape
-            ar_p = w_p / float(h_p) if h_p > 0 else 0.5
-            if ar_p <= 0.42:
-                best_ch = '1'
-            else:
-                top_bar = p_norm[:4, :].sum(axis=1).mean()
-                mid_bar = p_norm[14:18, 5:15].mean()
-                if (ar_p >= 0.48 and top_bar >= 15.5) and scores.get('7', 0.0) >= 0.60:
-                    best_ch = '7'
-                elif ar_p >= 0.48 and mid_bar > 0.65 and scores.get('3', 0.0) >= 0.60:
-                    best_ch = '3'
-
-        # Quy tắc 3: Phân biệt 0 và 8 (0 có lỗ rỗng ở giữa, 8 có nét gạch ngang ở giữa)
-        # Chỉ áp dụng cho 0 và 8, tuyệt đối không áp dụng cho 9 hay 6
-        if is_digit_only and best_ch in ['0', '8']:
-            if mid_center_val < 0.55:
-                best_ch = '0'
-            elif mid_center_val >= 0.65 and ranked[0][0] == '8':
-                best_ch = '8'
-
-        # Quy tắc 4: Phân biệt D và B
-        if is_letter_only and best_ch in ['B', 'D']:
-            right_mid_edge = p_norm[14:18, 16:].mean()
-            if right_mid_edge >= 0.55:
-                best_ch = 'D'
-            elif mid_center_val >= 0.65 and right_mid_edge < 0.35:
-                best_ch = 'B'
-
-        # Quy tắc 5: Chữ M (2 cột trụ thẳng đứng 2 bên cạnh phân biệt với chữ X, N)
-        if is_letter_only and best_ch in ['X', 'M', 'N', 'H']:
-            left_col_solid = (p_norm[6:26, :5].mean() > 0.45)
-            right_col_solid = (p_norm[6:26, -5:].mean() > 0.45)
-            if left_col_solid and right_col_solid:
-                if best_ch in ['X', 'H']:
-                    best_ch = 'M'
-                elif best_ch == 'N':
-                    left_leg = p_norm[20:31, 2:6].mean()
-                    right_leg = p_norm[20:31, 14:18].mean()
-                    bot_mid = p_norm[24:31, 8:12].mean()
-                    if left_leg > 0.70 and right_leg > 0.70 and bot_mid < 0.35 and scores.get('M', 0.0) >= 0.48:
-                        best_ch = 'M'
-
-        # Quy tắc 6: Phân biệt 7, 2, 3
-        if is_digit_only and best_ch in ['7', '2', '3', '8', 'Z'] and best_ch != '4':
-            top_bar = p_norm[:4, :].sum(axis=1).mean()
-            bot_bar = p_norm[-4:, :].sum(axis=1).mean()
-            left_indent = (p_norm[8:14, :5].mean() < 0.20 and p_norm[20:26, :5].mean() < 0.20)
-            mid_bar = p_norm[14:18, 5:14].mean() > 0.50
-
-            if ranked[0][0] == "3" and left_indent:
-                best_ch = "3"
-            elif top_bar > 15.0 and bot_bar < 8.0:
-                best_ch = '7'
-            elif ranked[0][0] == '2':
-                best_ch = '2'
-            elif left_indent and mid_bar:
-                best_ch = '3'
-            elif bot_bar > 14 and not left_indent and best_ch in ['2', '7']:
-                best_ch = '2'
-
-        return best_ch, round(float(best_score), 2)
+from .glyph_matcher import TemplateMatcher
 
 
 _GLOBAL_MATCHER = None
@@ -214,81 +170,63 @@ def get_template_matcher() -> TemplateMatcher:
 
 
 def binarize_cropped_plate(cropped_pil: Image.Image) -> np.ndarray:
-    """
-    Tiền xử lý và nhị phân hóa ảnh biển số xe kết hợp các kỹ thuật xử lý ảnh:
-    - Kích thước quá nhỏ / Resolution thấp: Tự động nội suy Bicubic và Unsharp Masking.
-    - Thiếu sáng / Tối: Kéo giãn phân vị động và Gamma correction.
-    - Loá sáng / Phản xạ: Cắt đỉnh chói và phân ngưỡng thích nghi cục bộ Sauvola.
-    - Dính bẩn / Che khuất: Hàn gắn nét ký tự bằng Morphology Closing & Black-Hat.
-    """
-    # 1. Xử lý ảnh kích thước quá nhỏ / Resolution thấp
-    cw, ch = cropped_pil.size
-    if ch < 120:
-        scale_up = 120.0 / float(ch)
-        new_cw = max(1, int(round(cw * scale_up)))
-        cropped_pil = cropped_pil.resize((new_cw, 120), Image.Resampling.BICUBIC)
-        gray = rgb_to_grayscale(np.array(cropped_pil))
-        gray = unsharp_mask(gray, amount=1.2, kernel_size=3, sigma=0.8)
-    else:
-        gray = rgb_to_grayscale(np.array(cropped_pil))
-
-    # 2. Xử lý ảnh thiếu sáng / tối hoặc loá sáng bằng CLAHE
-    try:
-        from image_processing.preprocessing import apply_clahe_contrast
-        gray = apply_clahe_contrast(gray, clip_limit=2.5, tile_grid_size=(8, 8))
-    except Exception:
-        gray = enhance_contrast_dynamic(gray, p_low=2.0, p_high=98.0)
-
-    h, w = gray.shape
-
-    # 3. Phân đoạn ảnh (Image Segmentation) bóc tách ký tự
-    try:
-        import cv2
-        char_bin_adapt = cv2.adaptiveThreshold(
-            gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-            cv2.THRESH_BINARY_INV, 31, 8
-        )
-    except Exception:
-        char_bin_adapt = None
-
-    y1, y2 = max(0, int(h * 0.08)), min(h, int(h * 0.92))
-    x1, x2 = max(0, int(w * 0.06)), min(w, int(w * 0.94))
-
-    inner_gray = gray[y1:y2, x1:x2]
-    if inner_gray.size == 0:
-        inner_gray = gray
-
-    _, t = otsu_threshold(inner_gray)
-    char_bin_otsu = (gray < t).astype(np.uint8) * 255
-
-    if char_bin_adapt is not None:
-        otsu_density = float(np.mean(char_bin_otsu > 0))
-        if otsu_density < 0.10 or otsu_density > 0.55:
-            char_bin = char_bin_adapt
+    """Nhị phân hóa thích nghi và bảo toàn nét chữ trên lòng biển số xe."""
+    arr = np.array(cropped_pil)
+    if arr.ndim == 3 and arr.shape[2] == 3:
+        r, g, b = arr[:, :, 0].astype(float), arr[:, :, 1].astype(float), arr[:, :, 2].astype(float)
+        is_yellow = (np.mean(r) > 80 and np.mean(g) > 70 and (np.mean(r) + np.mean(g)) / 2.0 > np.mean(b) * 1.15)
+        if is_yellow:
+            gray = np.clip((r * 0.45 + g * 0.55), 0, 255).astype(np.uint8)
         else:
-            char_bin = char_bin_otsu
+            gray = rgb_to_grayscale(arr)
     else:
-        char_bin = char_bin_otsu
+        gray = rgb_to_grayscale(arr)
+    unsharp = unsharp_mask(gray, amount=1.5, sigma=1.0)
+    # On a nearly flat background, percentile clipping can erase a sparse glyph
+    # while amplifying its sharpening halo. Preserve the full range in that case.
+    raw_lo, raw_hi = np.percentile(gray, (2, 98))
+    if raw_hi - raw_lo < .25 * float(np.ptp(gray)) and float(np.ptp(gray)) > 40:
+        lo, hi = float(unsharp.min()), float(unsharp.max())
+        enhanced = np.clip((unsharp.astype(np.float32)-lo)*255.0/max(hi-lo, 1.0), 0, 255).astype(np.uint8)
+    else:
+        enhanced = enhance_contrast_dynamic(unsharp)
 
-    # 4. Xử lý biển số bị dính bẩn / vết trầy xước: Hàn gắn nét ký tự bị đứt
-    char_bin = bridge_broken_characters(char_bin, gap_size=3)
+    h, w = enhanced.shape
+    pad_y = max(2, int(round(h * 0.06)))
+    pad_x = max(2, int(round(w * 0.05)))
+    inner = enhanced[pad_y : h - pad_y, pad_x : w - pad_x]
 
-    # 5. Triệt tiêu khung viền kim loại và ốc vít ở mép ngoài
-    margin_y = max(1, int(h * 0.06))
-    margin_x = max(1, int(w * 0.05))
-    char_bin[:margin_y, :] = 0
-    char_bin[-margin_y:, :] = 0
-    char_bin[:, :margin_x] = 0
-    char_bin[:, -margin_x:] = 0
+    if inner.size > 0:
+        _, t_otsu = otsu_threshold(inner)
+    else:
+        _, t_otsu = otsu_threshold(enhanced)
+
+    p25 = float(np.percentile(inner, 25)) if inner.size > 0 else float(np.percentile(enhanced, 25))
+    mean_inner = float(np.mean(inner)) if inner.size > 0 else float(np.mean(enhanced))
+
+    # Phát hiện nền tối / nền sáng để chọn chiến lược ngưỡng (Lỗi 3)
+    if mean_inner > 160:  # Nền sáng (biển trắng/vàng bình thường)
+        t_opt = int(round(0.80 * t_otsu + 0.20 * p25))
+        t_opt = max(40, min(200, t_opt))
+    else:  # Nền tối / thiếu sáng
+        t_opt = int(round(0.65 * t_otsu + 0.35 * p25))
+        t_opt = max(25, min(140, t_opt))
+
+    char_bin = (enhanced < t_opt)
+
+    # Khử viền mép ngoài biển số
+    b_y = max(2, int(round(h * 0.04)))
+    b_x = max(2, int(round(w * 0.03)))
+    char_bin[:b_y, :] = False
+    char_bin[-b_y:, :] = False
+    char_bin[:, :b_x] = False
+    char_bin[:, -b_x:] = False
 
     return char_bin
 
 
 def estimate_tilt_angle(candidates: List[Dict[str, Any]], h: int) -> float:
-    """
-    Ước lượng góc nghiêng (Tilt/Deskew Angle) của biển số xe bằng độ dốc trục hoành
-    của các ký tự trong dòng.
-    """
+    """Ước lượng góc nghiêng của biển số xe bằng độ dốc trục hoành của các ký tự."""
     if len(candidates) < 3:
         return 0.0
 
@@ -311,102 +249,344 @@ def estimate_tilt_angle(candidates: List[Dict[str, Any]], h: int) -> float:
 
 
 def segment_characters(char_bin: np.ndarray, plate_type: str = "double_row") -> List[Dict[str, Any]]:
-    """
-    Phân đoạn từng ký tự từ ảnh nhị phân bằng thuật toán Connected Component Labeling.
-    """
+    """Phân đoạn các ký tự bên trong lòng biển số."""
     h, w = char_bin.shape
-    components, _ = find_connected_components(char_bin, connectivity=8, compute_quad=False)
+    components, character_labels = find_connected_components(char_bin, connectivity=8, compute_quad=False)
 
-    char_candidates = []
+    candidates = []
+    min_h = int(round(h * 0.16))
+    max_h = int(round(h * 0.88)) if plate_type == "single_row" else int(round(h * 0.65))
+
     for c in components:
-        bx, by, bw, bh = c['bbox']
-        aspect_ratio = bw / float(bh) if bh > 0 else 0.0
-        h_ratio = bh / float(h)
-        w_ratio = bw / float(w)
-        density = c['density']
+        bx, by, bw, bh = c["bbox"]
+        area = c["bbox_area"]
+        density = c["density"]
 
-        if plate_type == "single_row":
-            if not (0.28 <= h_ratio <= 0.88):
-                continue
-            if not (0.015 <= w_ratio <= 0.22):
-                continue
-        else: # double_row
-            if not (0.15 <= h_ratio <= 0.52):
-                continue
-            if not (0.015 <= w_ratio <= 0.25):
-                continue
-
-        if not (0.10 <= aspect_ratio <= 1.15):
+        if bh < min_h or bh > max_h:
             continue
-        if not (0.10 <= density <= 0.88):
+        if bw < 3 or bw > int(round(w * 0.40)):
+            continue
+        # A narrow line touching the cleared crop edge is a frame fragment,
+        # not a new first/last character. Keep ordinary thin 1 inside the plate.
+        edge_x=max(2,round(w*.025))
+        if (bx<=edge_x or bx+bw>=w-edge_x) and bw/max(1,bh)<.18:
+            continue
+        if area < 25 or area > (h * w * 0.35):
             continue
 
-        patch = char_bin[by : by + bh, bx : bx + bw]
-        char_candidates.append({
+        ar = float(bw) / float(bh)
+        if not (0.07 <= ar <= 2.20):  # Hạ từ 0.10 -> 0.07 để giữ ký tự '1' rất mảnh (Lỗi 2)
+            continue
+        if not (0.15 <= density <= 0.95):
+            continue
+
+        patch = (character_labels[by : by + bh, bx : bx + bw] == c["id"])
+        candidates.append({
             "bbox": (bx, by, bw, bh),
-            "patch": patch,
             "cx": bx + bw / 2.0,
             "cy": by + bh / 2.0,
+            "area": area,
+            "patch": patch
         })
 
-    # Lọc các hộp trùng hoặc lồng bên trong nhau
-    filtered = []
-    for i, c1 in enumerate(char_candidates):
-        x1, y1, w1, h1 = c1["bbox"]
-        is_inside = False
-        for j, c2 in enumerate(char_candidates):
-            if i == j: continue
-            x2, y2, w2, h2 = c2["bbox"]
-            if (x2 <= x1 and y2 <= y1 and x2 + w2 >= x1 + w1 and y2 + h2 >= y1 + h1 and (w2*h2 > w1*h1 * 1.3)):
-                is_inside = True
+    # Khử đè lặp (NMS)
+    kept = []
+    candidates.sort(key=lambda c: c["area"], reverse=True)
+    for c in candidates:
+        bx, by, bw, bh = c["bbox"]
+        dup = False
+        for k in kept:
+            kx, ky, kw, kh = k["bbox"]
+            xi1 = max(bx, kx)
+            yi1 = max(by, ky)
+            xi2 = min(bx + bw, kx + kw)
+            yi2 = min(by + bh, ky + kh)
+            inter = max(0, xi2 - xi1) * max(0, yi2 - yi1)
+            iou = inter / float(bw * bh + kw * kh - inter) if (bw * bh + kw * kh - inter) > 0 else 0
+            if iou > 0.45:
+                dup = True
                 break
-        if not is_inside:
-            filtered.append(c1)
+        if not dup:
+            kept.append(c)
 
-    return filtered
+    return kept
 
 
-def recognize_license_plate(cropped_pil: Image.Image, plate_type: str = "double_row") -> Dict[str, Any]:
-    """
-    Hàm nhận diện toàn diện biển số xe:
-    1. Nhị phân hóa chính xác lòng biển số (hỗ trợ chống tối, chống lóa)
-    2. Tự động hiệu chỉnh góc nghiêng (Auto-Deskew) cho ảnh chụp xiên/nghiêng
-    3. Tách từng ký tự
-    4. Nhận dạng theo chuẩn cấu trúc biển số Việt Nam
-    """
-    # 1. Nhị phân hoá ảnh ban đầu ở góc 0 độ
-    char_bin = binarize_cropped_plate(cropped_pil)
+def _repair_row(row, mask, matcher, digit_only, max_characters=5):
+    if not row:
+        return row
+    median_y=float(np.median([c['bbox'][1] for c in row]))
+    median_h=float(np.median([c['bbox'][3] for c in row]))
+    median_cy=float(np.median([c['cy'] for c in row]))
+    result=[]
+    ordered=sorted(row,key=lambda c:c['cx'])
+    median_width=float(np.median([c['bbox'][2] for c in row]))
+    for item in ordered:
+        c=dict(item);x,y,w,h=c['bbox']
+        # Border pieces may be thick, diagonal or embossed. Test their position
+        # and separation from the text, rather than assuming all are thin lines.
+        at_left=x<mask.shape[1]*.065
+        at_right=x+w>mask.shape[1]*.935
+        isolated=False
+        if len(ordered)>=4 and item is ordered[0]:
+            isolated=ordered[1]['bbox'][0]-(x+w)>1.25*median_width
+        elif len(ordered)>=4 and item is ordered[-1]:
+            prev=ordered[-2]['bbox'];isolated=x-(prev[0]+prev[2])>1.25*median_width
+        if (at_left or at_right) and (isolated or (h<.72*median_h and abs(c['cy']-median_cy)>.20*median_h)):
+            continue
+        # A skinny frame fragment outside the text baseline is not digit 1.
+        if w/h<.17 and (x<mask.shape[1]*.20 or x+w>mask.shape[1]*.80) and abs(c['cy']-median_cy)>.25*median_h:
+            continue
+        if len(row)>=3 and h>1.25*median_h and y<median_y-.20*median_h:
+            y=max(0,round(median_y));h=min(mask.shape[0]-y,max(2,round(median_h)))
+            c['bbox']=(x,y,w,h);c['patch']=mask[y:y+h,x:x+w]
+            c['cx']=x+w/2;c['cy']=y+h/2
+        patch=c['patch'];ph,pw=patch.shape
+        if pw/ph>.70 and pw>1.35*median_width and len(row)<max_characters:
+            projection=patch.sum(axis=0)
+            left=max(2,round(pw*.25));right=min(pw-2,round(pw*.75))
+            if right>left:
+                cut=left+int(np.argmin(projection[left:right]))
+                if projection[cut]<.35*max(1,projection.max()):
+                    pieces=[patch[:,:cut],patch[:,cut:]]
+                    if all(piece.sum()>ph*2 and piece.shape[1]/ph>.12 for piece in pieces):
+                        whole=matcher.match_details(patch,is_digit_only=digit_only)['score']
+                        split=np.mean([matcher.match_details(piece,is_digit_only=digit_only)['score'] for piece in pieces])
+                        if split>whole+.025:
+                            for offset,piece in [(0,pieces[0]),(cut,pieces[1])]:
+                                q=dict(c);q['patch']=piece;q['bbox']=(int(x+offset),int(y),int(piece.shape[1]),int(ph))
+                                q['cx']=x+offset+piece.shape[1]/2;q['cy']=y+ph/2
+                                result.append(q)
+                            continue
+        result.append(c)
+    return sorted(result,key=lambda c:c['cx'])
+
+
+def _match_context(matcher, patch, is_digit_only=False, is_letter_only=False):
+    """Use syntax only as weak evidence, never force a clearly different glyph."""
+    return _apply_context(matcher.match_details(patch),is_digit_only,is_letter_only)
+
+
+def _apply_context(result,is_digit_only=False,is_letter_only=False):
+    scores=result.get('class_scores', {})
+    if not scores or not (is_digit_only or is_letter_only):
+        return result
+    allowed={ch:score for ch,score in scores.items()
+             if ch.isdigit()==is_digit_only}
+    best=max(allowed,key=allowed.get)
+    raw=result['char']
+    conflict=raw not in allowed
+    result['context_applied']=False
+    result['syntax_conflict']=conflict
+    if conflict and result['score']-allowed[best]<=.03:
+        result['char']=best
+        result['score']=allowed[best]
+        result['context_applied']=True
+        result['needs_review']=True
+        result['proposed_char']=best
+        result['syntax_conflict']=False
+    return result
+
+
+def _strip_plate_frame(mask):
+    """Remove long border lines, not short strokes inside individual glyphs."""
+    h,w=mask.shape
+    image=mask.astype(np.uint8)
+    vertical=cv2.morphologyEx(image,cv2.MORPH_OPEN,np.ones((max(3,round(h*.70)),1),np.uint8))
+    horizontal=cv2.morphologyEx(image,cv2.MORPH_OPEN,np.ones((1,max(3,round(w*.65))),np.uint8))
+    outer_v=np.zeros_like(image);outer_v[:,:max(2,round(w*.18))]=1;outer_v[:,-max(2,round(w*.18)):]=1
+    outer_h=np.zeros_like(image);outer_h[:max(2,round(h*.18))]=1;outer_h[-max(2,round(h*.18)):]=1
+    frame=(vertical & outer_v)|(horizontal & outer_h)
+    frame=cv2.dilate(frame,np.ones((3,3),np.uint8))>0
+    return mask & ~frame
+
+
+def _mask_candidates(image):
+    """Independent foreground masks; no union of all methods and noise."""
+    gray=np.array(image.convert('L'))
+    masks=[('enhanced_otsu',binarize_cropped_plate(image))]
+    _,otsu=cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    masks.append(('plain_otsu',otsu>0))
+    block=max(15,int(round(gray.shape[0]*.25))|1)
+    adaptive=adaptive_local_threshold(gray,block_size=block,k=.18,method='sauvola')==0
+    masks.append(('sauvola',adaptive))
+    # One-pixel repair at the standard crop scale, not a plate-wide closing.
+    masks.append(('sauvola_repair',cv2.morphologyEx(adaptive.astype(np.uint8),cv2.MORPH_CLOSE,np.ones((2,2),np.uint8))>0))
+    # Embossed chrome plates need local relief rather than a global dark class.
+    local=cv2.createCLAHE(clipLimit=2.,tileGridSize=(4,4)).apply(gray)
+    emboss=cv2.adaptiveThreshold(local,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,block,5)
+    masks.append(('local_relief',emboss>0))
+    augmented=[]
+    for name,mask in masks:
+        if name in ('enhanced_otsu','plain_otsu'):
+            augmented.append((name+'_frame_clean',_strip_plate_frame(mask)))
+        augmented.append((name,mask))
+    result=[];seen=set()
+    for name,mask in augmented:
+        mask=mask.copy()
+        by,bx=max(2,round(mask.shape[0]*.035)),max(2,round(mask.shape[1]*.025))
+        mask[:by]=False;mask[-by:]=False;mask[:,:bx]=False;mask[:,-bx:]=False
+        key=np.packbits(mask).tobytes()
+        if key not in seen:
+            result.append((name,mask));seen.add(key)
+    return result
+
+
+def _recognition_quality(result, plate_type):
+    chars=result.get('characters',[])
+    if not chars:
+        return -1.
+    if plate_type=='double_row':
+        nt=sum(c['row']==1 for c in chars);nb=sum(c['row']==2 for c in chars)
+        complete=3<=nt<=5 and 4<=nb<=5
+    else:
+        complete=7<=len(chars)<=9
+    confidence=result.get('avg_confidence',0.)
+    conflicts=sum(c.get('match_details',{}).get('syntax_conflict',False) for c in chars)/len(chars)
+    uncertain=sum(c.get('match_details',{}).get('needs_review',True) for c in chars)/len(chars)
+    # Distinct glyph components should not occupy the same bounding area.
+    # A connected frame can surround a real glyph, creating a high-scoring
+    # phantom letter and misleading mask fusion if chosen as the anchor.
+    collision=0.
+    for index,a in enumerate(chars):
+        ax,ay,aw,ah=a['bbox']
+        for b in chars[index+1:]:
+            if a['row']!=b['row']:
+                continue
+            bx,by,bw,bh=b['bbox']
+            overlap=max(0,min(ax+aw,bx+bw)-max(ax,bx))*max(0,min(ay+ah,by+bh)-max(ay,by))
+            collision+=overlap/max(1,min(aw*ah,bw*bh))
+    return (confidence + .18*complete - .08*uncertain - .08*conflicts
+            + .02*is_valid_vn_plate(result.get('plate_text',''))
+            + .06*result.get('ink_coverage',0.) - .20*collision)
+
+
+def _format_characters(characters,plate_type):
+    if plate_type=='double_row':
+        top=''.join(c['char'] for c in characters if c['row']==1)
+        bottom=''.join(c['char'] for c in characters if c['row']==2)
+        prefix=top[:2]+' '+top[2:] if top[:2].isdigit() and len(top)>2 else top
+        body=bottom[:3]+'.'+bottom[3:] if len(bottom)==5 else bottom
+        return (prefix+' '+body).strip() or 'KXD'
+    raw=''.join(c['char'] for c in characters)
+    match=re.fullmatch(r'(\d{2}[A-Z]{1,2})(\d{4,5})',raw)
+    if not match:
+        return raw or 'KXD'
+    prefix,body=match.groups()
+    return prefix+' '+(body[:3]+'.'+body[3:] if len(body)==5 else body)
+
+
+def _recognize_single_orientation(cropped_pil, plate_type='double_row', geometry_rectified=False):
+    if cropped_pil.height<100:
+        scale=120/cropped_pil.height
+        cropped_pil=cropped_pil.resize((max(1,round(cropped_pil.width*scale)),120),Image.Resampling.BICUBIC)
+    results=[]
+    for name,mask in _mask_candidates(cropped_pil):
+        result=_recognize_from_mask(cropped_pil,plate_type,geometry_rectified,mask_override=mask)
+        result['binarization']=name
+        results.append(result)
+    # Prefer a segmentation supported by several methods, rather than choosing
+    # a slightly higher average after accidentally dropping a difficult glyph.
+    def row_counts(result):
+        chars=result.get('characters',[])
+        return tuple(sum(c['row']==row for c in chars) for row in ([1,2] if plate_type=='double_row' else [1]))
+    from collections import Counter
+    complete=[r for r in results if ((3<=row_counts(r)[0]<=5 and 4<=row_counts(r)[1]<=5) if plate_type=='double_row' else 7<=row_counts(r)[0]<=9)]
+    pool=complete or results
+    counts=Counter(row_counts(r) for r in pool)
+    modal,support=counts.most_common(1)[0]
+    consistent=[r for r in pool if row_counts(r)==modal] if support>=2 else pool
+    best=max(consistent,key=lambda r:_recognition_quality(r,plate_type))
+    if len(consistent)<2 or not best.get('characters'):
+        return best
+    fused=[]
+    for idx,anchor in enumerate(best['characters']):
+        ax,ay,aw,ah=anchor['bbox']
+        votes=[]
+        for alternative in consistent:
+            options=[]
+            for char in alternative.get('characters',[]):
+                if char['row']!=anchor['row']:continue
+                x,y,w,h=char['bbox']
+                overlap=max(0,min(ax+aw,x+w)-max(ax,x))*max(0,min(ay+ah,y+h)-max(ay,y))
+                iou=overlap/max(1,aw*ah+w*h-overlap)
+                if iou>.4:options.append((iou,char))
+            if options:votes.append(max(options,key=lambda pair:pair[0])[1]['match_details'])
+        all_classes=set.intersection(*(set(v.get('class_scores',{})) for v in votes)) if votes else set()
+        if len(votes)<2 or not all_classes:
+            fused.append(anchor);continue
+        scores={ch:float(np.mean([v['class_scores'][ch] for v in votes])) for ch in all_classes}
+        ranked=sorted(scores.items(),key=lambda pair:(-pair[1],pair[0]));char,score=ranked[0]
+        margin=score-ranked[1][1]
+        details={'char':char,'score':round(score,4),'raw_char':char,'proposed_char':char,
+                 'class_scores':scores,'rule_applied':False,'backend':'shape-v2',
+                 'margin':round(margin,4),
+                   'needs_review':score<.65 or margin<.025 or len({v['char'] for v in votes})>1,
+                   'mask_disagreement':len({v['char'] for v in votes})>1,
+                 'top_candidates':[{'char':ch,'score':round(sc,4)} for ch,sc in ranked[:3]]}
+        row_chars=[c for c in best['characters'] if c['row']==anchor['row']]
+        position=row_chars.index(anchor)
+        if plate_type=='double_row' and anchor['row']==2:
+            digit,letter=True,False
+        elif plate_type=='single_row':
+            digit,letter=position!=2,position==2
+        else:
+            digit=position in ([0,1,4] if len(row_chars)>=5 else [0,1])
+            letter=position in ([2,3] if len(row_chars)>=5 else [2])
+        details=_apply_context(details,digit,letter)
+        copy=dict(anchor,char=details['char'],score=details['score'],match_details=details)
+        fused.append(copy)
+    best=dict(best)
+    best['characters']=fused
+    best['plate_text']=_format_characters(fused,plate_type)
+    best['avg_confidence']=round(float(np.mean([c['score'] for c in fused])),3)
+    best['uncertain_positions']=[i for i,c in enumerate(fused) if c['match_details'].get('needs_review',True)]
+    best['needs_review']=bool(best['uncertain_positions']) or not is_valid_vn_plate(best['plate_text'])
+    best['binarization_methods']=[r['binarization'] for r in consistent]
+    return best
+
+
+def _recognize_from_mask(
+    cropped_pil: Image.Image,
+    plate_type: str = "double_row",
+    geometry_rectified: bool = False,
+    mask_override=None
+) -> Dict[str, Any]:
+    """Quy trình nhận diện ký tự trên một hướng ảnh cụ thể."""
+    # [P07]: Chuẩn hóa kích thước crop nhỏ (upscale giữ tỷ lệ nếu H < 100)
+    if cropped_pil.height < 100:
+        scale = 120.0 / float(cropped_pil.height)
+        new_w = max(1, int(round(cropped_pil.width * scale)))
+        new_h = 120
+        cropped_pil = cropped_pil.resize((new_w, new_h), resample=Image.Resampling.BICUBIC)
+
+    char_bin = binarize_cropped_plate(cropped_pil) if mask_override is None else mask_override.copy()
     h, w = char_bin.shape
     candidates = segment_characters(char_bin, plate_type=plate_type)
 
-    # 2. Xử lý trường hợp ảnh chụp nghiêng / biến dạng góc (Auto-Deskewing):
-    # Ước lượng góc nghiêng từ dãy ký tự ban đầu
+    # [P08]: Bổ sung nhị phân hóa cục bộ Sauvola khi Otsu toàn cục bắt thiếu ký tự
+    if len(candidates) < 4 and mask_override is None:
+        gray_crop = np.array(cropped_pil.convert("L"))
+        bs = max(15, int(round(cropped_pil.height * 0.35)))
+        if bs % 2 == 0:
+            bs += 1
+        # The helper returns a binary image, not the local threshold matrix.
+        sauv_bin = adaptive_local_threshold(gray_crop, block_size=bs, k=0.18, method="sauvola") == 0
+        by, bx = max(2, round(sauv_bin.shape[0] * 0.04)), max(2, round(sauv_bin.shape[1] * 0.03))
+        sauv_bin[:by, :] = sauv_bin[-by:, :] = False
+        sauv_bin[:, :bx] = sauv_bin[:, -bx:] = False
+        cands_sauv = segment_characters(sauv_bin, plate_type=plate_type)
+        if len(cands_sauv) > len(candidates):
+            candidates = cands_sauv
+            char_bin = sauv_bin
+            h, w = char_bin.shape
+
     tilt_cands = estimate_tilt_angle(candidates, h)
+    needs_deskew = (abs(tilt_cands) >= 2.5) or (len(candidates) < 6)
 
-    # Ước lượng góc nghiêng từ mô-men trung tâm bậc 2 (2nd-order Central Moments)
-    # trên vùng nền sáng của biển số (theo giáo trình Xử lý ảnh số - Đặc trưng hình học đối tượng)
-    arr_c = np.array(cropped_pil)
-    if arr_c.ndim == 3:
-        lum_c = 0.299 * arr_c[..., 0] + 0.587 * arr_c[..., 1] + 0.114 * arr_c[..., 2]
-    else:
-        lum_c = arr_c.astype(float)
-    bright_mask = lum_c > np.percentile(lum_c, 55)
-    ys_m, xs_m = np.where(bright_mask)
-    if len(xs_m) > 100:
-        xm_c, ym_c = np.mean(xs_m), np.mean(ys_m)
-        u20 = np.mean((xs_m - xm_c)**2)
-        u02 = np.mean((ys_m - ym_c)**2)
-        u11 = np.mean((xs_m - xm_c) * (ys_m - ym_c))
-        tilt_moments = float(np.degrees(0.5 * np.arctan2(2 * u11, u20 - u02)))
-    else:
-        tilt_moments = 0.0
-
-    # Nếu có dấu hiệu nghiêng xiên hoặc số ký tự thu được ban đầu < 6, tiến hành tìm góc nắn thẳng tối ưu
-    needs_deskew = (abs(tilt_cands) >= 2.5) or (abs(tilt_moments) >= 4.0) or (len(candidates) < 6)
-    if needs_deskew:
+    if needs_deskew and not geometry_rectified and mask_override is None:
         test_angles = [0.0]
-        candidate_pool = [-tilt_cands, tilt_cands, -tilt_moments, tilt_moments, -18.0, -15.0, -12.0, 12.0, 15.0, 18.0]
-        for a in candidate_pool:
+        for a in [-tilt_cands, tilt_cands, -18.0, -15.0, -12.0, 12.0, 15.0, 18.0]:
             if abs(a) >= 2.5 and not any(abs(a - ta) < 1.0 for ta in test_angles):
                 test_angles.append(a)
 
@@ -415,11 +595,17 @@ def recognize_license_plate(cropped_pil: Image.Image, plate_type: str = "double_
         best_bin = char_bin
         best_pil = cropped_pil
 
+        # [P04]: Ước lượng màu nền sáng để đệm viền xoay, chống cắt mép và chống sinh rác đen
+        arr_c = np.array(cropped_pil)
+        if arr_c.ndim == 3:
+            bg_val = tuple(np.percentile(arr_c, 75, axis=(0, 1)).astype(int))
+        else:
+            bg_val = int(np.percentile(arr_c, 75))
+
         for ang in test_angles:
-            rot_pil = cropped_pil.rotate(ang, resample=Image.Resampling.BICUBIC) if abs(ang) > 0.5 else cropped_pil
-            rot_bin = binarize_cropped_plate(rot_pil)
+            rot_pil = cropped_pil.rotate(ang, resample=Image.Resampling.BICUBIC, expand=True, fillcolor=bg_val) if abs(ang) > 0.5 else cropped_pil
+            rot_bin = binarize_cropped_plate(rot_pil) if abs(ang) > 0.5 else char_bin
             cands_rot = segment_characters(rot_bin, plate_type=plate_type)
-            rh, rw = rot_bin.shape
 
             if plate_type == "double_row" and len(cands_rot) >= 4:
                 all_cys = [c['cy'] for c in cands_rot]
@@ -429,10 +615,10 @@ def recognize_license_plate(cropped_pil: Image.Image, plate_type: str = "double_
                 sc = 0.0
                 if 3 <= len(top_c) <= 5: sc += 3.5
                 if 4 <= len(bot_c) <= 6: sc += 4.5
-                if len(top_c) >= 3:
-                    sc += max(0.0, 2.0 - np.var([c['cy'] for c in top_c]) / 40.0)
-                if len(bot_c) >= 3:
-                    sc += max(0.0, 2.0 - np.var([c['cy'] for c in bot_c]) / 40.0)
+                vt = np.var([c['cy'] for c in top_c]) if len(top_c) >= 3 else 999.0
+                vb = np.var([c['cy'] for c in bot_c]) if len(bot_c) >= 3 else 999.0
+                if len(top_c) >= 3: sc += max(0.0, 2.0 - vt / 40.0)
+                if len(bot_c) >= 3: sc += max(0.0, 2.0 - vb / 40.0)
             else:
                 sc = float(len(cands_rot))
                 if len(cands_rot) >= 5:
@@ -450,70 +636,86 @@ def recognize_license_plate(cropped_pil: Image.Image, plate_type: str = "double_
             cropped_pil = best_pil
             h, w = char_bin.shape
 
+    # [P05]: Xác nhận lại bố cục một/hai dòng dựa trên phân bố ký tự sau khi nắn thẳng
+    if len(candidates) >= 4:
+        cys = [c["cy"] for c in candidates]
+        y_span = max(cys) - min(cys)
+        c_h = np.median([c["bbox"][3] for c in candidates])
+        if plate_type == "double_row" and y_span < 0.28 * c_h and (w / float(h)) >= 2.2:
+            plate_type = "single_row"
+        elif plate_type == "single_row" and y_span > 0.85 * c_h and (w / float(h)) < 2.5:
+            plate_type = "double_row"
+
     matcher = get_template_matcher()
 
     if not candidates or len(candidates) < 2:
         return {
             "plate_text": "KXD",
+            "needs_review": True,
+            "uncertain_positions": [],
+            "recognizer": "shape-v2",
             "char_count": len(candidates),
             "avg_confidence": 0.0,
-            "characters": []
+            "characters": [],
+            "deskewed_image": cropped_pil
         }
 
     recognized_chars = []
 
     if plate_type == "double_row":
-        # Tự động chia dòng 1 và dòng 2 bằng tâm phân vị dọc (Adaptive Vertical Clustering)
-        # đảm bảo chính xác tuyệt đối kể cả khi ảnh cắt có lề hoặc biển số bị nghiêng
-        if len(candidates) >= 4:
-            all_cys = [c['cy'] for c in candidates]
-            mid_cand = (min(all_cys) + max(all_cys)) / 2.0
-            top_group = [cy for cy in all_cys if cy < mid_cand]
-            bot_group = [cy for cy in all_cys if cy >= mid_cand]
-            if top_group and bot_group:
-                split_y = (max(top_group) + min(bot_group)) / 2.0
+        # Phân tách 2 hàng bằng khe hở lớn nhất (Max Vertical Gap) giữa 2 cụm ký tự thay vì (min+max)/2
+        all_cys = sorted([c["cy"] for c in candidates])
+        if len(all_cys) >= 4:
+            gaps = [(all_cys[i+1] - all_cys[i], (all_cys[i+1] + all_cys[i]) / 2.0) for i in range(len(all_cys) - 1)]
+            y_span = max(all_cys) - min(all_cys)
+            valid_gaps = [g for g in gaps if (min(all_cys) + 0.20 * y_span) <= g[1] <= (min(all_cys) + 0.80 * y_span)]
+            if valid_gaps:
+                split_y = max(valid_gaps, key=lambda g: g[0])[1]
             else:
-                split_y = float(np.median(all_cys))
+                split_y = (min(all_cys) + max(all_cys)) / 2.0
         else:
-            split_y = h * 0.48
-
+            split_y = (min(all_cys) + max(all_cys)) / 2.0
         top_row = [c for c in candidates if c["cy"] < split_y]
         bot_row = [c for c in candidates if c["cy"] >= split_y]
-
-        # Khử các đốm nhiễu viền khung / ốc vít có chiều cao hoặc tọa độ y bất thường ở dòng 2
-        if len(bot_row) > 5:
-            med_h = float(np.median([c['bbox'][3] for c in bot_row]))
-            med_y = float(np.median([c['cy'] for c in bot_row]))
-            bot_row = [
-                c for c in bot_row
-                if abs(c['bbox'][3] - med_h) <= 0.35 * med_h and abs(c['cy'] - med_y) <= 0.18 * h
-            ]
-
-        # Biển số xe máy Việt Nam dòng 2 có tối đa 5 chữ số:
-        # Nếu dư ký tự do viền mép / ốc vít, loại bỏ ký tự nhiễu biên để giữ đúng 5 số
-        while len(bot_row) > 5:
-            first_c = bot_row[0]
-            last_c = bot_row[-1]
-            if last_c['bbox'][2] < 26 or last_c['bbox'][0] > w * 0.85:
-                bot_row.pop(-1)
-            elif first_c['bbox'][2] < 26 or first_c['bbox'][0] < w * 0.08:
-                bot_row.pop(0)
-            else:
-                # Loại ký tự có điểm tin cậy thấp nhất
-                min_idx = min(range(len(bot_row)), key=lambda i: matcher.match(bot_row[i]['patch'], is_digit_only=True)[1])
-                bot_row.pop(min_idx)
 
         top_row.sort(key=lambda c: c["cx"])
         bot_row.sort(key=lambda c: c["cx"])
 
+        # Lọc đốm nhiễu ốc vít / bóng viền nếu số ký tự quá nhiều
+        if top_row:
+            min_top_x = min([c['cx'] for c in top_row])
+        else:
+            min_top_x = 0
+
+        if len(top_row) > 5:
+            med_h = np.median([c['bbox'][3] for c in top_row])
+            top_row = [c for c in top_row if med_h * 0.70 <= c['bbox'][3] <= med_h * 1.35]
+            if len(top_row) > 5:
+                top_row = top_row[:5]
+
+        if len(bot_row) > 5:
+            med_h = np.median([c['bbox'][3] for c in bot_row])
+            bot_row = [
+                c for c in bot_row
+                if (med_h * 0.70 <= c['bbox'][3] <= med_h * 1.35) and (c['cx'] >= min_top_x - 30)
+            ]
+            if len(bot_row) > 5:
+                bot_row = bot_row[:5]
+
+        # Repair rows without discarding the left side of a touching pair.
+        # The old artifact rule could turn a connected "60" into just "0".
+        top_row = _repair_row(top_row, char_bin, matcher, digit_only=False)
+        bot_row = _repair_row(bot_row, char_bin, matcher, digit_only=True)
+
         top_text = ""
         top_scores = []
         for idx, c in enumerate(top_row):
-            # Biển 2 dòng:
-            # - Ký tự 0, 1: Luôn là số tỉnh (ví dụ 18, 37, 90)
-            # - Ký tự 2: Luôn là chữ cái series (ví dụ M, A, B)
-            # - Nếu dòng trên có 5 ký tự (ví dụ 18-MD2): Ký tự 3 là chữ cái (D), ký tự 4 là số (2)
-            # - Nếu dòng trên có 4 ký tự: Ký tự 3 có thể là chữ cái (37-AC) hoặc chữ số (90-B3)
+            # Cú pháp dòng 1:
+            # - Vị trí 0, 1: Bắt buộc là số (Mã tỉnh) -> is_digit_only=True
+            # - Vị trí 2: Bắt buộc là chữ cái (Series) -> is_letter_only=True
+            # - Vị trí 3:
+            #   + Nếu có 5 ký tự (18-MD2): vị trí 3 là chữ, vị trí 4 là số
+            #   + Nếu có 4 ký tự: vị trí 3 có thể là chữ (98-AA, 37-AC) hoặc số (34-B4, 90-B3)
             if len(top_row) >= 5:
                 is_digit = (idx in [0, 1, 4])
                 is_letter = (idx in [2, 3])
@@ -521,95 +723,133 @@ def recognize_license_plate(cropped_pil: Image.Image, plate_type: str = "double_
                 is_digit = (idx in [0, 1])
                 is_letter = (idx == 2)
 
-            ch, score = matcher.match(c["patch"], is_digit_only=is_digit, is_letter_only=is_letter)
-            
-            # Post-processing quy đổi ký tự nhầm lẫn:
-            if is_digit:
-                digit_map = {'O': '0', 'D': '0', 'Q': '0', 'I': '1', 'L': '1', 'T': '1', 'Z': '2', 'S': '5', 'B': '8'}
-                ch = digit_map.get(ch, ch)
-            elif is_letter:
-                letter_map = {'0': 'D', '1': 'I', '8': 'B'}
-                ch = letter_map.get(ch, ch)
-
+            match_info = _match_context(matcher,c["patch"],is_digit_only=is_digit,is_letter_only=is_letter)
+            ch, score = match_info["char"], match_info["score"]
             top_text += ch
             top_scores.append(score)
-            recognized_chars.append({"char": ch, "score": score, "row": 1, "bbox": c["bbox"]})
+            recognized_chars.append({"char": ch, "score": score, "row": 1, "bbox": c["bbox"], "match_details": match_info})
 
         bot_text = ""
         bot_scores = []
         for idx, c in enumerate(bot_row):
-            # Dòng dưới luôn là các chữ số
-            ch, score = matcher.match(c["patch"], is_digit_only=True)
-            
-            # Post-processing chuẩn hóa ký tự nhầm lẫn sang chữ số
-            digit_map = {'O': '0', 'D': '0', 'Q': '0', 'I': '1', 'L': '1', 'T': '1', 'Z': '2', 'S': '5', 'B': '8'}
-            ch = digit_map.get(ch, ch)
-
+            # Dòng 2 bắt buộc 100% là chữ số
+            match_info = _match_context(matcher,c["patch"],is_digit_only=True)
+            ch, score = match_info["char"], match_info["score"]
             bot_text += ch
             bot_scores.append(score)
-            recognized_chars.append({"char": ch, "score": score, "row": 2, "bbox": c["bbox"]})
+            recognized_chars.append({"char": ch, "score": score, "row": 2, "bbox": c["bbox"], "match_details": match_info})
 
-        # Định dạng chuẩn biển số 2 dòng: ví dụ 18-MD2 074.73
         if len(top_text) >= 3 and len(bot_text) >= 4:
             if len(bot_text) == 5:
                 formatted_bot = f"{bot_text[:3]}.{bot_text[3:]}"
             else:
                 formatted_bot = bot_text
-            formatted_top = f"{top_text[:2]}-{top_text[2:]}"
+
+            if len(top_text) >= 4 and top_text[2:4].isalpha():
+                formatted_top = f"{top_text[:2]}-{top_text[2:]}"
+            elif len(top_text) >= 4:
+                formatted_top = f"{top_text[:2]}-{top_text[2:]}"
+            else:
+                formatted_top = f"{top_text[:2]}-{top_text[2:]}"
+
+            if not top_text[:2].isdigit():
+                formatted_top = top_text
             plate_text = f"{formatted_top} {formatted_bot}"
-        elif top_text and bot_text:
-            plate_text = f"{top_text}-{bot_text}"
-        elif top_text:
-            plate_text = top_text
-        elif bot_text:
-            plate_text = bot_text
         else:
-            plate_text = "KXD"
+            plate_text = f"{top_text} {bot_text}" if (top_text or bot_text) else "KXD"
 
         all_scores = top_scores + bot_scores
         avg_score = float(np.mean(all_scores)) if all_scores else 0.0
 
-    else: # single_row
+    else:  # single_row (Biển 1 dòng)
+        if len(candidates) >= 4:
+            med_cy = float(np.median([c['cy'] for c in candidates]))
+            med_h = float(np.median([c['bbox'][3] for c in candidates]))
+            candidates = [
+                c for c in candidates
+                if abs(c['cy'] - med_cy) <= 0.35 * med_h and abs(c['bbox'][3] - med_h) <= 0.40 * med_h
+            ]
+
+        candidates = _repair_row(candidates, char_bin, matcher, digit_only=False, max_characters=9)
         candidates.sort(key=lambda c: c["cx"])
         plate_text_chars = []
         scores = []
         for idx, c in enumerate(candidates):
-            is_digit = (idx < 2)
+            is_digit = (idx < 2 or idx > 2)
             is_letter = (idx == 2)
-            ch, score = matcher.match(c["patch"], is_digit_only=is_digit, is_letter_only=is_letter)
-            
-            # Post-processing quy đổi ký tự nhầm lẫn:
-            if is_digit or idx > 2:
-                digit_map = {'O': '0', 'D': '0', 'Q': '0', 'I': '1', 'L': '1', 'T': '1', 'Z': '2', 'S': '5', 'B': '8'}
-                ch = digit_map.get(ch, ch)
-            elif is_letter:
-                letter_map = {'0': 'D', '1': 'I', '8': 'B'}
-                ch = letter_map.get(ch, ch)
 
+            match_info = _match_context(matcher,c["patch"],is_digit_only=is_digit,is_letter_only=is_letter)
+            ch, score = match_info["char"], match_info["score"]
             plate_text_chars.append(ch)
             scores.append(score)
-            recognized_chars.append({"char": ch, "score": score, "row": 1, "bbox": c["bbox"]})
+            recognized_chars.append({"char": ch, "score": score, "row": 1, "bbox": c["bbox"], "match_details": match_info})
 
         raw_text = "".join(plate_text_chars)
         if len(raw_text) >= 6:
-            # Ví dụ: 30F-123.45
             prefix = raw_text[:3]
             body = raw_text[3:]
-            if len(body) == 5:
+            if len(body) >= 5:
                 plate_text = f"{prefix}-{body[:3]}.{body[3:]}"
             else:
                 plate_text = f"{prefix}-{body}"
-        elif len(raw_text) > 3:
-            plate_text = f"{raw_text[:3]}-{raw_text[3:]}"
         else:
             plate_text = raw_text if raw_text else "KXD"
 
         avg_score = float(np.mean(scores)) if scores else 0.0
 
+    covered=np.zeros_like(char_bin,dtype=bool)
+    for character in recognized_chars:
+        bx,by,bw,bh=character['bbox']
+        covered[by:by+bh,bx:bx+bw]=True
+    coverage=float(np.sum(char_bin & covered)/max(1,np.sum(char_bin)))
+    uncertain = [i for i,c in enumerate(recognized_chars)
+                 if c.get("match_details", {}).get("needs_review", True)]
     return {
+        "ink_coverage": coverage,
+        "needs_review": bool(uncertain) or not is_valid_vn_plate(plate_text),
+        "uncertain_positions": uncertain,
+        "recognizer": "shape-v2",
         "plate_text": plate_text,
         "char_count": len(recognized_chars),
         "avg_confidence": round(avg_score, 3),
         "characters": recognized_chars,
         "deskewed_image": cropped_pil
     }
+
+
+def recognize_license_plate_template(cropped_pil, plate_type: str = "double_row", geometry_rectified: bool = False) -> Dict[str, Any]:
+    if isinstance(cropped_pil, np.ndarray):
+        cropped_pil = Image.fromarray(cropped_pil)
+    """
+    Hàm nhận diện toàn diện biển số xe (kèm cơ chế tự động chống lộn ngược ảnh 180°):
+    - Đánh giá nhận dạng ở hướng 0 độ và 180 độ.
+    - Ưu tiên tuyệt đối hướng khớp Regex biển số chuẩn Việt Nam hoặc đạt điểm tin cậy cao hơn.
+    """
+    res_0 = _recognize_single_orientation(cropped_pil, plate_type, geometry_rectified)
+    q0 = _recognition_quality(res_0, plate_type)
+    if q0 > .98 and not res_0.get('needs_review',True):
+        result = res_0
+    else:
+        res_180 = _recognize_single_orientation(cropped_pil.rotate(180,expand=True),plate_type,geometry_rectified)
+        q180 = _recognition_quality(res_180, plate_type)
+        result = res_180 if q180 > q0+.03 else res_0
+    # Keep layout formatting with spaces replacing '-' for clear readability
+    result = dict(result)
+    result['plate_text'] = format_plate_display(result.get('plate_text', 'KXD'), plate_type)
+    return result
+
+
+def recognize_license_plate(cropped_pil, plate_type="double_row", geometry_rectified=False, backend=None):
+    """Select an explicit reader; annotation/training never happens at prediction."""
+    import config
+    selected=backend or getattr(config,'OCR_BACKEND','template')
+    if selected=='template':
+        return recognize_license_plate_template(cropped_pil,plate_type,geometry_rectified)
+    if selected!='crnn':
+        raise ValueError('Unknown OCR backend: '+str(selected))
+    if isinstance(cropped_pil,np.ndarray):cropped_pil=Image.fromarray(cropped_pil)
+    try:
+        from learning.line_model import recognize
+        return recognize(cropped_pil,plate_type)
+    except (ImportError,FileNotFoundError) as exc:
+        raise RuntimeError('Chưa sẵn sàng bộ đọc học sâu. Chạy tools/setup_learning.ps1 hoặc chọn bộ đọc Truyền thống.') from exc

@@ -1,0 +1,12 @@
+{
+  "training_examples": 9587,
+  "training_positives": 4792,
+  "training_negatives": 4752,
+  "train_accuracy": 0.9842495045373943,
+  "val_examples": 474,
+  "val_accuracy": 0.9683544303797469,
+  "val_recall_positive": 0.9556962025316456,
+  "val_specificity_negative": 0.9746835443037974,
+  "source": "Tập huấn luyện archive/splits + calibration manifest",
+  "feature_dim": 865
+}

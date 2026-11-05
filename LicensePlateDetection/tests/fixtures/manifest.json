@@ -1,0 +1,23 @@
+[
+  {
+    "file": "docx_red_car_crop.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_fixed_validation_20261105\\cropped\\1793704680381_43902677484248231_7370845134107454326_2992417f61a9187cb53522334cf6ba7c_plate_1_double_row.png",
+    "expected_text": "34-A 789.22",
+    "split": "calibration_regression",
+    "note": "User error-document crop; not an independent benchmark"
+  },
+  {
+    "file": "docx_truck_crop.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_cases_trial_20261105\\cropped\\bien-so-xe-tai-2-1024x767_plate_1_double_row.png",
+    "expected_text": "T61 679.60",
+    "split": "calibration_regression",
+    "note": "User error-document crop; not an independent benchmark"
+  },
+  {
+    "file": "docx_29g1_user_confirmed.png",
+    "source": "D:\\hoc_tap\\hoc_tap\\nam_4\\xu_li_anh\\btl\\LicensePlateDetection\\output\\runs\\docx_fixed_validation_20261105\\cropped\\1793454835350_43902677484248231_7370845134107454326_62a98a9c6b4587de423574c2d091bab8_plate_1_double_row.png",
+    "expected_text": "29-G1 727.58",
+    "split": "calibration_regression",
+    "label_source": "Explicit user confirmation on 2026-11-05"
+  }
+]

@@ -49,6 +49,48 @@ def sobel_x(image_gray: np.ndarray) -> np.ndarray:
     return np.clip(np.round(normalized), 0, 255).astype(np.uint8)
 
 
+def combined_sobel(
+    image_gray: np.ndarray,
+    weight_x: float = 0.8,
+    weight_y: float = 0.4
+) -> np.ndarray:
+    """
+    Toán tử Sobel kết hợp cả phương X và phương Y (Combined Sobel):
+        magnitude = sqrt(weight_x * Gx^2 + weight_y * Gy^2)
+    Bắt trọn vẹn viền ký tự ngay cả khi biển số bị xoay dọc, xoay nghiêng (từ 45° đến 90°).
+
+    Args:
+        image_gray: Ảnh mức xám (H, W).
+        weight_x: Trọng số gradient phương X (mặc định 0.8).
+        weight_y: Trọng số gradient phương Y (mặc định 0.4).
+
+    Returns:
+        Ảnh gradient kết hợp sau khi chuẩn hóa về [0, 255], kiểu uint8.
+    """
+    kernel_x = np.array([
+        [-1, 0, 1],
+        [-2, 0, 2],
+        [-1, 0, 1]
+    ], dtype=np.float32)
+    kernel_y = np.array([
+        [-1, -2, -1],
+        [ 0,  0,  0],
+        [ 1,  2,  1]
+    ], dtype=np.float32)
+
+    gx = convolve2d(image_gray.astype(np.float32), kernel_x)
+    gy = convolve2d(image_gray.astype(np.float32), kernel_y)
+
+    magnitude = np.sqrt(weight_x * (gx ** 2) + weight_y * (gy ** 2))
+    max_val = np.max(magnitude)
+    if max_val > 0:
+        normalized = (magnitude / max_val) * 255.0
+    else:
+        normalized = magnitude
+
+    return np.clip(np.round(normalized), 0, 255).astype(np.uint8)
+
+
 def sobel_y(image_gray: np.ndarray) -> np.ndarray:
     """
     Toán tử Sobel theo phương Y:

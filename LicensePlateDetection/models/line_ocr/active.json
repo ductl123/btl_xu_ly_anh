@@ -1,0 +1,1178 @@
+{
+  "checkpoint": "runs/20261105T034509Z_521574/best.pth",
+  "version": "20261105T034509Z_521574",
+  "sha256": "e895d098e79b81bc46b117707ee47886fc0ba45d1bd68269115478599bd53778",
+  "dataset_hash": "221bb631a1285daec48f1a47b04e663bb3cf01d17e811c545942eb8ab9afb59f",
+  "validation": {
+    "plates": 2,
+    "correct": 2,
+    "exact_accuracy": 1.0,
+    "character_error_rate": 0.0,
+    "character_errors": 0,
+    "characters": 17,
+    "details": [
+      {
+        "id": "dbe0a2264b6941d5a74005ef",
+        "expected": "37AC17124",
+        "observed": "37AC17124"
+      },
+      {
+        "id": "c2a7dd31621c2efa82281c2f",
+        "expected": "79A36361",
+        "observed": "79A36361"
+      }
+    ]
+  },
+  "training": {
+    "plates": 224,
+    "correct": 210,
+    "exact_accuracy": 0.9375,
+    "character_error_rate": 0.02359437751004016,
+    "character_errors": 47,
+    "characters": 1992,
+    "details": [
+      {
+        "id": "b2779adaec836087805208f6",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "a936ffce74cb11b1e4be32a8",
+        "expected": "98B323451",
+        "observed": "98B323451"
+      },
+      {
+        "id": "d9bf7108f7477f42a3d4b8e7",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "32bd40ff6b91e9cb91fffc46",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "c5a7deb883f409f05c3d5eda",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "04982ed61d08fc989fc45906",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "1a93562f24be95dc43e16d16",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "e945de7d71656478f286dc91",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "d941e4bc62077607fabbbb21",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "f84fd057105213bf86d0dad1",
+        "expected": "98AA37554",
+        "observed": "98AA37554"
+      },
+      {
+        "id": "3e8141f8c22ed761dcfacdcb",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "2766ad50a16cf1a809215b47",
+        "expected": "98G109088",
+        "observed": "98G109088"
+      },
+      {
+        "id": "aa65fedd0d88b2cfa1aa3ec2",
+        "expected": "19E106057",
+        "observed": "19E106057"
+      },
+      {
+        "id": "334af2665d7d89379e555e09",
+        "expected": "98N66762",
+        "observed": "98N66762"
+      },
+      {
+        "id": "1d812e631f35ff82f7bc7768",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "9292f94a9b79c6fba3369bf0",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "79e9d72c4ad3b941993cc138",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "929aa4c0e811aa8fef56ba08",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "5613383eaa342d1088b04b52",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "36b97bc593c9ec7cb88cc64c",
+        "expected": "29C124579",
+        "observed": "29C124579"
+      },
+      {
+        "id": "3694400327a966e91ea475aa",
+        "expected": "18B182866",
+        "observed": "18B182866"
+      },
+      {
+        "id": "798276f3c18cd61c72826325",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "c8220cdba0f68b4731342b94",
+        "expected": "34A78922",
+        "observed": "34A78922"
+      },
+      {
+        "id": "25b798d25d144935a960fa77",
+        "expected": "30F51286",
+        "observed": "30F51286"
+      },
+      {
+        "id": "a1c71c10369a6de39fba67dc",
+        "expected": "89E187010",
+        "observed": "89E187010"
+      },
+      {
+        "id": "38768ac472094f1ae41fbce4",
+        "expected": "29T159736",
+        "observed": "29T159736"
+      },
+      {
+        "id": "133dc7bdb8eb8a114b8c7561",
+        "expected": "60C55555",
+        "observed": "60C55555"
+      },
+      {
+        "id": "0e0aa4731b4b63b810487fc1",
+        "expected": "T6167960",
+        "observed": "T6167960"
+      },
+      {
+        "id": "142d7a3702dcd00803b5f362",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "f6b0342e60e0a795523c7a76",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "4c5b7fed2823a8be6ec22819",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "9703c726a13756d9e465e3d0",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "300e5e100d434df3e7338fbb",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "9bc17b14730e65149f2084c2",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "06218d2fc4e74d92484d2b00",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "e983a0e14ca0e81a4b3c3a45",
+        "expected": "98B323451",
+        "observed": "98B323451"
+      },
+      {
+        "id": "128863f98b47b7ccda376d6d",
+        "expected": "98B323451",
+        "observed": "98B323451"
+      },
+      {
+        "id": "2e5a6867c859a5f41fa118ca",
+        "expected": "98B323451",
+        "observed": "98B323451"
+      },
+      {
+        "id": "54b034f7e35c68cbf76b53e3",
+        "expected": "98B323451",
+        "observed": "98B323451"
+      },
+      {
+        "id": "19ad08a747a20b075d078656",
+        "expected": "98B323451",
+        "observed": "98B323451"
+      },
+      {
+        "id": "73dadad0ce5d79e5c7c4dead",
+        "expected": "98B323451",
+        "observed": "98B323451"
+      },
+      {
+        "id": "71d6fb0e88d47398686ea2b6",
+        "expected": "98B323451",
+        "observed": "98B323451"
+      },
+      {
+        "id": "7d891fa58d26dcacf4a58966",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "d84600323b5a688c37f3ba6d",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "fc73bae94e12801f344fbc1e",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "cc2650d5a832672394263d12",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "cd855c631264c5ec0141b7a1",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "798ac80b255d3a672f487b3c",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "b7d8ab3a81be0d71fc78031e",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "16e5812637a95cf85575de99",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "c5503cc4e653dae822eb5a12",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "c8ba1a5dae739dc81279eb77",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "684c57d14b6eeba47611b6e2",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "e58a72d92a6f4b0814dbc314",
+        "expected": "18C127711",
+        "observed": "18C12771"
+      },
+      {
+        "id": "8e4b6fe4c4ab3712b55b59a2",
+        "expected": "90B331534",
+        "observed": "95B331534"
+      },
+      {
+        "id": "ad5e959178a0d7fca1ef5174",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "2d28ab131a4abec7d9e7469b",
+        "expected": "18C127711",
+        "observed": "127711"
+      },
+      {
+        "id": "a7f03463bbf320ff29adc430",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "fff7a4c31c7e2139646b6c98",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "507de00718a973910f377982",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "38b6be98fa605843891c8b3b",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "a1c067ab27512f455582498d",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "704e706449fae6cc4e692ec9",
+        "expected": "18C127711",
+        "observed": "18C12771"
+      },
+      {
+        "id": "fedda68984249533ffaef752",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "d587aee039da9cfeba84b1e8",
+        "expected": "18C127711",
+        "observed": ""
+      },
+      {
+        "id": "42afb06433840b90ee10aeab",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "1919658de0cca50e92635f4b",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "043c3a25ca51738750697cbc",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "77216003a31710055faf06ea",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "92c09fd08e052d878941c3ef",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "694bd9fd1968a215fc59b697",
+        "expected": "18C127711",
+        "observed": "18C1271"
+      },
+      {
+        "id": "fdaccfb9766c1bc8369ae894",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "934f383116d3c720b6bfd7b1",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "78f48d01663b4144694a3ed1",
+        "expected": "18C127711",
+        "observed": "181B82771"
+      },
+      {
+        "id": "dc90dc032288c0497e6f9138",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "be1ab1e8b0281092d2d8629d",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "0f8ec54e0326c74b8482bcc8",
+        "expected": "18C127711",
+        "observed": "C271"
+      },
+      {
+        "id": "62334917209138fc7e6d6801",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "be44b89624e1fee1e09e049c",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "c65e17d906bbc737ce2a75dd",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "81997d3d8c14239f9e02ea53",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "4b72ad541aad178c40382cb8",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "89a8ac837092b8f2f35ec07e",
+        "expected": "18C127711",
+        "observed": "18C127721"
+      },
+      {
+        "id": "7eb2c43577bc781df84b2b31",
+        "expected": "34B476792",
+        "observed": "34B476792"
+      },
+      {
+        "id": "91c7db2934d168912b711c5c",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "3c7e62da99bf995a80e58fe0",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "60f9eb2f02078628e49fa8f3",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "f88f04935209b2200e4f9ebc",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "03862ba1231ed2ea11b19235",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "21f551ff039fae7403f7ef25",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "a513bd7175d3344e5c64991b",
+        "expected": "90B331534",
+        "observed": "90B331534"
+      },
+      {
+        "id": "0cc4a3b101e7c653125ce449",
+        "expected": "98AA37554",
+        "observed": "98AA37554"
+      },
+      {
+        "id": "142cc1e86bb7002cd2bba119",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "d4a976be886fc4cb8dffee57",
+        "expected": "98AA37554",
+        "observed": "98AA37554"
+      },
+      {
+        "id": "b83adaa5b8ba9045272ab1bf",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "d073e177d8229bf27d420631",
+        "expected": "98AA37554",
+        "observed": "98AA37554"
+      },
+      {
+        "id": "0208392e05b4cb591e02d73e",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "f2709554d7846eaf215a1e98",
+        "expected": "98AA37554",
+        "observed": "98AA37554"
+      },
+      {
+        "id": "c46977d7e5a400dfbdc14bed",
+        "expected": "18C127711",
+        "observed": "8C17711"
+      },
+      {
+        "id": "9cf9641213c410f2f12b9688",
+        "expected": "98AA37554",
+        "observed": "98AA37554"
+      },
+      {
+        "id": "972621ffd0f518c075839abb",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "bce8d3387a6a47d8463ea101",
+        "expected": "98AA37554",
+        "observed": "98AA37554"
+      },
+      {
+        "id": "6b6d292a685fbf0e47e63749",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "381cea721d193b6fa1224523",
+        "expected": "98AA37554",
+        "observed": "98AA37554"
+      },
+      {
+        "id": "5dd7b285de996fa09f3b6c93",
+        "expected": "18C127711",
+        "observed": "18C127711"
+      },
+      {
+        "id": "4b4c993ad09686086345d4d2",
+        "expected": "98G109088",
+        "observed": "8880"
+      },
+      {
+        "id": "6bb1b3181cdcfd16a8da1482",
+        "expected": "98G109088",
+        "observed": "98G109088"
+      },
+      {
+        "id": "690683780ca8ea600a194a21",
+        "expected": "98G109088",
+        "observed": "98G109088"
+      },
+      {
+        "id": "de5c5a88dd04cabbc512ae79",
+        "expected": "98G109088",
+        "observed": "98G109088"
+      },
+      {
+        "id": "70dda45b66e15774cd45d7d6",
+        "expected": "98G109088",
+        "observed": "98G109088"
+      },
+      {
+        "id": "3af2138fac58fb2bfd349252",
+        "expected": "98G109088",
+        "observed": "98G109088"
+      },
+      {
+        "id": "778a9b23b3a63cef9561fa11",
+        "expected": "98G109088",
+        "observed": "98G109088"
+      },
+      {
+        "id": "6e8ee0cf949aa5d2e9ac2bee",
+        "expected": "19E106057",
+        "observed": "19E106057"
+      },
+      {
+        "id": "1cfbe880c6c4f4603665cdfd",
+        "expected": "19E106057",
+        "observed": "19E106057"
+      },
+      {
+        "id": "7ddd04a72b1d5845060479b2",
+        "expected": "19E106057",
+        "observed": "19E106057"
+      },
+      {
+        "id": "3dab89f0d75b01bd9820db2c",
+        "expected": "19E106057",
+        "observed": "19E106057"
+      },
+      {
+        "id": "d20e13e6b276a3a3a9265a08",
+        "expected": "19E106057",
+        "observed": "19E106057"
+      },
+      {
+        "id": "b25fcddb721e7f70945d76aa",
+        "expected": "19E106057",
+        "observed": "19E106057"
+      },
+      {
+        "id": "c243a6a89f0b096a86d99810",
+        "expected": "19E106057",
+        "observed": "19E106057"
+      },
+      {
+        "id": "5ec95fc960c275f884b89e8a",
+        "expected": "98N66762",
+        "observed": "98N66762"
+      },
+      {
+        "id": "ee291971f655d95078820223",
+        "expected": "98N66762",
+        "observed": "98N66762"
+      },
+      {
+        "id": "0119560bb5c54b04015e9812",
+        "expected": "98N66762",
+        "observed": "98N66762"
+      },
+      {
+        "id": "ee736764cd11eb0c380a0128",
+        "expected": "98N66762",
+        "observed": "98N66762"
+      },
+      {
+        "id": "18031ae683f93be5d8d41cb0",
+        "expected": "98N66762",
+        "observed": "98N66762"
+      },
+      {
+        "id": "e0cc3412e654e1b812f09b6e",
+        "expected": "98N66762",
+        "observed": "98N66762"
+      },
+      {
+        "id": "e1ebbde797816ff1962a6d1d",
+        "expected": "98N66762",
+        "observed": "98N66762"
+      },
+      {
+        "id": "878c7a4d2f7cc22305b5a625",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "845f95d6ab46f370ee54bb57",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "2be23035cb5f1ab67b000ddf",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "e66e22cb0f32e07f2f7dcd0f",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "3abbb0693c399835ccd3ccb3",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "46843f7b8255cf158db9bfac",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "3ea48cff391008b8b8a06a6b",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "c6a9f27d4a23497061d1573c",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "5f019b4bfd23cdc182d4bc01",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "42cdd57669ecd82ebf4f2406",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "833cd9876ba30dc6b270117a",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "7f933a26652a823155fb3579",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "f7f680bebda2629ac3115c7e",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "4084723bc0f06b3cc5e72658",
+        "expected": "21FA01738",
+        "observed": "21FA01738"
+      },
+      {
+        "id": "29ea9473656225b92a4b4342",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "c914395e4fffb35debb83efd",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "dc4eb6bede662cba79c834db",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "e19aed40e219085516e9e873",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "84f9bda482db5a1971238ad4",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "619e11a23203def99a94a97b",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "7daaf94379589d7f571295a4",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "eab6ea8bccd43a8dbf72cd58",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "c9cec666758eaa6b1e2203fa",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "ccbea3e3e2259b634c6c02d7",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "8e935ec85c0181f01a691a2a",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "27518e8dbcaa5d89a31840fd",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "d9caaea14ffa103253dc1681",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "056377d14c74b4ca414d8bb8",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "2f03f13856d3fffb54d356f8",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "c3dcab42bce04071c70801f8",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "7047cccea35b6f1fc1801df1",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "734c6bb056dd93340135dcbd",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "162010b72986fece98524749",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "f8570032b301bacfc508817d",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "20f5100e4b4adab65d6c9bdc",
+        "expected": "29G172758",
+        "observed": "29G172758"
+      },
+      {
+        "id": "c14ab773807e119d3aaa67ce",
+        "expected": "29C124579",
+        "observed": "29C124579"
+      },
+      {
+        "id": "b9307ec50f71266b64cadf18",
+        "expected": "29C124579",
+        "observed": "29C124579"
+      },
+      {
+        "id": "52670d2a7fc18f4871faea86",
+        "expected": "29C124579",
+        "observed": "29C124579"
+      },
+      {
+        "id": "954b423b66d021f0ad81f913",
+        "expected": "29C124579",
+        "observed": "29C124579"
+      },
+      {
+        "id": "30a1e03406c1ff85241b3ccc",
+        "expected": "29C124579",
+        "observed": "29C124579"
+      },
+      {
+        "id": "48ca74787471bfdd9e8f1bc8",
+        "expected": "29C124579",
+        "observed": "29C124579"
+      },
+      {
+        "id": "1ccd55d8f13fe560fe1c2ade",
+        "expected": "29C124579",
+        "observed": "29C124579"
+      },
+      {
+        "id": "b656155e7f5232723f5e6400",
+        "expected": "18B182866",
+        "observed": "8818881"
+      },
+      {
+        "id": "9dc665603f4b3726d4fdf7d5",
+        "expected": "18B182866",
+        "observed": "18B182866"
+      },
+      {
+        "id": "184b8eebe2bd1ef7d4b1a1e6",
+        "expected": "18B182866",
+        "observed": "18B182866"
+      },
+      {
+        "id": "efe7259523031f86bc3efce5",
+        "expected": "18B182866",
+        "observed": "18B182866"
+      },
+      {
+        "id": "844bb3d2824fbb8db6768ab2",
+        "expected": "18B182866",
+        "observed": "18B182866"
+      },
+      {
+        "id": "091ac77d99aef9124fd60754",
+        "expected": "18B182866",
+        "observed": "18B182866"
+      },
+      {
+        "id": "10ff55d0f222e226792236e5",
+        "expected": "18B182866",
+        "observed": "18B182866"
+      },
+      {
+        "id": "2ee9d300767b025c59e10552",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "c0a59963d2fd1ad565e3c072",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "cf0772e2ffd9379eb7c05b33",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "6762b327b0bac8abf1053422",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "9ae1354ce69b5e98b98224fc",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "10dd7c6dc04f401c590487de",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "696e2099c7cdaf1d8134534a",
+        "expected": "18MD207473",
+        "observed": "18MD207473"
+      },
+      {
+        "id": "47869068b0f96f6dba633588",
+        "expected": "34A78922",
+        "observed": "782"
+      },
+      {
+        "id": "e1aa7155b12f0e3631970e08",
+        "expected": "34A78922",
+        "observed": "34A78922"
+      },
+      {
+        "id": "7f633819a6976291de8a01a0",
+        "expected": "34A78922",
+        "observed": "34A78922"
+      },
+      {
+        "id": "c3b9af1718fc011ef595dd5b",
+        "expected": "34A78922",
+        "observed": "34A78922"
+      },
+      {
+        "id": "c4a332cbe68b633b2da3036c",
+        "expected": "34A78922",
+        "observed": "34A78922"
+      },
+      {
+        "id": "f66141cf43f29f66a10a1fb9",
+        "expected": "34A78922",
+        "observed": "34A78922"
+      },
+      {
+        "id": "34b11213652340e74dbe0042",
+        "expected": "34A78922",
+        "observed": "34A78922"
+      },
+      {
+        "id": "2c49e00def9e7f597c7f79e2",
+        "expected": "30F51286",
+        "observed": "30F51286"
+      },
+      {
+        "id": "5309109e31301a6e076d11cb",
+        "expected": "30F51286",
+        "observed": "30F51286"
+      },
+      {
+        "id": "3cd8cdce15735dfaf9577af2",
+        "expected": "30F51286",
+        "observed": "30F51286"
+      },
+      {
+        "id": "db31d4a6ff86004f98432b0b",
+        "expected": "30F51286",
+        "observed": "30F51286"
+      },
+      {
+        "id": "d0a94d27ca2529263486e88d",
+        "expected": "30F51286",
+        "observed": "30F51286"
+      },
+      {
+        "id": "4f6288cc018bfe2c09de73fd",
+        "expected": "30F51286",
+        "observed": "30F51286"
+      },
+      {
+        "id": "ed40869c70d8358eaae05cae",
+        "expected": "30F51286",
+        "observed": "30F51286"
+      },
+      {
+        "id": "7a65c781d9fc7af25d6ab260",
+        "expected": "89E187010",
+        "observed": "89E187010"
+      },
+      {
+        "id": "59072e8da26fa0224e646117",
+        "expected": "29T159736",
+        "observed": "29T159736"
+      },
+      {
+        "id": "826dd22f992e2815d39fc22c",
+        "expected": "89E187010",
+        "observed": "89E187010"
+      },
+      {
+        "id": "c90c4cb95df294761d7b22b0",
+        "expected": "29T159736",
+        "observed": "29T159736"
+      },
+      {
+        "id": "f2683a03decb9ebbffe13cc5",
+        "expected": "89E187010",
+        "observed": "89E187010"
+      },
+      {
+        "id": "3fb462f8e912b7c0b0777868",
+        "expected": "29T159736",
+        "observed": "29T159736"
+      },
+      {
+        "id": "49f882229b58d68a7e3e052c",
+        "expected": "89E187010",
+        "observed": "89E187010"
+      },
+      {
+        "id": "b8ffbefb7387106a2ac530af",
+        "expected": "29T159736",
+        "observed": "29T159736"
+      },
+      {
+        "id": "fbdaadf8f0d1466cd101fe43",
+        "expected": "89E187010",
+        "observed": "89E187010"
+      },
+      {
+        "id": "557e595917de07cc8d513c07",
+        "expected": "29T159736",
+        "observed": "29T159736"
+      },
+      {
+        "id": "a306005cefabdda18e4bc204",
+        "expected": "89E187010",
+        "observed": "89E187010"
+      },
+      {
+        "id": "23c5d1f92eda30b185360fb8",
+        "expected": "29T159736",
+        "observed": "29T159736"
+      },
+      {
+        "id": "1ad4aeaa7929f2c6e6575d6a",
+        "expected": "89E187010",
+        "observed": "89E187010"
+      },
+      {
+        "id": "24120956d243bab947b843ce",
+        "expected": "29T159736",
+        "observed": "29T159736"
+      },
+      {
+        "id": "b1e7b905d66e292155584199",
+        "expected": "60C55555",
+        "observed": "60C55555"
+      },
+      {
+        "id": "365cb30eb3a6223391843135",
+        "expected": "60C55555",
+        "observed": "60C55555"
+      },
+      {
+        "id": "34d2c0c68182259fc79b7a55",
+        "expected": "60C55555",
+        "observed": "60C55555"
+      },
+      {
+        "id": "5ea1763657d461a19edb2d7b",
+        "expected": "60C55555",
+        "observed": "60C55555"
+      },
+      {
+        "id": "85b7d6fac7d1b1a86cd0bdcd",
+        "expected": "60C55555",
+        "observed": "60C55555"
+      },
+      {
+        "id": "9170ff0d60b391e8f54605ca",
+        "expected": "60C55555",
+        "observed": "60C55555"
+      },
+      {
+        "id": "022ee7cab8986fa5107a2aa7",
+        "expected": "60C55555",
+        "observed": "660C55555"
+      },
+      {
+        "id": "ec2d9e7b64f9c136bc7d745a",
+        "expected": "T6167960",
+        "observed": "T6167960"
+      },
+      {
+        "id": "4970689d4a746e8c674a938f",
+        "expected": "T6167960",
+        "observed": "T6167960"
+      },
+      {
+        "id": "a55cb7a6aeb5edfd79c762ca",
+        "expected": "T6167960",
+        "observed": "T6167960"
+      },
+      {
+        "id": "1977b29d311daeb48b8b7228",
+        "expected": "T6167960",
+        "observed": "T6167960"
+      },
+      {
+        "id": "2df7e4241048663bad994bec",
+        "expected": "T6167960",
+        "observed": "T6167960"
+      },
+      {
+        "id": "176d38765e1ee7af6a1e3f63",
+        "expected": "T6167960",
+        "observed": "T6167960"
+      },
+      {
+        "id": "5dc6fd9c1c5669b1131aa7f2",
+        "expected": "T6167960",
+        "observed": "T6167960"
+      }
+    ]
+  },
+  "trained_character_counts": {
+    "1": 288,
+    "8": 184,
+    "M": 16,
+    "D": 16,
+    "2": 192,
+    "0": 128,
+    "7": 240,
+    "4": 104,
+    "3": 168,
+    "9": 168,
+    "B": 56,
+    "5": 144,
+    "6": 112,
+    "C": 40,
+    "A": 40,
+    "G": 32,
+    "E": 16,
+    "N": 8,
+    "F": 24,
+    "T": 16
+  }
+}
