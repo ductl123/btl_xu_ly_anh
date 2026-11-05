@@ -180,6 +180,7 @@ def archive_detector_proposals(
                 'aspect_ratio': ar,
                 'score': float(item['score']),  # Không cộng khống +0.15
                 'source': 'archive_detector',
+                'detector_confidence': float(item['score']),
                 'plate_type': plate_type,
                 'is_detector_proposal': True,
                 'red_ratio': red_ratio,

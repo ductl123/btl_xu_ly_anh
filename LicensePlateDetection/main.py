@@ -400,7 +400,11 @@ def process_single_image(
         valid_size_cands = []
         for c in candidates:
             bx, by, bw, bh = c['bbox']
-            if bw >= 28 and bh >= 16 and (bw * bh) >= 600:
+            regular_size = bw >= 28 and bh >= 16 and bw * bh >= 600
+            small_detector_box = (c.get('detector_confidence', 0) >= .72
+                                  and bw >= max(8, 32*scale_factor)
+                                  and bh >= max(5, 14*scale_factor))
+            if regular_size or small_detector_box:
                 valid_size_cands.append(c)
         candidates = valid_size_cands
 
@@ -482,6 +486,58 @@ def process_single_image(
                 cropped_pil = crop_std
                 ocr_res = ocr_std
 
+            # Recover characters clipped by an incomplete proposal before verification.
+            lines = ocr_res.get('line_predictions', [])
+            serial_short = (cand['plate_type'] == 'double_row' and len(lines) == 2
+                            and len(lines[1]['text']) == 4)
+            short_or_uncertain = serial_short or ocr_res.get('needs_review', True)
+            if short_or_uncertain:
+                x, y, w, h = cand['bbox']
+                left, right, vertical = (.20, .45, .20) if serial_short else (.08, .30, .10)
+                search_box = (x - round(left*w), y - round(vertical*h),
+                              w + round((left+right)*w), h + round(2*vertical*h))
+                wider_quad, _ = refine_quad_corners(
+                    orig_np_full, search_box, scale_factor, cand['plate_type'])
+                alternatives = [wider_quad] if wider_quad is not None else []
+                extended_quad = None
+                original_quad = cand.get('quad_corners')
+                if serial_short and original_quad is not None:
+                    extended = np.asarray(original_quad, dtype=np.float32).copy()
+                    extended[1] += .34 * (extended[1] - extended[0])
+                    extended[2] += .34 * (extended[2] - extended[3])
+                    extended_quad = extended
+                    alternatives.insert(0, extended_quad)
+                for wider_quad in alternatives:
+                    wider_crop = crop_license_plate(
+                        orig_pil, search_box, scale_factor, margin_ratio=.04,
+                        quad_corners=wider_quad, ordered_quad=True)
+                    wider_read = recognize_license_plate(
+                        wider_crop, plate_type=cand['plate_type'], geometry_rectified=True)
+                    wider_flat = wider_read.get('deskewed_image') or wider_crop
+                    wider_layout = plate_evidence(wider_flat, cand['plate_type'])
+                    wider_lines = wider_read.get('line_predictions', [])
+                    recovered_serial = (serial_short and len(wider_lines) == 2
+                                        and len(wider_lines[1]['text']) == 5
+                                        and wider_lines[1]['text'].startswith(lines[1]['text'])
+                                        and wider_lines[0]['text'].startswith(lines[0]['text']))
+                    old_valid = is_valid_vietnamese_plate_format(ocr_res.get('plate_text', ''))
+                    new_valid = is_valid_vietnamese_plate_format(wider_read.get('plate_text', ''))
+                    if (new_valid and wider_read.get('avg_confidence', 0) >= .78
+                            and wider_layout is not None
+                            and (recovered_serial or not old_valid)):
+                        cropped_pil, ocr_res = wider_crop, wider_read
+                        lo = np.maximum(0, np.floor(wider_quad.min(axis=0))).astype(int)
+                        hi = np.minimum(np.ceil(wider_quad.max(axis=0)),
+                                        np.ceil(np.array(orig_pil.size)*scale_factor)).astype(int)
+                        cand['bbox'] = (int(lo[0]), int(lo[1]),
+                                        int(hi[0]-lo[0]), int(hi[1]-lo[1]))
+                        cand['quad_corners'] = wider_quad
+                        if wider_quad is not extended_quad:
+                            cand['boundary_refined'] = True
+                        cand['ordered_quad'] = True
+                        cand['aspect_ratio'] = wider_crop.width / wider_crop.height
+                        break
+
             plate_text = ocr_res.get("plate_text", "KXD")
             char_count = ocr_res.get("char_count", 0)
             avg_conf = ocr_res.get("avg_confidence", 0.0)
@@ -511,7 +567,8 @@ def process_single_image(
         rejected = []
         for candidate in evaluated_cands:
             result = candidate['ocr_res']
-            evidence = plate_evidence(candidate['cropped_pil'], candidate['plate_type'])
+            measured_layout = plate_evidence(candidate['cropped_pil'], candidate['plate_type'])
+            evidence = measured_layout
             if evidence is None:
                 allow_repaired=True
                 if result.get('recognizer','').startswith('crnn'):
@@ -621,8 +678,8 @@ def process_single_image(
                 # Tiêu chuẩn giữ KXD đồng nhất cho cả DIP và Detector:
                 # Chỉ giữ KXD khi có bằng chứng vật lý chắc chắn là biển số (viền biển 4 góc hoặc nguồn boundary đã xác thực):
                 # - Có viền thực tế được xác thực (boundary_refined hoặc source=='boundary' hoặc mudguard_separated)
-                # - VÀ evidence score >= 0.82
-                # - VÀ tỷ lệ khung hình sau nắn hợp lý (0.85 <= ar <= 4.5)
+                # - VÀ có bằng chứng bố cục hoặc bộ xác minh ảnh độc lập
+                # - VÀ tỷ lệ khung hình phù hợp với biển một hoặc hai dòng
                 # - VÀ không có màu đỏ chiếm ưu thế (không phải đèn hậu/gói hàng đỏ)
                 ar = candidate.get('aspect_ratio', 1.0)
                 red_ratio = candidate.get('red_ratio', 0.0)
@@ -630,7 +687,21 @@ def process_single_image(
                                     or candidate.get('source') == 'boundary'
                                     or candidate.get('mudguard_separated', False))
 
-                if not has_solid_border or evidence.get('score', 0.0) < 0.82 or ar < 0.85 or ar > 4.5 or red_ratio > 0.30:
+                boundary_layout = candidate.get('layout_evidence', {}) if candidate.get('source') == 'boundary' else {}
+                visual_layout = measured_layout or boundary_layout
+                min_counts = (2, 3) if candidate['plate_type'] == 'double_row' else (6,)
+                counts = visual_layout.get('counts', [])
+                has_visual_rows = (len(counts) == len(min_counts)
+                                   and all(n >= minimum for n, minimum in zip(counts, min_counts))
+                                   and visual_layout.get('score', 0) >= .82)
+                if has_solid_border and not visual_layout.get('counts') and candidate['plate_type'] == 'double_row':
+                    # A reflective or worn plate may have faint, broken components.
+                    # Require independent appearance evidence and text on both rows.
+                    if len(lines) == 2 and all(len(line) >= 2 for line in lines) and ar <= 2.5:
+                        from image_processing.object_verifier import object_margin
+                        margin = object_margin(np.asarray(candidate['cropped_pil'].convert('L')))
+                        has_visual_rows = margin is not None and margin >= .50
+                if not has_solid_border or not has_visual_rows or ar < .85 or ar > 6.0 or red_ratio > .30:
                     rejected.append({'bbox': candidate['bbox'], 'reason': 'insufficient_evidence_for_kxd'})
                     continue
 

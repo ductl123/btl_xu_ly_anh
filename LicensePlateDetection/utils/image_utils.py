@@ -4,6 +4,7 @@ Sử dụng Pillow (PIL) và Matplotlib theo đúng yêu cầu công nghệ bắ
 """
 
 from pathlib import Path
+import math
 from typing import List, Dict, Any, Tuple, Union, Optional
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
@@ -99,68 +100,248 @@ def draw_bounding_boxes(
     line_width: int = 4
 ) -> Image.Image:
     """
-    Vẽ Bounding Box quanh các biển số phát hiện được trên ảnh gốc.
-    Quy đổi tọa độ từ ảnh thu nhỏ về kích thước ảnh gốc thông qua scale_factor.
+    Vẽ Bounding Box quanh các biển số phát hiện được trên ảnh gốc kèm nhãn biển số
+    màu đỏ nổi bật, to rõ, tự động co dãn theo độ phân giải ảnh và kích thước biển số.
 
     Args:
         original_pil: Ảnh gốc kích thước đầy đủ (PIL Image).
-        candidates: Danh sách các ứng viên biển số từ candidate_filter.
+        candidates: Danh sách các ứng viên biển số từ candidate_filter / main.py.
         scale_factor: Tỷ lệ co dãn (new_size / orig_size) đã dùng ở bước resize.
-        outline_color: Màu viền hộp bao (mặc định xanh lục sáng).
-        line_width: Độ dày nét vẽ viền.
+        outline_color: Màu viền hộp bao mặc định.
+        line_width: Độ dày nét vẽ viền cơ sở.
 
     Returns:
-        Bản sao ảnh gốc có vẽ bounding box và nhãn chú thích.
+        Bản sao ảnh gốc có vẽ bounding box và nhãn biển số màu đỏ rõ nét.
     """
     canvas = original_pil.copy()
     draw = ImageDraw.Draw(canvas)
     orig_w, orig_h = original_pil.size
+
+    # Độ dày nét vẽ thích ứng theo kích thước ảnh gốc
+    diag = (orig_w ** 2 + orig_h ** 2) ** 0.5
+    lw = max(line_width, int(round(diag * 0.0035)))
+
+    num_cands = len(candidates)
 
     for idx, cand in enumerate(candidates, start=1):
         x, y, w, h = cand['bbox']
         quad = cand.get('quad_corners')
         angle = cand.get('angle', 0.0)
 
-        # Chọn màu: Biển 1 dòng màu xanh lá, biển 2 dòng màu vàng cam
-        color = "#00FF00" if cand.get("plate_type") == "single_row" else "#FFD700"
+        # Chọn màu khung viền: Biển 1 dòng màu xanh lá, biển 2 dòng màu vàng tươi
+        color = "#00E676" if cand.get("plate_type") == "single_row" else "#FFD700"
 
-        # Nếu có 4 góc nghiêng và góc nghiêng đáng kể (|angle| >= 1.5 độ), vẽ đa giác 4 đỉnh
+        # Chuẩn bị thông tin hình học và góc nghiêng
+        is_tilted = False
+        top_edge_info = None
+
+        # Nếu có 4 góc nghiêng và góc nghiêng đáng kể, vẽ đa giác 4 đỉnh
         if quad is not None and len(quad) == 4 and abs(angle) >= 0.8:
             quad_orig = [(float(pt[0]) / scale_factor, float(pt[1]) / scale_factor) for pt in quad]
-            # Vẽ đa giác 4 cạnh bám sát theo độ nghiêng thực tế của biển số
-            draw.polygon(quad_orig, outline=color, width=line_width)
+            draw.polygon(quad_orig, outline=color, width=lw)
 
-            # Tọa độ nhãn đặt ở đỉnh cao nhất
-            top_pt = min(quad_orig, key=lambda pt: pt[1])
-            text_x = max(0, int(top_pt[0]))
-            text_y = max(0, int(top_pt[1]) - 22)
+            xs = [pt[0] for pt in quad_orig]
+            ys = [pt[1] for pt in quad_orig]
+            box_w_orig = max(10.0, max(xs) - min(xs))
+            box_h_orig = max(10.0, max(ys) - min(ys))
+            center_x = (min(xs) + max(xs)) / 2.0
+            top_y = min(ys)
+            bottom_y = max(ys)
+
+            # Tìm cạnh trên cùng và vector pháp tuyến ngoài của biển số nghiêng
+            q_arr = np.array(quad_orig, dtype=np.float32)
+            center_q = q_arr.mean(axis=0)
+            edges = []
+            for i in range(4):
+                p_a = q_arr[i]
+                p_b = q_arr[(i + 1) % 4]
+                mid = (p_a + p_b) / 2.0
+                if p_a[0] > p_b[0]:
+                    p_left, p_right = p_b, p_a
+                else:
+                    p_left, p_right = p_a, p_b
+                dx = p_right[0] - p_left[0]
+                dy = p_right[1] - p_left[1]
+                length = math.hypot(dx, dy)
+                if length < 1e-3:
+                    continue
+                ux = dx / length
+                uy = dy / length
+                n1 = np.array([uy, -ux])
+                n2 = np.array([-uy, ux])
+                v_out = mid - center_q
+                n = n1 if np.dot(n1, v_out) > 0 else n2
+                edges.append({
+                    'p_left': p_left,
+                    'p_right': p_right,
+                    'mid': mid,
+                    'length': length,
+                    'n': n,
+                    'angle_deg': math.degrees(math.atan2(dy, dx)),
+                    'mid_y': mid[1],
+                    'n_y': n[1]
+                })
+
+            top_cands = [e for e in edges if e['n_y'] < -0.2]
+            if not top_cands:
+                top_cands = edges
+            cand_top_edge = min(top_cands, key=lambda e: e['mid_y'])
+
+            # Chỉ áp dụng xoay nhãn theo chiều biển nếu biển thực sự nghiêng (|angle| >= 2.0 độ)
+            if abs(cand_top_edge['angle_deg']) >= 2.0:
+                is_tilted = True
+                top_edge_info = cand_top_edge
         else:
-            # Quy đổi ngược lại tọa độ gốc
             orig_x = int(round(x / scale_factor))
             orig_y = int(round(y / scale_factor))
             orig_w_box = int(round(w / scale_factor))
             orig_h_box = int(round(h / scale_factor))
 
-            # Đảm bảo không vượt quá biên ảnh
             x1 = max(0, min(orig_x, orig_w - 1))
             y1 = max(0, min(orig_y, orig_h - 1))
             x2 = max(0, min(orig_x + orig_w_box, orig_w - 1))
             y2 = max(0, min(orig_y + orig_h_box, orig_h - 1))
 
-            # Vẽ hình chữ nhật
-            draw.rectangle([x1, y1, x2, y2], outline=color, width=line_width)
-            text_x = x1
-            text_y = max(0, y1 - 22)
+            draw.rectangle([x1, y1, x2, y2], outline=color, width=lw)
+            box_w_orig = float(max(10, x2 - x1))
+            box_h_orig = float(max(10, y2 - y1))
+            center_x = (x1 + x2) / 2.0
+            top_y = float(y1)
+            bottom_y = float(y2)
 
-        # Chuẩn bị nội dung nhãn (hiển thị biển số nhận diện nếu có)
-        plate_type_vn = "1-Dong" if cand.get("plate_type") == "single_row" else "2-Dong"
-        plate_text_display = cand.get("plate_text", plate_type_vn)
-        score = cand.get('score', 0.0)
-        label_text = f"#{idx} [{plate_text_display}] AR={cand.get('aspect_ratio', 0):.2f} ({score:.2f})"
+        # Chuẩn bị nội dung biển số nhận diện
+        raw_txt = cand.get("plate_text", "")
+        if not raw_txt or raw_txt == "KXD":
+            plate_display = "Chưa đọc rõ"
+        else:
+            plate_display = raw_txt
 
-        # Vẽ nền nhãn để chữ rõ ràng
-        draw.rectangle([text_x, text_y, text_x + len(label_text) * 9, text_y + 20], fill=color)
-        draw.text((text_x + 4, text_y + 2), label_text, fill="#000000")
+        label_text = plate_display
+        char_count = max(1, len(label_text))
+
+        # Tính kích cỡ font (tăng to thêm 1 tí theo yêu cầu, vẫn vừa vặn theo chiều rộng biển)
+        ref_width = top_edge_info['length'] if is_tilted else box_w_orig
+        target_tw = max(38.0, ref_width * 0.94)
+        size_by_w = target_tw / (char_count * 0.52)
+        size_by_h = box_h_orig * 0.20
+        font_size = int(round(min(size_by_w, size_by_h)))
+        font_size = max(18, min(font_size, 46))
+
+        # Nạp font Bold của hệ thống Windows
+        font = None
+        for font_name in ["arialbd.ttf", "tahomabd.ttf", "segoeuib.ttf", "calibrib.ttf", "arial.ttf"]:
+            try:
+                font = ImageFont.truetype(font_name, font_size)
+                break
+            except Exception:
+                continue
+        if font is None:
+            font = ImageFont.load_default()
+
+        # Đo kích thước chữ thực tế
+        bbox_text = draw.textbbox((0, 0), label_text, font=font)
+        tw = bbox_text[2] - bbox_text[0]
+        th = bbox_text[3] - bbox_text[1]
+
+        # Padding gọn gàng
+        pad_x = max(4, int(round(font_size * 0.16)))
+        pad_y = max(2, int(round(font_size * 0.08)))
+        badge_w = tw + 2 * pad_x
+        badge_h = th + 2 * pad_y
+
+        # Giới hạn không vượt quá chiều dài cạnh biển
+        if badge_w > ref_width * 1.02 and font_size > 15:
+            scale_ratio = (ref_width * 0.96) / max(1.0, float(badge_w))
+            font_size = max(14, int(round(font_size * scale_ratio)))
+            try:
+                font = ImageFont.truetype("arialbd.ttf", font_size)
+                bbox_text = draw.textbbox((0, 0), label_text, font=font)
+                tw = bbox_text[2] - bbox_text[0]
+                th = bbox_text[3] - bbox_text[1]
+                pad_x = max(4, int(round(font_size * 0.16)))
+                pad_y = max(2, int(round(font_size * 0.08)))
+                badge_w = tw + 2 * pad_x
+                badge_h = th + 2 * pad_y
+            except Exception:
+                pass
+
+        # -------------------------------------------------------------
+        # VẼ NHÃN: NẾU BIỂN NGHIÊNG THÌ XOAY THEO CHIỀU BIỂN
+        # -------------------------------------------------------------
+        if is_tilted and top_edge_info is not None:
+            # Tạo ảnh nhãn RGBA
+            badge_img = Image.new("RGBA", (badge_w, badge_h), (0, 0, 0, 0))
+            bdraw = ImageDraw.Draw(badge_img)
+            radius = max(3, int(round(font_size * 0.15)))
+            border_w = max(1, int(round(font_size * 0.05)))
+            bdraw.rounded_rectangle(
+                [0, 0, badge_w - 1, badge_h - 1],
+                radius=radius,
+                fill="#FFFFFF",
+                outline="#D50000",
+                width=border_w
+            )
+            tx = pad_x - bbox_text[0]
+            ty = pad_y - bbox_text[1]
+            bdraw.text((tx, ty), label_text, font=font, fill="#D50000")
+
+            # Xoay nhãn song song theo đúng góc nghiêng cạnh trên biển số
+            rot_angle = top_edge_info['angle_deg']
+            rot_badge = badge_img.rotate(-rot_angle, resample=Image.BICUBIC, expand=True)
+            rw, rh = rot_badge.size
+
+            # Đặt nhãn nằm sát mép trên biển số (tịnh tiến theo pháp tuyến ngoài)
+            gap = max(3, int(round(font_size * 0.12)))
+            dist = badge_h / 2.0 + gap + lw / 2.0
+            nx, ny = top_edge_info['n']
+            mx, my = top_edge_info['mid']
+            cx = mx + nx * dist
+            cy = my + ny * dist
+
+            paste_x = int(round(cx - rw / 2.0))
+            paste_y = int(round(cy - rh / 2.0))
+            canvas.paste(rot_badge, (paste_x, paste_y), rot_badge)
+        else:
+            # Biển thẳng / không nghiêng: Vẽ nhãn ngang nằm sát trên đỉnh biển
+            gap = 2
+            badge_x = int(center_x - badge_w / 2.0)
+            min_x_bound = min(xs) if (quad is not None and len(quad) == 4 and abs(angle) >= 0.8) else float(x1)
+            max_x_bound = max(xs) if (quad is not None and len(quad) == 4 and abs(angle) >= 0.8) else float(x2)
+            if badge_w <= (max_x_bound - min_x_bound):
+                badge_x = max(int(min_x_bound), min(badge_x, int(max_x_bound - badge_w)))
+            else:
+                badge_x = max(2, min(badge_x, orig_w - badge_w - 2))
+
+            badge_y = int(top_y - badge_h - gap)
+            if badge_y < 2:
+                badge_y = int(bottom_y + gap)
+
+            radius = max(3, int(round(font_size * 0.15)))
+            badge_border_w = max(1, int(round(font_size * 0.05)))
+            try:
+                draw.rounded_rectangle(
+                    [badge_x, badge_y, badge_x + badge_w, badge_y + badge_h],
+                    radius=radius,
+                    fill="#FFFFFF",
+                    outline="#D50000",
+                    width=badge_border_w
+                )
+            except Exception:
+                draw.rectangle(
+                    [badge_x, badge_y, badge_x + badge_w, badge_y + badge_h],
+                    fill="#FFFFFF",
+                    outline="#D50000",
+                    width=badge_border_w
+                )
+
+            tx = badge_x + pad_x - bbox_text[0]
+            ty = badge_y + pad_y - bbox_text[1]
+            draw.text(
+                (tx, ty),
+                label_text,
+                font=font,
+                fill="#D50000"
+            )
 
     return canvas
 
